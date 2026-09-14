@@ -2,48 +2,47 @@
 
 포맷 중립 스펙. HTML 렌더러와 문서 렌더러가 동일하게 이 구조를 입력으로 받는다.
 
-**현재 버전: 2.1**
+**현재 버전: 2.2**
 
 - 2.0 — `key_takeaway` · `kpis` · `actions` · `glossary` · `calcs` · `group_detail` 추가
 - 2.1 — `brief` · `segments` 추가. exhibit에 `views`(축 전환) · `drilldown`(계층) 추가.
   action에서 `owner` 제거하고 `level` 추가
+- 2.2 — `key_takeaway.ask` 추가. `brief`에 `tension` · `mechanism` · `narrative_order` ·
+  `three_minute_story` 추가. exhibit에 `emphasis_steps` 추가
+
+---
+
+## 0. 이 문서의 코드 조각을 읽는 법
+
+아래 JSON 조각은 **설명 중인 필드의 형태만** 보여준다.
+
+- **구성을 복사하지 않는다.** exhibit이 몇 개인지, 어떤 순서인지, 어떤 차트를 쓰는지는
+  전부 `brief.questions`에서 나온다. 조각에 exhibit이 두 개 있다고 두 개를 만들지 않는다
+- **값을 복사하지 않는다.** 값은 자리를 보여주려고 넣은 것이다
+- **채워야 할 키의 목록이 아니다.** 필수 여부는 각 절의 표가 정한다.
+  선택 필드를 "예시에 있으니까" 채우지 않는다
+
+완결된 스펙 한 벌이 필요하면 `${CLAUDE_PLUGIN_ROOT}/references/examples/`를 본다.
+거기 있는 것도 **하나의 사례일 뿐 형태가 아니다.**
 
 ---
 
 ## 1. 최상위 구조
 
-```json
-{
-  "spec_version": "2.1",
-  "mode": "report",
-  "title": "쿠팡 채널 — 고객·시리즈·지역",
-  "period_badge": "2026년 8월",
-  "key_takeaway": {
-    "text": "쿠팡 구매자의 절반이 40대 여성이고, 매출의 38%가 세 시리즈에 몰려 있다",
-    "emphasis": ["절반", "세 시리즈"]
-  },
-  "audience": "본부장",
-  "decision": "9월 채널별 배본 비중 조정 여부",
-  "period": { "from": "2026-08-01", "to": "2026-08-31" },
-  "basis": "쿠팡 리포트 (판매분석 GMV, 반품 차감)",
-  "unit": "원/부",
-  "brief": { },
-  "segments": [ ],
-  "dataset_card": { },
-  "kpis": [ ],
-  "summary": [ ],
-  "exhibits": [ ],
-  "actions": [ ],
-  "glossary": [ ],
-  "calcs": [ ],
-  "footnote": { },
-  "open_questions": [ ]
-}
+키 목록이다. 값이 아니라 **어떤 키가 어느 층에 있는지**만 본다.
+
+```
+spec_version  mode  title  period_badge
+key_takeaway { text  emphasis  ask }
+audience  decision  period  basis  unit
+brief { }  segments [ ]  dataset_card { }
+kpis [ ]  exhibits [ ]  actions [ ]
+glossary [ ]  calcs [ ]  footnote { }  open_questions [ ]
 ```
 
 | 필드 | 필수 | 설명 |
 |---|---|---|
-| `spec_version` | O | 현재 `"2.1"` |
+| `spec_version` | O | 현재 `"2.2"` |
 | `mode` | O | `quick` \| `report` |
 | `title` | O | 문서 제목. 명사구 허용 (문서 이름이지 결론이 아님) |
 | `period_badge` | 선택 | 제목 옆 배지. 예: `"2026년 8월"` |
@@ -70,22 +69,14 @@
 `frame-question`이 만든 브리프를 **그대로** 넣는다. 여기서 고치지 않는다.
 질문이 바뀌어야 하면 `frame-question`으로 되돌아간다.
 
-```json
-"brief": {
-  "why_now": "9월 채널별 배본 비중 조정 판단",
-  "audience": "채널마케팅본부장",
-  "audience_level": "head",
-  "mechanism": "document",
-  "tone": "serious",
-  "narrative_order": "lead_with_ending",
-  "three_minute_story": "쿠팡을 실험 채널로 다뤄 왔는데, 8월 데이터를 보면 이미 …",
-  "tension": {
-    "what_is": "쿠팡을 실험 채널로 다루고 있다",
-    "what_could_be": "이미 당사 최대 단일 채널이고 그에 맞는 운영이 필요하다"
-  },
-  "questions": [{ "id":"q1", "text":"쿠팡에서 사는 사람은 누구인가", "why":"…" }],
-  "assumptions": [{ "text":"쿠팡 공급액 기준. 사내 SAP 출고와 합산하지 않는다", "confirmed":true }],
-  "out_of_scope": ["유입경로 분석"]
+```
+brief {
+  why_now  audience  audience_level  mechanism  tone  narrative_order
+  three_minute_story
+  tension { what_is  what_could_be }
+  questions   [{ id  text  why }]
+  assumptions [{ text  confirmed }]
+  out_of_scope [ ]
 }
 ```
 
@@ -124,13 +115,8 @@
 화면에서 **가장 큰 글자**이고 가장 먼저 읽힌다.
 **판단 한 문장 + 요청 한 줄 + 섹션 헤더 목록**, 세 부분이다.
 
-```json
-"key_takeaway": {
-  "text": "쿠팡은 다른 고객이 다른 책을 사는 채널이 아니라, 같은 책이 같은 비중으로 팔리는 당사 최대 채널이다",
-  "emphasis": ["다른 책을 사는 채널이 아니라", "당사 최대 채널"],
-  "ask": "3회차 회의에서 '쿠팡 전용 상품' 전제를 유지할지 결정해 주시기 바랍니다",
-  "ask_level": "head"
-}
+```
+key_takeaway { text  emphasis[]  ask  ask_level }
 ```
 
 | 필드 | 필수 | 설명 |
@@ -163,16 +149,8 @@
 
 히어로 아래 숫자 카드. **2~4개.** 5개를 넘으면 그건 KPI가 아니라 표다.
 
-```json
-"kpis": [
-  {
-    "label": "8월 매출",
-    "value": "546.6",
-    "unit": "백만원",
-    "delta": { "dir": "up", "text": "12.4%", "note": "전월 대비" },
-    "calc_ref": "calc-gmv"
-  }
-]
+```
+kpis [{ label  value  unit  delta { dir  text  note }  calc_ref  term_ref }]
 ```
 
 | 필드 | 필수 | 설명 |
@@ -190,43 +168,21 @@
 
 ## 5. exhibit
 
-```json
-{
-  "id": "ex5",
-  "nav_label": "지역",
-  "answers": ["q3"],
-  "action_title": "지역이 바꾸는 것은 상품이 아니라 학년이다",
-  "so_what": "지역 타깃 기획을 시도 단위로 잡으면 이 차이가 지워진다",
-  "views": [
-    {
-      "id": "by-region",
-      "label": "지역별",
-      "read": "서울·세종은 고등 우위, 제주·전북은 초등 우위다",
-      "question_type": "geo", "chart": "choropleth",
-      "data": { "columns": ["시도","고등−초등"], "rows": [["서울", 10.8]] },
-      "encoding": { "key": "시도", "value": "고등−초등", "level": "sido", "scale": "diverging" }
-    },
-    {
-      "id": "by-grade",
-      "label": "학교급별",
-      "read": "중등은 어느 지역에서나 절반을 넘는다. 갈리는 것은 고등과 초등이다",
-      "question_type": "composition", "chart": "stacked_bar_100",
-      "data": { "columns": ["시도","초등","중등","고등"], "rows": [["서울", 5.7, 51.5, 16.5]] },
-      "encoding": { "x": "시도", "y": ["초등","중등","고등"], "sort": "고등" }
-    }
-  ],
-  "drilldown": {
-    "label": "시군구",
-    "by": "지역 유형",
-    "columns": ["시군구","GMV(백만원)","초등","중등","고등","고등−초등"],
-    "rows": {
-      "학군지": [["서울 강남구", 10.2, 5.7, 51.5, 21.2, 15.5]],
-      "신도시": [["경기 김포시", 9.1, 16.4, 56.8, 12.7, -3.7]]
-    }
-  },
-  "footnote": { "source": "…", "period": "…", "unit": "…", "basis": "…" }
+```
+exhibit {
+  id  nav_label  answers[]  action_title  so_what
+  views [{ id  label  read  question_type  chart  data{columns,rows}  encoding }]
+  emphasis_steps [{ id  label  read  highlight[] }]
+  drilldown { label  by  columns  rows{} }
+  group_detail { }
+  basis  unit
+  footnote { source  period  unit  basis }
 }
 ```
+
+**exhibit이 몇 개인지, 어떤 순서인지, 어떤 차트를 쓰는지는 이 조각이 정하지 않는다.**
+`brief.questions`에 답하는 데 필요한 만큼만 만든다. 질문 하나에 exhibit 하나가 기본이고,
+한 질문을 여러 각도로 봐야 하면 `views`로 묶는다.
 
 | 필드 | 필수 | 설명 |
 |---|---|---|
@@ -248,9 +204,11 @@
 
 | 반려 | 왜 | 고친 것 |
 |---|---|---|
-| 구매자의 절반이 40대 여성이고, 40~50대가 87.4%다 — 사는 사람은 학부모다 | 주장 3개 | 사는 사람은 학생이 아니라 40대 학부모다 |
-| 수도권이 54.9%지만 나머지 45%는 251개 시군구에 흩어져 있다 — 대구·광주가 인천·부산과 같은 체급이다 | 주장 2개 | 매출의 45%는 수도권 밖 251개 시군구에 흩어져 있다 |
+| A가 절반이고 A와 B를 합치면 87%다 — 따라서 주 고객층은 X다 | 주장 3개 | 주 고객층은 우리가 가정한 Y가 아니라 X다 |
+| 상위 지역이 55%지만 나머지는 흩어져 있다 — 중위 지역이 상위권과 같은 체급이다 | 주장 2개 | 매출의 45%는 상위 지역 밖에 흩어져 있다 |
 | 채널별 현황 | 명사구 | (서술형 결론으로) |
+
+위 칸의 A·B·X는 자리표시자다. 실제 action_title은 **데이터에서 나온 말**로 쓴다.
 
 판정법 — **"그래서?"를 한 번만 물을 수 있어야 한다.** 두 번 물을 게 남으면 두 개다.
 
@@ -286,16 +244,15 @@
 한 차트로 여러 가지를 순서대로 짚어야 할 때 쓴다. **데이터·순서·축·색 체계는 전부 그대로 두고
 무엇을 강조할지만 바꾼다.**
 
-```json
-"emphasis_steps": [
-  { "id": "s1", "label": "전체",
-    "read": "8개 채널 모두 중학이 46~57%로 최대다",
-    "highlight": [] },
-  { "id": "s2", "label": "고등",
-    "read": "고등만 쿠팡에서 눈에 띄게 낮다",
-    "highlight": [{ "series": "고등" }, { "key": "쿠팡" }] }
+```
+emphasis_steps [
+  { id label read highlight[] }          # highlight 빈 배열 = 전체를 먼저 보여주는 단계
+  { id label read highlight[ {series} {key} ] }
 ]
 ```
+
+단계를 몇 개 둘지는 이 조각이 정하지 않는다. **짚어야 할 것이 몇 개인지가 정한다.**
+짚을 것이 하나뿐이면 `emphasis_steps`를 쓰지 않는다.
 
 | 필드 | 필수 | 설명 |
 |---|---|---|
@@ -320,21 +277,16 @@
 
 | | 바뀌는 것 | 예 |
 |---|---|---|
-| `views` | 축이나 단위 | 구성비(%) ↔ 절대 부수 / 지역별 ↔ 학교급별 |
-| `emphasis_steps` | 강조만 | 같은 100% 누적 막대에서 ①전체 → ②고등 강조 |
+| `views` | 축이나 단위 | 구성비(%) ↔ 절대금액 / 분류 A별 ↔ 분류 B별 |
+| `emphasis_steps` | 강조만 | 같은 차트에서 ①전체 → ②특정 계열 강조 |
 
 ### drilldown — 같은 축, 더 깊은 단위
 
 세그먼트에서 패턴을 보고, 클릭해서 개별로 내려간다.
-**시군구 251개를 처음부터 보여주지 않는다.** 유형으로 묶어 보고, 궁금하면 열게 한다.
+**개별 항목이 수백 개면 처음부터 보여주지 않는다.** 유형으로 묶어 보고, 궁금하면 열게 한다.
 
-```json
-"drilldown": {
-  "label": "시군구",
-  "by": "지역 유형",
-  "columns": ["시군구","GMV(백만원)","고등−초등"],
-  "rows": { "학군지": [["서울 강남구", 10.2, 15.5]], "신도시": [["경기 김포시", 9.1, -3.7]] }
-}
+```
+drilldown { label  by  columns[]  rows{ 그룹명: [[...]] } }
 ```
 
 - `by`는 `segments`의 세그먼트 이름. 그 그룹 값이 곧 `rows`의 키다
@@ -405,16 +357,12 @@
 
 ### glossary — 인라인 툴팁
 
-```json
-"glossary": [
-  {
-    "id": "gmv",
-    "term": "GMV",
-    "full": "Gross Merchandise Volume",
-    "desc": "플랫폼에서 거래된 총 상품 금액. 여기서는 반품을 차감한 순액이다. 사내 SAP 출고 기준과 다르므로 합산하지 않는다."
-  }
-]
 ```
+glossary [ { id term full desc } ]
+```
+
+`desc`는 뜻만 적고 끝내지 않는다. **그 말이 오해받는 지점이 있으면 그것까지 적는다.**
+예: 외부 플랫폼 기준 금액 지표라면 "사내 출고 기준과 다르므로 합산하지 않는다"를 `desc`에 넣는다.
 
 **다음이 본문에 등장하면 반드시 등록한다.**
 
@@ -544,23 +492,11 @@ metrics.md에 없고 확인도 안 됐으면 `desc`에 `확인 필요`를 적고
 
 ## 11. segments — 데이터에 없는 그룹
 
-"학군지 vs 신도시", "핵심 시리즈 vs 롱테일"처럼 **데이터 컬럼에는 없지만 판단에 필요한 묶음**.
+데이터 컬럼에는 없지만 판단에 필요한 묶음.
 `frame-question`에서 합의한 것을 그대로 옮긴다.
 
-```json
-"segments": [
-  {
-    "name": "지역 유형",
-    "groups": {
-      "학군지": ["서울 강남구","서울 송파구","대구 수성구","경기 부천시"],
-      "신도시": ["경기 김포시","광주 광산구","경남 김해시"],
-      "기타": []
-    },
-    "basis": "고등 비중이 전국 평균(15.5%) +5%p 이상이면 학군지, 초등 비중이 전국 평균(11.5%) +3%p 이상이면 신도시",
-    "confirmed": false,
-    "drill_to": "시군구"
-  }
-]
+```
+segments [{ name  groups{ 그룹명: [소속 값들] }  basis  confirmed  drill_to }]
 ```
 
 | 필드 | 필수 | 설명 |
@@ -578,6 +514,23 @@ metrics.md에 없고 확인도 안 됐으면 `desc`에 `확인 필요`를 적고
 - `basis`를 비워두지 않는다. 사용자가 목록만 주고 근거를 안 주면 `담당자 판단`이라고 적는다
 - 어느 그룹에도 안 들어가는 값이 있으면 `기타`를 만든다. 조용히 빼지 않는다
 - 그룹은 3~5개. 넘으면 묶는 의미가 없다
+
+### 분류 근거가 결과에서 나오면 순환논증이다
+
+가장 자주 나오는 실패다. **결론을 만들 때 쓸 지표로 그룹을 나누면**,
+그 그룹이 그 지표에서 차이를 보이는 것은 당연하고 아무것도 증명하지 않는다.
+
+| 위험한 `basis` | 왜 |
+|---|---|
+| "지표 X가 평균보다 높은 항목을 A 그룹으로" 후 "A 그룹은 X가 높다"고 서술 | 동어반복 |
+| 상위 N개를 뽑아 이름 붙인 뒤 그 이름의 특성이라고 설명 | 선택 편향. 이름의 원래 정의에 해당하는 항목이 표본에 없을 수 있다 |
+| 규모가 큰 항목만 남은 표본에서 그룹을 만들고 규모를 통제하지 않음 | 교란 |
+
+분류 축을 쓰려면 **분류 근거가 결과 변수와 독립**이어야 한다.
+`basis`는 결과를 보기 전에 정해진 외부 정의(제도·지리·조직·제품 계보 등)에서 나와야 하고,
+그렇지 않으면 그룹에 이름을 붙이지 말고 **관측된 사실 그대로**("지표 X 상위/하위") 서술한다.
+
+`confirmed: false`이면서 `basis`가 결과 변수에서 나왔으면 **스펙을 되돌린다.**
 
 ---
 
@@ -632,16 +585,15 @@ metrics.md에 없고 확인도 안 됐으면 `desc`에 `확인 필요`를 적고
 
 ## 13. footnote (공통)
 
-```json
-{
-  "source": "쿠팡 셀프서비스 리포트 CSV × Metabase core.item_lineage",
-  "period": "2026-08-01 ~ 2026-08-31",
-  "unit": "원/부",
-  "basis": "쿠팡 리포트 기준 (판매분석 GMV, 반품 차감)",
-  "extracted_at": "2026-09-14 09:30",
-  "caveats": ["ISBN 미매칭 4.5%"]
-}
 ```
+footnote { source period unit basis extracted_at caveats[] }
+```
+
+| 필드 | 무엇을 적나 |
+|---|---|
+| `source` | 원천을 **결합까지 포함해** 적는다. 두 소스를 이어 붙였으면 둘 다 적는다 |
+| `basis` | 어느 기준의 숫자인가. 같은 이름의 지표라도 기준이 다르면 다른 숫자다 |
+| `caveats` | 매칭 실패율·제외분·추정 구간 등 **숫자를 깎는 것**을 적는다. 없으면 빈 배열 |
 
 exhibit별 각주가 있으면 공통 각주를 덮어쓴다.
 
@@ -659,39 +611,20 @@ exhibit별 각주가 있으면 공통 각주를 덮어쓴다.
 
 ---
 
-## 15. 최소 예시 (quick)
+## 15. quick 모드에서 생략할 수 있는 것
 
 quick 모드는 `brief` · `kpis` · `actions` · `nav_label` · `answers` · `audience` · `decision`을 생략할 수 있다.
-**`key_takeaway`와 `glossary`는 quick에서도 필수다.**
-exhibit의 `views`는 quick에서도 배열이다 — 하나만 넣으면 토글 없이 그려진다.
 
-```json
-{
-  "spec_version": "2.1",
-  "mode": "quick",
-  "title": "월별 출고 추이",
-  "key_takeaway": {
-    "text": "6월 이후 3개월 연속 감소했으나 감소폭은 줄고 있다",
-    "emphasis": ["3개월 연속 감소", "감소폭은 줄고"]
-  },
-  "period": { "from": "2026-01-01", "to": "2026-08-31" },
-  "basis": "미확인",
-  "unit": "부",
-  "dataset_card": { "source": "출고집계.xlsx", "rows": 8, "basis": "미확인" },
-  "exhibits": [{
-    "id": "ex1",
-    "action_title": "6월 이후 3개월 연속 감소했으나 감소폭은 줄고 있다",
-    "so_what": "감소 추세가 꺾이는지 9월 데이터로 확인이 필요하다",
-    "views": [{
-      "id": "main", "label": "월별",
-      "question_type": "trend", "chart": "line",
-      "data": { "columns": ["월","출고량"], "rows": [["2026-01", 41200]] },
-      "encoding": { "x": "월", "y": "출고량", "series": null, "sort": "asc", "y_zero": false }
-    }],
-    "footnote": { "source": "출고집계.xlsx", "period": "2026-01 ~ 2026-08", "unit": "부", "basis": "미확인" }
-  }],
-  "glossary": [{ "id":"chulgo", "term":"출고량", "desc":"SAP 매출수량 기준. 집계 기준(총출고/순출고) 미확인." }],
-  "footnote": { "source": "출고집계.xlsx", "period": "2026-01-01 ~ 2026-08-31", "unit": "부", "basis": "미확인" },
-  "open_questions": ["집계 기준(총출고/순출고) 미확인"]
-}
-```
+**quick에서도 생략할 수 없는 것**
+
+- `key_takeaway` — 결론 없는 산출물은 모드와 무관하게 만들지 않는다
+- `glossary` — 읽는 사람이 모르는 말이 있으면 리포트는 그 지점에서 멈춘다
+- `footnote`의 `source` · `basis` — 기준을 못 밝힌 숫자는 쓰지 않는다
+- `open_questions` — 확인 안 된 것은 추정으로 채우지 않고 여기 올린다
+
+exhibit의 `views`는 quick에서도 배열이다. 하나만 넣으면 토글 없이 그려진다.
+
+형식이 맞는 스펙 한 벌을 대조해봐야 하면
+`${CLAUDE_PLUGIN_ROOT}/references/examples/quick-minimal.json`을 본다.
+**거기서 가져올 수 있는 것은 키의 중첩 위치와 자료형뿐이다** — exhibit 개수·순서·차트·흐름은 아니다.
+자세한 것은 같은 폴더의 `README.md`.
