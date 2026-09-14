@@ -68,6 +68,7 @@
 
 | 스크립트 | 언제 |
 |---|---|
+| `scripts/assemble.py` | 항상. 본문 + CSS + JS → 단일 파일 |
 | `scripts/check_html.py` | 항상. 소스를 읽는다. 의존성 없음 |
 | `scripts/lint_render.py` | 항상. **브라우저로 칠해보고 픽셀을 잰다** (playwright) |
 | `scripts/verify_docs_sync.py` | 개발용. 릴리스 전에 플러그인 자신을 검사한다 |
@@ -124,7 +125,9 @@
 | `skills/frame-question/SKILL.md` | 질문 후보 도출, 수신자 레벨, 가정, 분석 축 정의 |
 | `references/watch-thresholds.md` | 감시형 임계값 설정·결론문 |
 | `references/sources/` | 엑셀·Metabase·붙여넣기 어댑터별 주의사항 |
-| `references/html-template.html` | **디자인 토큰·컴포넌트·스크립트 원본** |
+| `references/template/parts.html` | **부품 목록. 리포트 만들 때 읽는 것은 이것뿐** |
+| `references/template/base.css` `base.js` | 읽지 않는다. `assemble.py`가 붙인다 |
+| `references/html-template.html` | 위 셋의 **조립 결과.** 검사용. 직접 고치지 않는다 |
 | `assets/korea_paths.json` | 시도 17개 + 시군구 전체 SVG 경로 (441KB) |
 | `references/report-types.md` | **산출물 유형 4종과 유형별 필수·해당없음** |
 | `references/examples/` | 스키마 확인용 사례. **형태가 아니다** |
@@ -159,6 +162,13 @@
 
 ## 변경 이력
 
+- **v0.8.0** — **수정이 오래 걸리던 원인을 고쳤다.** 라벨 하나 옮기려고 9만 자를 다시 쓰고 있었다.
+  템플릿을 `template/{parts.html, base.css, base.js}`로 쪼개고 `scripts/assemble.py` 신설 —
+  **CSS 18K와 JS 7K를 이제 읽지도 쓰지도 않는다.**
+  수정을 결론/내용/표현 3층으로 가르고, 표현 수정은 본문만 `Edit`한다
+  (판정 기준: 바꿀 것이 스펙에 대응하는 필드가 있는가).
+  표현 수정 루프에서는 참조 문서를 다시 읽지 않고 서브에이전트도 다시 부르지 않는다.
+  `lint_render.py --quick`(데스크톱 1회) 추가.
 - **v0.7.0** — 커맨드 재편. `/daily` 제거하고 `/verify`(이미 있는 산출물 검수만)와
   `/refresh`(기존 리포트를 새 데이터로, 구성은 그대로) 신설.
   `daily-report.md`를 `watch-thresholds.md`로 일반화 — 영업일보 사례를 걷어내고

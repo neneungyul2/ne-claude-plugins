@@ -120,9 +120,21 @@ Agent 도구로 `report-verifier`를 호출한다.
 
 ## 5. 다시 돌린다
 
-고친 뒤 1·2단계를 다시 돌린다 — 둘 다 빠르다.
-3단계는 **구조나 결론이 바뀌었을 때만** 다시 부른다
-(라벨 위치를 옮긴 정도면 다시 부르지 않는다).
+고친 뒤 **본문을 다시 조립하고** 1·2단계를 다시 돌린다.
+
+```bash
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/assemble.py <이름>.content.html -o <이름>.html
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/check_html.py <이름>.html --spec <스펙>
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/lint_render.py <이름>.html --quick
+```
+
+**표현만 고쳤으면 `--quick`을 쓴다** — 데스크톱 1회만 돈다. 모바일·폰트 폴백은
+레이아웃이 바뀌었을 때만 의미가 있다.
+
+3단계는 **구조나 결론이 바뀌었을 때만** 다시 부른다.
+라벨 위치를 옮긴 정도면 부르지 않는다 — 검수자가 볼 것이 바뀌지 않았다.
+
+**전달 직전에는 `--quick` 없이 한 번 전부 돌린다.**
 
 ## 6. 전달
 

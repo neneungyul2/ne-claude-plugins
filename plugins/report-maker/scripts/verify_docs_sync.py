@@ -281,6 +281,35 @@ def c_version(root, files, r):
         r.ok("버전 일치", d.get("version"))
 
 
+def c_template_fresh(root, files, r):
+    """html-template.html이 template/의 세 조각과 일치하는가.
+
+    생성물이라 원본만 고치고 다시 조립하는 것을 잊기 쉽다.
+    """
+    import subprocess, tempfile
+    gen = os.path.join(root, "references", "html-template.html")
+    src = os.path.join(root, "references", "template", "parts.html")
+    asm = os.path.join(root, "scripts", "assemble.py")
+    if not all(os.path.isfile(p) for p in (gen, src, asm)):
+        r.warn("템플릿 최신 여부", "파일을 못 찾았다")
+        return
+    with tempfile.NamedTemporaryFile(suffix=".html", delete=False) as t:
+        tmp = t.name
+    try:
+        subprocess.run([sys.executable, asm, src, "-o", tmp, "--title", "{{TITLE}}"],
+                       capture_output=True, check=True)
+        norm = lambda s: re.sub(r"\s+", " ", re.sub(r"<!--.*?-->", "", s, flags=re.S)).strip()
+        if norm(open(tmp, encoding="utf-8").read()) != norm(open(gen, encoding="utf-8").read()):
+            r.fail("템플릿 최신 여부",
+                   "html-template.html이 template/의 원본과 다르다 — assemble.py를 다시 돌린다")
+        else:
+            r.ok("템플릿 최신 여부", "조립 결과와 일치")
+    except subprocess.CalledProcessError as e:
+        r.fail("템플릿 최신 여부", f"조립 실패: {e.stderr.decode()[:80]}")
+    finally:
+        os.unlink(tmp)
+
+
 def c_skill_refs(root, files, r):
     """스킬이 서로를 가리킬 때 그 스킬이 실제로 있는가."""
     have = {d for d in os.listdir(os.path.join(root, "skills"))
@@ -305,7 +334,7 @@ def c_skill_refs(root, files, r):
 
 
 CHECKS = [c_plugin_root_paths, c_frontmatter_name, c_spec_version, c_question_types,
-          c_report_types, c_thresholds, c_version, c_skill_refs]
+          c_report_types, c_thresholds, c_version, c_template_fresh, c_skill_refs]
 
 
 def main():

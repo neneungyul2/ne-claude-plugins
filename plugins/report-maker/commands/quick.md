@@ -8,7 +8,7 @@ argument-hint: [파일 경로 또는 보고 싶은 내용]
 **본인이 확인하려고 보는 화면이다.** 남에게 보낼 것이면 `/report`로 간다.
 
 ```
-load-data → plan-report(mode: quick) → build-html → check_html.py + lint_render.py
+load-data → plan-report(mode: quick) → build-html → assemble.py → check_html.py + lint_render.py --quick
 ```
 
 생략하는 것 — `frame-question`(질문 설계)과 서브에이전트 검수.

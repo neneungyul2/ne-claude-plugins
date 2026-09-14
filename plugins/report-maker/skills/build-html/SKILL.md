@@ -12,15 +12,33 @@ description: 확정된 리포트 스펙을 HTML 단일 파일로 렌더링한다
 - `${CLAUDE_PLUGIN_ROOT}/references/report-types.md` — **필수.** `report_type`이 뼈대와 필수 요소를 바꾼다
 - `${CLAUDE_PLUGIN_ROOT}/references/design-rules.md`
 - `${CLAUDE_PLUGIN_ROOT}/references/storytelling.md` — 히어로 구성과 수평 논리
-- `${CLAUDE_PLUGIN_ROOT}/references/html-template.html` — 토큰·컴포넌트·스크립트 전부 여기 있다
+- `${CLAUDE_PLUGIN_ROOT}/references/template/parts.html` — **부품 목록. 이것만 읽는다**
 - 지역 데이터가 있으면 `${CLAUDE_PLUGIN_ROOT}/references/korea-map.md`
 
-**템플릿의 CSS와 스크립트는 그대로 가져다 쓴다.** 색이나 크기를 즉흥적으로 바꾸지 않는다.
+**`base.css`와 `base.js`를 읽지 않는다.** 25,000자이고 한 글자도 바뀌지 않는다.
+`assemble.py`가 붙인다. 색이나 크기를 즉흥적으로 바꾸지 않는다.
 
-**템플릿의 `<body>`는 부품 목록이지 레이아웃이 아니다.**
+**`parts.html`은 부품 목록이지 레이아웃이 아니다.**
 거기 exhibit이 셋 있다고 셋을 만들지 않는다 — 섹션 개수·순서·차트 종류는 전부 스펙이 정한다.
 필요 없는 부품(탭·목차·축 전환·드릴다운·모달·실무 후속 과제)은 통째로 지운다.
 자리표시자(`{{…}}`)와 `000.0` 같은 값이 산출물에 하나라도 남아 있으면 검수 실패다.
+
+## 0-1. 무엇을 쓰는가 — 본문만 쓴다
+
+```
+report-spec.json        무엇을 말할지 (plan-report가 만든 것)
+<이름>.content.html     ← 여기를 쓴다. <main> 안쪽 + 필요하면 모달
+<이름>.html             ← assemble.py가 만든다. 직접 쓰지 않는다
+```
+
+```bash
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/assemble.py <이름>.content.html -o <이름>.html
+```
+
+`<!doctype>`·`<head>`·`<style>`·`<script>`를 쓰지 않는다. 스크립트가 붙인다.
+이 리포트에만 필요한 스타일이 정말 있으면 본문에 `<style data-extra>`로 둔다.
+
+**`.content.html`을 지운다면 다음 수정이 비싸진다.** 작업 폴더에 스펙과 함께 남긴다.
 
 ## 1. 원칙
 
@@ -307,11 +325,44 @@ with sync_playwright() as p:
 
 줄바꿈·겹침·색은 코드로는 안 보인다. 반드시 그림으로 확인한다.
 
+## 10-1. 수정 — 층을 먼저 가른다
+
+**수정 요청이 오면 무엇을 다시 만들지부터 정한다.** 전부 다시 그리는 것이 기본이 아니다.
+9만 자짜리 산출물을 통째로 다시 쓰는 것은 라벨 하나 옮기는 값으로 너무 비싸다.
+
+**판정 기준은 하나다 — 바꿀 것이 스펙에 대응하는 필드가 있는가.**
+
+| 층 | 예 | 스펙에 | 한다 |
+|---|---|---|---|
+| **결론** | 축을 바꾼다, exhibit을 빼거나 넣는다, 숫자가 틀렸다, 차트 종류를 바꾼다 | 있다 | **`plan-report`로 되돌아간다.** 스펙을 고치고 본문을 다시 만든다 |
+| **내용** | 문구를 다듬는다, `action_title`·`so_what`을 고친다, 각주를 보탠다 | 있다 | 스펙의 그 필드를 고치고, **본문에서 그 부분만 `Edit`** |
+| **표현** | 라벨 위치, 마진, 줄바꿈, 툴팁 문구, 강조 한 곳 | **없다** | **본문만 `Edit`.** 스펙은 건드릴 것이 없다 |
+
+세 층 모두 마지막에 `assemble.py` → `check_html.py` → `lint_render.py --quick`을 돌린다.
+
+### 표현 수정에서 하지 않는 것
+
+- **참조 문서를 다시 읽지 않는다.** 라벨을 옮기는 데 `design-rules.md`가 필요하지 않다.
+  규칙이 기억나지 않으면 그 부분만 `Grep`으로 찾는다
+- **본문 전체를 다시 쓰지 않는다.** `Edit`으로 해당 SVG 요소나 그 블록만 바꾼다
+- **서브에이전트 검수를 다시 부르지 않는다.** 구조도 결론도 안 바뀌었다
+
+### 되돌아가야 하는 신호
+
+수정 요청이 이 중 하나면 **표현 층이 아니다.** 스펙부터 고친다.
+
+- "이 차트로는 그게 안 보인다" → 인코딩이 틀렸다. `encoding.claim`을 다시 본다
+- "이 숫자가 더 중요한데" → `weight`나 축이 틀렸다
+- "순서를 바꿔줘" → 수평 논리가 틀렸다. `action_title` 목록부터 다시 읽는다
+
+화면만 고쳐서 덮으면 **스펙과 화면이 갈라지고, 다음 수정에서 무엇이 참인지 모른다.**
+
 ## 11. 다음 단계 — 전달 전에 검수한다
 
 ```bash
-python3 ${CLAUDE_PLUGIN_ROOT}/scripts/check_html.py <산출물.html> --spec <report-spec.json>
-python3 ${CLAUDE_PLUGIN_ROOT}/scripts/lint_render.py <산출물.html>
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/assemble.py <이름>.content.html -o <이름>.html
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/check_html.py <이름>.html --spec <report-spec.json>
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/lint_render.py <이름>.html
 ```
 
 앞은 소스를 읽고, 뒤는 **브라우저로 칠해서 픽셀을 잰다** — 잘린 글자·겹친 라벨·

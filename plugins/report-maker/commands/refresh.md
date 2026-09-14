@@ -17,7 +17,9 @@ argument-hint: [기존 스펙 또는 HTML 경로, 새 기간·데이터]
    기준이 바뀌었는데 갱신하면 이전 회차와 비교할 수 없는 숫자가 나란히 놓인다
 3. **다시 계산해야 하는 것** — `key_takeaway`, 각 `action_title`, `so_what`, KPI의 `delta`,
    축 범위, 각주의 기간·추출 시각. 숫자만 바꾸고 결론 문장을 두면 **거짓말이 된다**
-4. `build-html` → `check_html.py` + `lint_render.py`
+4. **기존 `.content.html`을 고친다.** 구성이 같으므로 값과 결론 문장만 바뀐다 —
+   본문 전체를 다시 쓰지 않는다
+5. `assemble.py` → `check_html.py` → `lint_render.py`
 
 **유형에 따라 하는 일이 다르다** (`${CLAUDE_PLUGIN_ROOT}/references/report-types.md`).
 

@@ -149,6 +149,8 @@ def main():
     ap.add_argument("--shot", help="전체 스크린샷을 이 경로에 저장한다")
     ap.add_argument("--no-fallback", action="store_true",
                     help="폰트 폴백 검사를 건너뛴다")
+    ap.add_argument("--quick", action="store_true",
+                    help="데스크톱 1회만. 표현 수정 루프용 — 전달 전에는 전체를 돈다")
     a = ap.parse_args()
 
     if not os.path.isfile(a.html):
@@ -200,6 +202,9 @@ def main():
             pg.screenshot(path=a.shot, full_page=True)
 
         # 모바일 — 가로 스크롤이 핵심
+        if a.quick:
+            b.close()
+            return _emit(r, a, js_err, req_fail, con_err, quick=True)
         pg.set_viewport_size({"width": MOBILE[0], "height": MOBILE[1]})
         pg.wait_for_timeout(400)
         judge(r, pg.evaluate(PROBE), "모바일 400px")
@@ -213,6 +218,11 @@ def main():
 
         b.close()
 
+    return _emit(r, a, js_err, req_fail, con_err)
+
+
+def _emit(r, a, js_err, req_fail, con_err, quick=False):
+    """페이지 수준 결과를 보태고 출력한다."""
     if js_err:
         r.fail("JS 에러", f"{len(js_err)}건: {js_err[0]}")
     else:
@@ -225,8 +235,8 @@ def main():
         r.warn("콘솔 error", f"{len(con_err)}건: {con_err[0]}")
 
     if a.json:
-        print(json.dumps({"file": a.html, "failed": r.failed, "results": r.rows},
-                         ensure_ascii=False, indent=2))
+        print(json.dumps({"file": a.html, "quick": quick, "failed": r.failed,
+                          "results": r.rows}, ensure_ascii=False, indent=2))
     else:
         order = {"FAIL": 0, "WARN": 1, "OK": 2}
         w = max((len(x["rule"]) for x in r.rows), default=10)
@@ -235,8 +245,12 @@ def main():
         n_f = sum(1 for x in r.rows if x["level"] == "FAIL")
         n_w = sum(1 for x in r.rows if x["level"] == "WARN")
         print(f"\nFAIL {n_f} · WARN {n_w} · OK {len(r.rows) - n_f - n_w}")
-        print("폰트 폴백은 WARN이다 — Pretendard가 없는 PC에서 이렇게 보인다는 뜻이고,\n"
-              "사내 배포라면 고치는 쪽이 맞다.")
+        if quick:
+            print("빠른 모드 — 데스크톱만 봤다. "
+                  "전달 전에는 --quick 없이 한 번 전부 돌린다.")
+        else:
+            print("폰트 폴백은 WARN이다 — Pretendard가 없는 PC에서 이렇게 보인다는 뜻이고,\n"
+                  "사내 배포라면 고치는 쪽이 맞다.")
     return 1 if r.failed else 0
 
 
