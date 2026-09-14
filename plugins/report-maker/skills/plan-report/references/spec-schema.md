@@ -2,13 +2,16 @@
 
 포맷 중립 스펙. HTML 렌더러와 문서 렌더러가 동일하게 이 구조를 입력으로 받는다.
 
-**현재 버전: 2.2**
+**현재 버전: 2.4**
 
 - 2.0 — `key_takeaway` · `kpis` · `actions` · `glossary` · `calcs` · `group_detail` 추가
 - 2.1 — `brief` · `segments` 추가. exhibit에 `views`(축 전환) · `drilldown`(계층) 추가.
   action에서 `owner` 제거하고 `level` 추가
 - 2.2 — `key_takeaway.ask` 추가. `brief`에 `tension` · `mechanism` · `narrative_order` ·
   `three_minute_story` 추가. exhibit에 `emphasis_steps` 추가
+- 2.3 — exhibit에 `weight` 추가 (화면 비중). `encoding`에 `claim` 추가 (주장을 만드는 값).
+  완결 예시를 `references/examples/`로 분리
+- 2.4 — `report_type` 추가. **필수 여부가 유형에 따라 달라진다** (`references/report-types.md` §3)
 
 ---
 
@@ -32,7 +35,7 @@
 키 목록이다. 값이 아니라 **어떤 키가 어느 층에 있는지**만 본다.
 
 ```
-spec_version  mode  title  period_badge
+spec_version  mode  report_type  title  period_badge
 key_takeaway { text  emphasis  ask }
 audience  decision  period  basis  unit
 brief { }  segments [ ]  dataset_card { }
@@ -42,8 +45,9 @@ glossary [ ]  calcs [ ]  footnote { }  open_questions [ ]
 
 | 필드 | 필수 | 설명 |
 |---|---|---|
-| `spec_version` | O | 현재 `"2.2"` |
+| `spec_version` | O | 현재 `"2.4"` |
 | `mode` | O | `quick` \| `report` |
+| `report_type` | **report 필수** | `diagnostic` \| `choice` \| `watch` \| `track`. **아래 표의 필수 여부를 바꾼다** |
 | `title` | O | 문서 제목. 명사구 허용 (문서 이름이지 결론이 아님) |
 | `period_badge` | 선택 | 제목 옆 배지. 예: `"2026년 8월"` |
 | `key_takeaway` | O | **화면 최상단 강조 블록.** 아래 4장 |
@@ -61,6 +65,25 @@ glossary [ ]  calcs [ ]  footnote { }  open_questions [ ]
 | `calcs` | 조건부 필수 | 별도 계산 로직이 있으면 필수. 아래 6장 |
 | `footnote` | O | 공통 각주 |
 | `open_questions` | 선택 | 확인 필요 항목 배열. 비어 있어도 키는 유지 |
+
+### report_type이 "필수"를 바꾼다
+
+아래 표의 `필수` 표기는 **진단형 기준**이다. 유형에 따라 달라진다.
+원본은 `${CLAUDE_PLUGIN_ROOT}/references/report-types.md` §3.
+
+| 요소 | `diagnostic` | `choice` | `watch` | `track` |
+|---|---|---|---|---|
+| `key_takeaway.text` | 판단 문장 | 추천안 | 현재 상태 판정 | 도달 전망 |
+| `key_takeaway.ask` | 필수 | 필수 | **이상일 때만** | 이탈 시 필수 |
+| `brief.tension` | 필수 | 필수 | **—** | 필수 |
+| `brief.three_minute_story` | 필수 | 필수 | **—** | **—** |
+| `actions` | 3~5개 | 추천 1 + 대안 | **정상이면 0개** | 이탈 항목만 |
+| `weight: primary` | exhibit 하나 | 옵션 표 | **KPI 행** | 시간축 차트 |
+| exhibit 수 | 3~7 | 옵션 수 | **고정 슬롯** | 1~3 |
+| `narrative_order` 기본 | `lead_with_ending` | `lead_with_ending` | `lead_with_ending` | **`chronological`** |
+
+**`—`인 것을 억지로 채우지 않는다.** 감시형에 만들어 낸 긴장, 정상인데 지어낸 액션은
+다음부터 그 칸을 아무도 안 읽게 만든다.
 
 ---
 
@@ -123,7 +146,7 @@ key_takeaway { text  emphasis[]  ask  ask_level }
 |---|---|---|
 | `text` | O | **판단.** 명사구 금지. 읽고 "그래서 뭐?"가 남으면 반려 |
 | `emphasis` | O | `text` 안에서 형광펜으로 칠할 **부분 문자열** 2~4개 |
-| `ask` | **report 필수** | **요청.** 독자가 무엇을 알거나 하기를 원하는가 |
+| `ask` | **report 필수** | **요청.** 독자가 무엇을 알거나 하기를 원하는가. `watch`는 이상일 때만 |
 | `ask_level` | 선택 | 요청의 결정 레벨. `brief.audience_level`과 맞아야 한다 |
 
 **Big Idea 3요소** — `text`+`ask`가 아래를 만족해야 한다.
@@ -131,7 +154,7 @@ key_takeaway { text  emphasis[]  ask  ask_level }
 2. 무엇이 걸려 있는지 전달할 것
 3. 완전한 문장일 것
 
-> **발견에서 멈추면 반려다.** "가격이 하락했다"는 관찰이고,
+> **발견에서 멈추면 반려다** (`watch`·정상 상태는 예외 — "이상 없음"이 결론이다). "가격이 하락했다"는 관찰이고,
 > "그러므로 이 범위로 출시하자"까지가 결론이다.
 > 액션 표는 문서 맨 아래에 있다. 위에서 아래로 읽는 독자는 요청을 마지막에 만난다.
 > `ask`는 그래서 히어로 안에 있어야 한다.
@@ -170,8 +193,9 @@ kpis [{ label  value  unit  delta { dir  text  note }  calc_ref  term_ref }]
 
 ```
 exhibit {
-  id  nav_label  answers[]  action_title  so_what
-  views [{ id  label  read  question_type  chart  data{columns,rows}  encoding }]
+  id  nav_label  answers[]  action_title  so_what  weight
+  views [{ id  label  read  question_type  chart  data{columns,rows}
+           encoding{ x  y  series  claim  sort  y_zero } }]
   emphasis_steps [{ id  label  read  highlight[] }]
   drilldown { label  by  columns  rows{} }
   group_detail { }
@@ -191,12 +215,48 @@ exhibit {
 | `answers` | report 필수 | **이 exhibit이 답하는 `brief.questions`의 id 배열.** 비어 있으면 왜 있는 exhibit인지 되묻는다 |
 | `action_title` | O | **서술형 결론. 주장 하나.** 아래 참조 |
 | `so_what` | O | 한 줄. 제목의 반복 금지 |
+| `weight` | O | `primary` \| `supporting` \| `appendix`. **화면에서 차지할 비중.** 아래 참조 |
 | `views` | O | **1개 이상.** 하나뿐이면 토글 없이 그냥 그린다. 2개 이상이면 축 전환 버튼이 생긴다 |
 | `emphasis_steps` | 선택 | **같은 차트·같은 순서, 강조만 이동.** 아래 참조 |
 | `drilldown` | 선택 | 상위에서 클릭해 개별 단위로 내려가는 계층. 아래 참조 |
 | `group_detail` | 조건부 필수 | 항목을 묶었으면 반드시 채운다. 아래 10장 |
 | `basis`/`unit` | 선택 | 최상위와 다를 때만 |
 | `footnote` | O | 4요소 전부 |
+
+### weight — 자리 크기는 서열의 선언이다
+
+전부 같은 크기로 깔면 "전부 똑같이 중요하다"고 말한 것이고,
+독자는 그것을 "아무것도 중요하지 않다"로 읽는다.
+
+| 값 | 뜻 | 렌더러가 하는 일 |
+|---|---|---|
+| `primary` | 결론을 직접 만드는 exhibit. **정확히 하나** | 가장 큰 자리. 전체 폭. 강조 예산을 여기에 쓴다 |
+| `supporting` | 결론을 뒷받침하거나 반례를 막는다 | 기본 크기 |
+| `appendix` | 참고. 없어도 결론은 선다 | 접거나 문서 뒤로 내린다 |
+
+- **`primary`가 둘이면 결론이 둘이다.** 질문으로 되돌아간다
+- `primary`가 없으면 가장 큰 자리를 누가 갖는지 아무도 정하지 않은 것이다
+- `appendix`가 절반을 넘으면 그건 리포트가 아니라 자료 모음이다
+
+**빈 공간이 많은 차트는 `primary`가 될 수 없다.** 데이터가 플롯 영역의 절반도 안 채우면
+가장 많은 주의를 받는 자리에서 가장 적게 돌려주는 것이다. 축 범위를 분포에 맞추거나
+`supporting`으로 내린다.
+
+### encoding.claim — 주장을 만드는 값
+
+`action_title`이 하는 주장을 만드는 **필드 이름 하나**를 적는다.
+
+| 상태 | 판정 |
+|---|---|
+| `claim`이 `x` 또는 `y`와 같다 | 통과 |
+| `claim`이 `series`에만 있다 | 경고. 색으로는 크기를 못 읽는다 |
+| `claim`이 값 라벨·툴팁에만 있다 | **반려.** 차트나 축을 바꾼다 |
+| `claim`을 못 적겠다 | `action_title`이 이 차트에서 안 나온다. 질문으로 되돌아간다 |
+
+막대 길이가 *건수*인데 제목이 *건당 효율*을 말하는 것이 전형적인 실패다.
+건당 효율이 주장이면 건당 효율이 막대 길이여야 한다.
+`scripts/check_html.py --spec` 이 이 항목을 기계적으로 본다.
+서열의 근거는 `references/chart-rules.md` §1-1.
 
 ### action_title — 주장 하나
 

@@ -1,16 +1,27 @@
 {
   "_note": "하나의 사례일 뿐 형태가 아니다. exhibit 개수·순서·차트 종류는 brief.questions가 정한다. 값·제목·용어는 전부 자리표시자다. 복사해서 채우지 말고, 스키마를 확인하는 용도로만 본다.",
-  "spec_version": "2.2",
+  "spec_version": "2.4",
   "mode": "quick",
+  "report_type": "diagnostic",
   "title": "월별 출고 추이",
   "key_takeaway": {
     "text": "6월 이후 3개월 연속 감소했으나 감소폭은 줄고 있다",
-    "emphasis": ["3개월 연속 감소", "감소폭은 줄고"]
+    "emphasis": [
+      "3개월 연속 감소",
+      "감소폭은 줄고"
+    ]
   },
-  "period": { "from": "2026-01-01", "to": "2026-08-31" },
+  "period": {
+    "from": "2026-01-01",
+    "to": "2026-08-31"
+  },
   "basis": "미확인",
   "unit": "부",
-  "dataset_card": { "source": "출고집계.xlsx", "rows": 8, "basis": "미확인" },
+  "dataset_card": {
+    "source": "출고집계.xlsx",
+    "rows": 8,
+    "basis": "미확인"
+  },
   "exhibits": [
     {
       "id": "ex1",
@@ -22,16 +33,51 @@
           "label": "월별",
           "question_type": "trend",
           "chart": "line",
-          "data": { "columns": ["월", "출고량"], "rows": [["2026-01", 41200]] },
-          "encoding": { "x": "월", "y": "출고량", "series": null, "sort": "asc", "y_zero": false }
+          "data": {
+            "columns": [
+              "월",
+              "출고량"
+            ],
+            "rows": [
+              [
+                "2026-01",
+                41200
+              ]
+            ]
+          },
+          "encoding": {
+            "x": "월",
+            "y": "출고량",
+            "series": null,
+            "claim": "출고량",
+            "sort": "asc",
+            "y_zero": false
+          }
         }
       ],
-      "footnote": { "source": "출고집계.xlsx", "period": "2026-01 ~ 2026-08", "unit": "부", "basis": "미확인" }
+      "footnote": {
+        "source": "출고집계.xlsx",
+        "period": "2026-01 ~ 2026-08",
+        "unit": "부",
+        "basis": "미확인"
+      },
+      "weight": "primary"
     }
   ],
   "glossary": [
-    { "id": "chulgo", "term": "출고량", "desc": "SAP 매출수량 기준. 집계 기준(총출고/순출고) 미확인." }
+    {
+      "id": "chulgo",
+      "term": "출고량",
+      "desc": "SAP 매출수량 기준. 집계 기준(총출고/순출고) 미확인."
+    }
   ],
-  "footnote": { "source": "출고집계.xlsx", "period": "2026-01-01 ~ 2026-08-31", "unit": "부", "basis": "미확인" },
-  "open_questions": ["집계 기준(총출고/순출고) 미확인"]
+  "footnote": {
+    "source": "출고집계.xlsx",
+    "period": "2026-01-01 ~ 2026-08-31",
+    "unit": "부",
+    "basis": "미확인"
+  },
+  "open_questions": [
+    "집계 기준(총출고/순출고) 미확인"
+  ]
 }

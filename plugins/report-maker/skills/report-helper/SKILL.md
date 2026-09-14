@@ -57,22 +57,35 @@ quick 모드는 이 단계를 건너뛰고 `load-data`로 바로 간다.
 ```
 [이 스킬] 모드 판단
    ↓
-frame-question   질문·가정·수신자 레벨·분석 축 합의  ← report 필수
+frame-question   유형 판정 → 질문·가정·수신자 레벨·분석 축 합의  ← report 필수
    ↓
 load-data        데이터 확보 + 정규화 + 데이터셋 카드
    ↓
-plan-report   포맷 중립 스펙 작성 (여기서 결론과 차트가 확정된다)
+plan-report      포맷 중립 스펙 작성 (결론·차트·배치가 여기서 확정된다)
    ↓
 build-html  또는  build-doc
+   ↓
+verify-report    기계 검사 + 만든 맥락 없는 검수  ← report 필수
 ```
+
+**사용자 확인은 두 곳이다** — `frame-question`에서 **형태**(데이터 전),
+`plan-report`에서 **배치**(데이터 후). 둘 다 **글자 와이어프레임**으로 보여준다.
+HTML을 그려서 확인받지 않는다 — 화면을 만들면 사용자는 구조가 아니라 색에 반응하고,
+만든 쪽은 애착이 생겨 틀렸어도 못 버린다.
+
+**앞뒤 두 단계가 핵심이다.** 앞에서 무엇을 답할지 합의하지 않으면 있는 데이터로
+만들 수 있는 것을 만들게 되고, 뒤에서 다른 눈으로 보지 않으면 만든 사람만
+읽히는 화면이 나간다.
 
 다음 스킬로 넘어갈 때는 해당 SKILL.md를 Read 도구로 읽고 그 지침을 따른다.
 
+- `${CLAUDE_PLUGIN_ROOT}/references/report-types.md` — **유형이 형태를 정한다. 먼저 읽는다**
 - `${CLAUDE_PLUGIN_ROOT}/skills/frame-question/SKILL.md`
 - `${CLAUDE_PLUGIN_ROOT}/skills/load-data/SKILL.md`
 - `${CLAUDE_PLUGIN_ROOT}/skills/plan-report/SKILL.md`
 - `${CLAUDE_PLUGIN_ROOT}/skills/build-html/SKILL.md`
 - `${CLAUDE_PLUGIN_ROOT}/skills/build-doc/SKILL.md`
+- `${CLAUDE_PLUGIN_ROOT}/skills/verify-report/SKILL.md`
 
 report 모드에서는 **인사이트·액션(3~5개)이 필수**다. exhibit만 늘어놓고 끝내지 않는다.
 축약어·사내 용어가 나오면 용어 설명을 붙이고, 한 문장으로 안 되는 계산은 산식 모달로 뺀다.

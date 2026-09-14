@@ -1,6 +1,6 @@
 ---
 name: build-html
-description: 확정된 리포트 스펙을 HTML 단일 파일로 렌더링한다. 외부 의존 없이 인라인 SVG로 차트를 그리고, 디자인 토큰·목차·모달·용어 툴팁을 강제한다. report-maker 워크플로의 4단계(HTML 경로)로, plan-report가 만든 스펙을 입력으로 받는다.
+description: 확정된 리포트 스펙을 HTML 단일 파일로 렌더링한다. 외부 의존 없이 인라인 SVG로 차트를 그리고, 디자인 토큰·목차·모달·용어 툴팁을 강제한다. report-maker 워크플로의 4단계(HTML 경로)로, plan-report가 만든 스펙을 입력으로 받고 verify-report로 넘긴다.
 ---
 
 # HTML 렌더링 (build-html)
@@ -9,6 +9,7 @@ description: 확정된 리포트 스펙을 HTML 단일 파일로 렌더링한다
 
 ## 0. 먼저 읽을 것
 
+- `${CLAUDE_PLUGIN_ROOT}/references/report-types.md` — **필수.** `report_type`이 뼈대와 필수 요소를 바꾼다
 - `${CLAUDE_PLUGIN_ROOT}/references/design-rules.md`
 - `${CLAUDE_PLUGIN_ROOT}/references/storytelling.md` — 히어로 구성과 수평 논리
 - `${CLAUDE_PLUGIN_ROOT}/references/html-template.html` — 토큰·컴포넌트·스크립트 전부 여기 있다
@@ -49,6 +50,29 @@ KPI           kpis 2~4개
 
 - exhibit은 스펙 배열 순서 그대로. 재배치하지 않는다
 - 섹션 번호와 목차 번호와 `id`를 일치시킨다 (`ex1` ↔ `<i>1</i>` ↔ `#ex1`)
+
+**위 순서는 진단형 기준이다.** `report_type`이 `watch`면 데이터 시점이 가장 위에 오고
+정상 항목은 접히며, `track`이면 시간축 차트가 맨 앞이다. `report-types.md` §4의 뼈대를 따른다.
+**감시형은 exhibit 구성이 매번 같아야 한다** — 이번에 흥미로운 게 생겼다고 섹션을 추가하지 않는다.
+
+### weight — 크기로 서열을 말한다
+
+**전부 같은 크기로 깔지 않는다.** 같은 테두리·같은 배경·같은 대비로 여섯 개를 나열하면
+독자는 "알아서 골라 보세요"라는 메시지를 받는다.
+
+| `weight` | 렌더 |
+|---|---|
+| `primary` | 차트 높이를 1.3배. 카드 배경 `var(--panel)`. 강조색은 여기에 쓴다 |
+| `supporting` | 기본 |
+| `appendix` | `<details>`로 접는다. 요약줄에 `action_title` |
+
+`primary`가 없거나 둘 이상이면 **렌더링 전에 사용자에게 알린다.**
+단 `watch`는 KPI 행이, `choice`는 옵션 표가 primary 자리를 갖는다 (exhibit이 아니다).
+
+### claim — 주장이 보이는 축에 있는가
+
+각 view의 `encoding.claim`이 `x` 또는 `y`가 아니면 **렌더링하지 않고 스펙을 되돌려 보낸다.**
+제목이 말하는 값이 차트에서 작은 글씨로만 있으면, 그 차트는 제목을 뒷받침하지 않는다.
 
 ### 히어로 — 세 부분이다
 
@@ -193,6 +217,8 @@ key_takeaway.ask             ← 요청. 별도 줄, 굵게
   `.subacts` 블록("실무 후속 과제")의 별도 표로 내린다. **지우지 않는다**
 - `actions`가 비어 있으면 블록을 만들되 **"현재 데이터로는 실행 가능한 액션이 도출되지 않았다"**와
   그 이유를 적는다. 블록 자체를 지우지 않는다
+- **`report_type: watch`에서 `actions`가 비어 있는 것은 정상이다.** "특이사항 없음"을
+  명시적으로 쓰고 끝낸다. 억지로 액션을 만들면 다음부터 아무도 그 칸을 안 읽는다
 
 ## 7-1. 가정 블록
 
@@ -250,6 +276,7 @@ key_takeaway.ask             ← 요청. 별도 줄, 굵게
 - [ ] 기울어진 텍스트가 하나도 없는가
 - [ ] 중앙정렬된 블록이 없는가
 - [ ] `emphasis_steps` 전환 시 **정렬이 바뀌지 않는가**
+- [ ] **`scripts/check_html.py`가 FAIL 0인가** — 아래 11장
 
 ### 두 가지 눈 검사 — 체크박스로 대체할 수 없다
 
@@ -262,8 +289,9 @@ key_takeaway.ask             ← 요청. 별도 줄, 굵게
 렌더링된 화면에서 **섹션 제목만 순서대로** 읽는다. 스펙 단계에서 통과했어도,
 렌더링 과정에서 순서가 바뀌거나 제목이 잘렸을 수 있다.
 
-사용자에게 전달할 때 **가능하면 제3자에게 먼저 보여줄 것을 권한다.**
-만든 사람은 자기 산출물을 독자의 눈으로 볼 수 없다.
+**여기까지는 자기 채점이다.** 만든 사람은 자기 산출물을 독자의 눈으로 못 본다 —
+무엇을 말하려 했는지 이미 알기 때문에 화면에 안 적힌 것도 읽힌다고 착각한다.
+그래서 전달 전에 반드시 `verify-report`로 넘긴다.
 
 ### 렌더링 확인 방법
 
@@ -278,3 +306,13 @@ with sync_playwright() as p:
 ```
 
 줄바꿈·겹침·색은 코드로는 안 보인다. 반드시 그림으로 확인한다.
+
+## 11. 다음 단계 — 전달 전에 검수한다
+
+```bash
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/check_html.py <산출물.html> --spec <report-spec.json>
+```
+
+FAIL이 나오면 고치고 다시 돌린다. FAIL 0이 되면
+`${CLAUDE_PLUGIN_ROOT}/skills/verify-report/SKILL.md`를 읽고 검수 단계로 넘어간다.
+**report 모드에서 이 단계를 건너뛰고 전달하지 않는다.**
