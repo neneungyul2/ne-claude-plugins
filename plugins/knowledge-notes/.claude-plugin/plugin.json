@@ -1,0 +1,13 @@
+{
+  "name": "knowledge-notes",
+  "version": "0.1.0",
+  "description": "새로 알게 된 지식(용어·개념·판단)을 atomic 노트로 분해해 Obsidian vault에 쌓고 링크로 연결한다. 기존 노트와 alias를 대조해 중복을 막고, 아직 노트가 없는 링크를 다음에 정리할 목록으로 뽑아준다.",
+  "author": {
+    "name": "choiyh",
+    "email": "choiyh@neungyule.com"
+  },
+  "homepage": "https://github.com/neneungyul2/ne-claude-plugins/tree/main/plugins/knowledge-notes",
+  "repository": "https://github.com/neneungyul2/ne-claude-plugins",
+  "category": "지식 관리",
+  "keywords": ["지식화", "Obsidian", "노트", "용어", "atomic", "vault"]
+}

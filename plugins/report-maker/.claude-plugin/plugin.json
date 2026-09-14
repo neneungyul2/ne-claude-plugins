@@ -1,0 +1,13 @@
+{
+  "name": "report-maker",
+  "version": "0.1.0",
+  "description": "데이터를 받아 경영컨설팅 펌 수준의 대시보드·보고서를 만든다. 엑셀·CSV·붙여넣은 표·Metabase 어디서 왔든 동일한 스펙 레이어를 거쳐 HTML 단일 파일 또는 문서·슬라이드로 출력한다. 기준(총출고/순출고 등)을 항상 명시하고, 결론을 먼저 쓰게 강제한다.",
+  "author": {
+    "name": "choiyh",
+    "email": "choiyh@neungyule.com"
+  },
+  "homepage": "https://github.com/neneungyul2/ne-claude-plugins/tree/main/plugins/report-maker",
+  "repository": "https://github.com/neneungyul2/ne-claude-plugins",
+  "category": "데이터·보고",
+  "keywords": ["대시보드", "보고서", "시각화", "차트", "영업일보", "데이터"]
+}

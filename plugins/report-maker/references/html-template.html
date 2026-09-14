@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{TITLE}}</title>
+<style>
+/* ── 디자인 토큰. 이 밖의 색을 쓰지 않는다 ───────────────────────── */
+:root{
+  --bg:#ffffff; --surface:#ffffff; --line:#e5e7eb;
+  --ink:#111827; --ink-2:#4b5563; --ink-3:#9ca3af;
+
+  /* 강조는 1색만. 나머지 계열은 단색 계조 */
+  --accent:#1d4ed8;
+  --s1:#1f2937; --s2:#4b5563; --s3:#6b7280; --s4:#9ca3af; --s5:#d1d5db;
+
+  /* 방향·상태 */
+  --up:#15803d; --down:#b91c1c; --warn:#b45309; --neutral:#6b7280;
+
+  --r:8px; --gap:24px;
+  --font:-apple-system,BlinkMacSystemFont,"Segoe UI","Malgun Gothic","Apple SD Gothic Neo",sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0b0f17; --surface:#111827; --line:#1f2937;
+    --ink:#f3f4f6; --ink-2:#9ca3af; --ink-3:#6b7280;
+    --accent:#60a5fa;
+    --s1:#e5e7eb; --s2:#9ca3af; --s3:#6b7280; --s4:#4b5563; --s5:#374151;
+    --up:#4ade80; --down:#f87171; --warn:#fbbf24;
+  }
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);
+     font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1080px;margin:0 auto;padding-block:32px;padding-left:20px;padding-right:20px}
+
+/* ── 헤더: 제목 + 기준 배지 ─────────────────────────────────────── */
+.head{display:flex;flex-wrap:wrap;gap:12px;align-items:baseline;
+      justify-content:space-between;border-bottom:1px solid var(--line);padding-bottom:12px}
+.head h1{font-size:18px;font-weight:600;margin:0}
+.basis{font-size:13px;color:var(--ink-2);white-space:nowrap}
+.basis b{color:var(--ink);font-weight:600}
+
+/* ── 헤드라인: 화면에서 가장 큰 글자. 좌상단 ────────────────────── */
+.headline{margin:28px 0 8px;font-size:26px;line-height:1.35;font-weight:700;max-width:34em}
+.summary{margin:0 0 8px;padding:0;list-style:none;color:var(--ink-2);font-size:14px}
+.summary li{margin:4px 0;padding-left:14px;position:relative}
+.summary li::before{content:"";position:absolute;left:0;top:.6em;width:5px;height:5px;
+                    border-radius:50%;background:var(--ink-3)}
+
+/* ── exhibit ────────────────────────────────────────────────────── */
+.ex{margin-top:36px;padding-top:20px;border-top:1px solid var(--line)}
+.ex h2{font-size:17px;font-weight:600;margin:0 0 4px;line-height:1.4}
+.sowhat{margin:0 0 14px;color:var(--ink-2);font-size:14px}
+.chart{overflow-x:auto}
+.chart svg{display:block;max-width:100%;height:auto}
+.note{margin-top:10px;font-size:12px;color:var(--ink-3);line-height:1.5}
+
+/* ── KPI ────────────────────────────────────────────────────────── */
+.kpis{display:flex;flex-wrap:wrap;gap:var(--gap)}
+.kpi{flex:1 1 160px;border:1px solid var(--line);border-radius:var(--r);padding:14px 16px}
+.kpi .label{font-size:12px;color:var(--ink-2)}
+.kpi .value{font-size:24px;font-weight:700;margin-top:2px;font-variant-numeric:tabular-nums}
+.kpi .delta{font-size:12px;margin-top:2px}
+.kpi .delta.up{color:var(--up)} .kpi .delta.down{color:var(--down)}
+
+/* ── 표 ─────────────────────────────────────────────────────────── */
+.tablewrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:left}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+tr.hl td{background:color-mix(in srgb, var(--accent) 8%, transparent)}
+
+/* ── 확인 필요 ──────────────────────────────────────────────────── */
+.open{margin-top:36px;border:1px solid var(--warn);border-radius:var(--r);padding:14px 16px}
+.open h3{margin:0 0 6px;font-size:13px;color:var(--warn)}
+.open ul{margin:0;padding-left:18px;font-size:13px;color:var(--ink-2)}
+
+.foot{margin-top:28px;padding-top:14px;border-top:1px solid var(--line);
+      font-size:12px;color:var(--ink-3)}
+
+/* ── 툴팁 ───────────────────────────────────────────────────────── */
+#tt{position:fixed;pointer-events:none;opacity:0;transition:opacity .1s;
+    background:var(--ink);color:var(--bg);font-size:12px;padding:5px 8px;
+    border-radius:6px;white-space:nowrap;z-index:10}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="head">
+    <h1>{{TITLE}}</h1>
+    <div class="basis">기준 <b>{{BASIS}}</b> · {{PERIOD}} · 단위 {{UNIT}}</div>
+  </div>
+
+  <p class="headline">{{HEADLINE}}</p>
+  <ul class="summary">
+    <li>{{SUMMARY_1}}</li>
+  </ul>
+
+  <!-- exhibit 반복 -->
+  <section class="ex">
+    <h2>{{ACTION_TITLE}}</h2>
+    <p class="sowhat">{{SO_WHAT}}</p>
+    <div class="chart">
+      <!--
+        인라인 SVG. 라이브러리를 불러오지 않는다.
+        막대는 y=0에서 시작. 축 라벨에 단위. 계열은 --s1~--s5 계조, 강조 1개만 --accent.
+        data-tip 속성을 두면 아래 스크립트가 툴팁을 붙인다.
+      -->
+      <svg viewBox="0 0 720 320" role="img" aria-label="{{ACTION_TITLE}}">
+        <line x1="56" y1="280" x2="700" y2="280" stroke="var(--line)"/>
+        <rect x="80" y="120" width="48" height="160" fill="var(--s2)" data-tip="A온라인 12,400부"/>
+        <text x="104" y="298" text-anchor="middle" font-size="12" fill="var(--ink-2)">A온라인</text>
+      </svg>
+    </div>
+    <p class="note">출처 {{SOURCE}} · 기간 {{PERIOD}} · 단위 {{UNIT}} · 집계기준 {{BASIS}}</p>
+  </section>
+
+  <div class="open">
+    <h3>확인 필요</h3>
+    <ul><li>{{OPEN_QUESTION}}</li></ul>
+  </div>
+
+  <div class="foot">
+    출처 {{SOURCE}} · 기간 {{PERIOD}} · 단위 {{UNIT}} · 집계기준 {{BASIS}} · 추출 {{EXTRACTED_AT}}
+  </div>
+</div>
+
+<div id="tt"></div>
+<script>
+(function(){
+  var tt=document.getElementById('tt');
+  document.addEventListener('mouseover',function(e){
+    var t=e.target.closest('[data-tip]'); if(!t)return;
+    tt.textContent=t.getAttribute('data-tip'); tt.style.opacity=1;
+  });
+  document.addEventListener('mousemove',function(e){
+    tt.style.left=(e.clientX+12)+'px'; tt.style.top=(e.clientY+12)+'px';
+  });
+  document.addEventListener('mouseout',function(e){
+    if(e.target.closest('[data-tip]')) tt.style.opacity=0;
+  });
+})();
+</script>
+</body>
+</html>
