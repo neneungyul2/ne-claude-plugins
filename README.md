@@ -25,7 +25,7 @@ Claude Code / Cowork에서 쓰는 사내 스킬 묶음을 한 곳에서 배포�
 
 | 플러그인 | 하는 일 | 상태 |
 |---|---|---|
-| [`work-toolkit`](plugins/work-toolkit) | 실무 커뮤니케이션 10가지 상황별 문서·메시지·체크리스트 생성 | v0.1.0 |
+| [`work-toolkit`](plugins/work-toolkit) | 조사·기획·보고·카피·이미지·데이터·자동화 7개 영역 52개 실무 상황 대응 | v0.2.0 |
 | [`report-maker`](plugins/report-maker) | 컨설팅 펌 수준의 대시보드·보고서 제작 (데이터 → 스펙 → HTML/문서) | v0.1.0 (파일럿) |
 | [`knowledge-notes`](plugins/knowledge-notes) | 새 지식을 atomic 노트로 분해해 Obsidian vault에 축적 | v0.1.0 (파일럿) |
 

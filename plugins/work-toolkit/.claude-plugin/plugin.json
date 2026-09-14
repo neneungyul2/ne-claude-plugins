@@ -1,13 +1,13 @@
 {
   "name": "work-toolkit",
-  "version": "0.1.0",
-  "description": "우선순위 재조정, 애매한 요청 확인, 일정 재계획, 핸드오프/완료기준, 회의 후속 정리, 이슈 공유, 진행상황 보고, 피드백 반영, SOP 문서화, 성과 정리 등 실무에서 반복되는 10가지 상황에 맞는 문서/메시지를 만들어주는 스킬 모음. work-helper가 상황을 판별해 해당 case 스킬로 안내한다.",
+  "version": "0.2.0",
+  "description": "실무에서 막히는 순간에 꺼내 쓰는 업무 도구함. 조사·기획·보고·카피·이미지·데이터·자동화 7개 영역 52개 상황에 맞춰 문서·메시지·체크리스트를 만들어준다. 영역 스킬이 상황을 판별해 해당 지침으로 수행하며, 모르는 것은 추정하지 않고 확인 필요로 남긴다.",
   "author": {
     "name": "choiyh",
     "email": "choiyh@neungyule.com"
   },
   "homepage": "https://github.com/neneungyul2/ne-claude-plugins/tree/main/plugins/work-toolkit",
   "repository": "https://github.com/neneungyul2/ne-claude-plugins",
-  "category": "업무 커뮤니케이션",
-  "keywords": ["실무", "커뮤니케이션", "보고", "체크리스트", "SOP"]
+  "category": "업무 전반",
+  "keywords": ["실무", "보고", "기획", "커뮤니케이션", "카피", "데이터", "자동화", "SOP"]
 }
