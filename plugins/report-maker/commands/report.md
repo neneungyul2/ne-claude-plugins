@@ -1,24 +1,31 @@
 ---
-description: 정식 보고용 대시보드·보고서를 만든다
+description: 정식 보고용 대시보드·보고서를 만든다 (5단계 전부)
 argument-hint: [무엇을 누구에게 보고할지]
 ---
 
 정식 보고 모드로 진행한다. 요청: $ARGUMENTS
 
-1. `${CLAUDE_PLUGIN_ROOT}/references/design-rules.md`,
-   `${CLAUDE_PLUGIN_ROOT}/references/chart-rules.md`,
-   `${CLAUDE_PLUGIN_ROOT}/references/metrics.md`를 읽는다.
-2. 아래 3가지를 **한 번에 묶어서** 확인한다. 이미 대화에 나온 건 다시 묻지 않는다.
-   - 수신자 (대표 / 본부장 / 팀장 / 파트원 / 타 부서)
-   - 이걸 보고 정해야 하는 것 (없으면 "공유")
-   - 이미 알고 있는 결론 (없으면 데이터에서 찾는다)
-   - 산출 포맷: HTML 단일 파일 / 문서·슬라이드 중 하나
-3. `${CLAUDE_PLUGIN_ROOT}/skills/load-data/SKILL.md` → 데이터 정규화 + 데이터셋 카드.
-   집계 기준이 판정되지 않으면 임의로 정하지 말고 확인한다.
-4. `${CLAUDE_PLUGIN_ROOT}/skills/plan-report/SKILL.md` → 스펙 작성 (`mode: "report"`, exhibit 3~7개).
-   자체 검사를 통과시키고 결과를 한 줄로 보고한다.
-5. 포맷에 맞는 렌더러로 출력한다.
-   - HTML → `${CLAUDE_PLUGIN_ROOT}/skills/build-html/SKILL.md`
-   - 문서·슬라이드 → `${CLAUDE_PLUGIN_ROOT}/skills/build-doc/SKILL.md`
+**5단계를 전부 돈다. 하나도 건너뛰지 않는다.**
 
-수정 요청이 오면 스펙(`report-spec.json`)을 고치고 다시 렌더링한다. 산출물을 직접 편집하지 않는다.
+```
+1) frame-question   유형 판정 → 질문·수신자·가정·분석 축 합의   ← 데이터를 열기 전
+2) load-data        정규화 + 데이터셋 카드
+3) plan-report      포맷 중립 스펙 + 배치 설계
+4) build-html/doc   렌더링
+5) verify-report    소스 검사 → 렌더 검사 → 서브에이전트 검수
+```
+
+각 단계는 해당 SKILL.md를 Read로 읽고 그 지침을 따른다.
+`${CLAUDE_PLUGIN_ROOT}/skills/<이름>/SKILL.md`
+
+**사용자 확인은 두 곳이다. 둘 다 글자 와이어프레임으로 한다.**
+
+- 1단계 — **형태**(유형). 데이터를 보기 전에 정한다
+- 3단계 — **배치**. 실제 exhibit이 들어간 모습을 보이고 동의를 받는다
+
+HTML을 그려서 확인받지 않는다. 화면을 만들면 사용자는 구조가 아니라 색에 반응하고,
+만든 쪽은 애착이 생겨 틀렸어도 못 버린다.
+
+**수정 요청이 오면 스펙(`report-spec.json`)을 고치고 다시 렌더링한다.**
+산출물을 직접 편집하지 않는다 — 스펙과 화면이 갈라지면 다음 수정에서 무엇이 참인지 모른다.
+결론이 바뀌어야 하는 요청이면 3단계로, 질문이 바뀌어야 하면 1단계로 되돌아간다.

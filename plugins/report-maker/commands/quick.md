@@ -5,13 +5,23 @@ argument-hint: [파일 경로 또는 보고 싶은 내용]
 
 빠른 시각화 모드로 진행한다. 요청: $ARGUMENTS
 
-1. `${CLAUDE_PLUGIN_ROOT}/references/design-rules.md`와
-   `${CLAUDE_PLUGIN_ROOT}/references/chart-rules.md`를 읽는다.
-2. 수신자·의사결정은 **묻지 않는다.** 데이터와 요청에서 추론하고, 추론한 내용을 한 줄로 밝힌다.
-3. `${CLAUDE_PLUGIN_ROOT}/skills/load-data/SKILL.md` → 데이터 정규화 + 데이터셋 카드.
-4. `${CLAUDE_PLUGIN_ROOT}/skills/plan-report/SKILL.md` → 스펙 작성 (`mode: "quick"`, exhibit 1~3개).
-   exhibit이 하나여도 스펙 단계를 건너뛰지 않는다.
-5. `${CLAUDE_PLUGIN_ROOT}/skills/build-html/SKILL.md` → HTML 단일 파일 출력.
+**본인이 확인하려고 보는 화면이다.** 남에게 보낼 것이면 `/report`로 간다.
 
-빠르다고 품질 기준이 낮아지지 않는다. 파이차트 금지, 기준 표기, 서술형 결론은 그대로 적용한다.
+```
+load-data → plan-report(mode: quick) → build-html → check_html.py + lint_render.py
+```
+
+생략하는 것 — `frame-question`(질문 설계)과 서브에이전트 검수.
+수신자·의사결정은 **묻지 않는다.** 데이터와 요청에서 추론하고, **추론한 내용을 한 줄로 밝힌다.**
+
+생략하지 않는 것
+
+- **스펙 단계.** exhibit이 하나여도 "무엇을 어떤 차트로 어떤 메시지로"를 먼저 적는다
+- **기계 검사 두 개.** 둘 다 빠르다. FAIL이 남은 채로 보여주지 않는다
+- 품질 기준 전부 — 파이차트 금지, 0 기준선, 기준 표기, 서술형 결론, 각주 4요소
+
+빠르다는 건 **단계를 줄인다는 뜻이지 기준을 낮춘다는 뜻이 아니다.**
 집계 기준을 알 수 없으면 `미확인`으로 표기하고 "확인 필요"에 남긴다.
+
+보다가 "이거 보고해야겠다" 싶으면 `/report`로 올린다.
+그때 `frame-question`부터 다시 돈다 — 질문이 합의되지 않은 채 만든 것이기 때문이다.
