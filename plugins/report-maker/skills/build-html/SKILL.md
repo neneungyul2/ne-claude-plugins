@@ -276,7 +276,7 @@ key_takeaway.ask             ← 요청. 별도 줄, 굵게
 - [ ] 기울어진 텍스트가 하나도 없는가
 - [ ] 중앙정렬된 블록이 없는가
 - [ ] `emphasis_steps` 전환 시 **정렬이 바뀌지 않는가**
-- [ ] **`scripts/check_html.py`가 FAIL 0인가** — 아래 11장
+- [ ] **`check_html.py`와 `lint_render.py`가 둘 다 FAIL 0인가** — 아래 11장
 
 ### 두 가지 눈 검사 — 체크박스로 대체할 수 없다
 
@@ -311,8 +311,11 @@ with sync_playwright() as p:
 
 ```bash
 python3 ${CLAUDE_PLUGIN_ROOT}/scripts/check_html.py <산출물.html> --spec <report-spec.json>
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/lint_render.py <산출물.html>
 ```
 
+앞은 소스를 읽고, 뒤는 **브라우저로 칠해서 픽셀을 잰다** — 잘린 글자·겹친 라벨·
+모바일 가로 스크롤·폰트 폴백 붕괴는 소스로는 안 보인다.
 FAIL이 나오면 고치고 다시 돌린다. FAIL 0이 되면
 `${CLAUDE_PLUGIN_ROOT}/skills/verify-report/SKILL.md`를 읽고 검수 단계로 넘어간다.
 **report 모드에서 이 단계를 건너뛰고 전달하지 않는다.**

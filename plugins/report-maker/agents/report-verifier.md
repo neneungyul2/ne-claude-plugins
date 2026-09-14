@@ -39,35 +39,22 @@ tools: Read, Bash, Glob, Grep
 ## 1. 기계 검사 — 먼저, 항상
 
 ```bash
-python3 ${CLAUDE_PLUGIN_ROOT}/scripts/check_html.py <산출물.html> --spec <report-spec.json>
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/check_html.py <산출물.html> --spec <스펙.json>
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/lint_render.py <산출물.html> --shot full.png
 ```
 
-판단이 필요 없는 것은 전부 여기서 나온다 — 외부 리소스, 자리표시자 잔존,
-폰트/라운드 종류 수, 각주 4요소, 히어로 목록 개수, 숫자 중복, 용어 미등록,
-본문 표 행 수, `encoding.claim`이 위치·길이에 있는지, `weight: primary` 개수.
-
+앞은 소스를 읽고, 뒤는 브라우저로 칠해본다.
 **FAIL이 있으면 그것부터 그대로 보고한다.** 여기서 나온 것을 눈으로 다시 확인하느라
-시간을 쓰지 않는다.
+시간을 쓰지 않는다 — 잘린 글자·겹친 라벨·넘치는 폭은 이미 기계가 잡았다.
 
-## 2. 눈 검사 — 스크립트가 못 보는 것
+`lint_render.py`가 종료 코드 2를 내면 playwright가 없는 것이다.
+그때만 아래 2단계의 스크린샷을 직접 찍는다.
 
-렌더링해서 **직접 본다.** 코드만 읽고 판정하지 않는다.
+## 2. 눈 검사 — 기계가 못 보는 것만
 
-```python
-from playwright.sync_api import sync_playwright
-with sync_playwright() as p:
-    b = p.chromium.launch()
-    pg = b.new_page(viewport={'width':1280,'height':1400})
-    errs = []; pg.on('pageerror', lambda e: errs.append(str(e)))
-    pg.goto('file://<절대경로>'); pg.wait_for_timeout(600)
-    pg.screenshot(path='full.png', full_page=True)
-    pg.set_viewport_size({'width':400,'height':900}); pg.wait_for_timeout(300)
-    pg.screenshot(path='mobile.png', full_page=True)
-    print('js errors:', errs)
-    b.close()
-```
+1단계가 남긴 `full.png`를 Read로 **실제로 본다.** 코드만 읽고 판정하지 않는다.
 
-찍은 이미지를 Read로 **실제로 본다.**
+여기서 볼 것은 **판단이 필요한 것뿐이다.** 잘림·겹침·넘침은 이미 잡혔으니 다시 세지 않는다.
 
 ### ① 눈이 먼저 가는 곳
 
@@ -85,10 +72,9 @@ with sync_playwright() as p:
 
 ### ③ 읽힘
 
-- 잘린 글자가 있는가 (라벨, 표 셀, 축)
-- 겹친 라벨이 있는가
-- 400px 폭에서 가로 스크롤이 생기는가
-- 모르는 말이 있는데 툴팁이 없는가
+- **모르는 말이 있는데 툴팁이 없는가** (기계는 등록 여부만 보지, 어려운 말인지는 못 본다)
+- 라벨이 붙어 있긴 한데 **무엇을 가리키는지 헷갈리는가**
+- 숫자의 기준이 화면에서 찾아지는가
 
 ### ④ 차트
 
@@ -98,6 +84,7 @@ with sync_playwright() as p:
 - 축 눈금과 값 라벨을 둘 다 쓰고 있지 않은가
 - **제목이 말하는 주장을 차트에서 눈으로 확인할 수 있는가** — 제목의 숫자가
   작은 글씨로만 있으면 인코딩이 틀린 것이다
+- 차트 종류가 그 질문에 맞는가 (기계는 매핑표만 보지, 질문이 맞는지는 못 본다)
 
 ## 3. 역스토리보딩 — 논리 대조
 
@@ -146,6 +133,6 @@ FAIL n · WARN n  (스크립트 출력 그대로)
 - 독자가 잘못된 결론에 이를 수 있다 (기준 혼동, 축 조작, 인코딩 불일치)
 - 독자가 읽다가 멈춘다 (잘린 글자, 모르는 말, 없는 기준)
 - 요청이 전달되지 않는다 (`ask` 부재, 강조가 엉뚱한 곳)
-- 기계 검사 FAIL
+- 기계 검사 FAIL (소스·렌더 양쪽)
 
 나머지는 "판단이 필요한 것"으로 내린다. **전부 올리면 아무것도 안 고쳐진다.**

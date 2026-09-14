@@ -6,7 +6,8 @@
 
 ## 1. question_type → chart 매핑
 
-`skills/plan-report/references/spec-schema.md` 4장과 **동일한 표**다. 한쪽만 고치지 않는다.
+`skills/plan-report/references/spec-schema.md`와 **동일한 표**다. 한쪽만 고치지 않는다.
+`scripts/verify_docs_sync.py`가 두 표를 줄 단위로 대조한다.
 
 | question_type | 질문 | 기본 chart | 대안 | 쓰지 말 것 |
 |---|---|---|---|---|
@@ -23,7 +24,7 @@
 | `correlation` | 두 값이 같이 움직이나 | `scatter` | — | 이중 Y축 선그래프 |
 | `deviation` | 기준 대비 얼마나 벗어났나 | `diverging_bar` | `bullet` | 일반 막대 |
 | `part_to_whole_time` | 구성이 시간에 따라 변했나 | `stacked_area` | `stacked_bar` | 파이 여러 개 |
-| `flow` | 어디서 어디로 이동했나 | `sankey`(항목 ≤6) | `waterfall` | — |
+| `flow` | 어디서 어디로 이동했나 | `sankey`(≤6) | `waterfall` | — |
 | `geo` | 어느 지역인가 | `choropleth` | `bar_sorted` | 지역명 막대만 (분포가 안 보인다) |
 | `single_value` | 지금 값이 얼마인가 | `kpi` | — | 게이지, 도넛 |
 | `detail` | 정확한 숫자를 봐야 함 | `table` | — | 차트 |
