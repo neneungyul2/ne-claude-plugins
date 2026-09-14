@@ -35,6 +35,9 @@ Claude Code / Cowork에서 쓰는 사내 스킬 묶음을 한 곳에서 배포�
 ne-claude-plugins/
 ├── .claude-plugin/
 │   └── marketplace.json      마켓플레이스 정의. 플러그인을 추가하면 여기 등록한다
+├── docs/
+│   ├── design-decisions.md   왜 이렇게 만들었는지
+│   └── open-issues.md        미확정 항목. 확인되면 여기와 플러그인 문서를 함께 고친다
 └── plugins/
     ├── work-toolkit/
     ├── report-maker/
@@ -67,6 +70,13 @@ ne-claude-plugins/
 - 패치: 문구·오탈자 수정
 - 마이너: 스킬 추가, 동작 변경
 - 메이저: 기존 사용법이 깨지는 변경
+
+## 문서
+
+| 파일 | 내용 |
+|---|---|
+| [`docs/design-decisions.md`](docs/design-decisions.md) | 설계 근거. 결정을 바꾸려면 여기부터 고치고 구현을 따라오게 한다 |
+| [`docs/open-issues.md`](docs/open-issues.md) | 미결 사항. 지표 정의·임계값처럼 확인이 필요한 항목을 모아둔다 |
 
 ## 사내 사용 시 주의
 

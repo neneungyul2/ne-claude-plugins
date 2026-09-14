@@ -98,6 +98,6 @@ alias가 없으면 "재고회전율", "재고 회전율", "inventory turnover", 
 
 ## 미결 사항
 
-- 훅 도입 여부 — 1차는 커맨드만으로 간다. 정착 후 판단한다
-  (도입한다면 `type: "prompt"` 훅으로 먼저 판정시키고 조건 충족 시에만 제안, 세션당 1회 제한)
-- 시드 용어 추가 — 영업 실무·마케팅 영역이 비어 있다
+훅 도입 여부, 시드 용어 추가, 시드의 사내 정의 채우기는
+저장소 루트의 [`docs/open-issues.md`](../../docs/open-issues.md)에서 관리한다.
+설계 근거는 [`docs/design-decisions.md`](../../docs/design-decisions.md) 참조.

@@ -160,6 +160,12 @@ work-toolkit/
 
 두 자료 모두 인용 시 출처 명기를 요구한다. **사내 용도로만 사용한다.**
 
+## 미결 사항
+
+영역 판별표 갱신, 출처 자료 사용 범위, 커맨드 도입 여부는
+저장소 루트의 [`docs/open-issues.md`](../../docs/open-issues.md)에서 관리한다.
+설계 근거는 [`docs/design-decisions.md`](../../docs/design-decisions.md) 참조.
+
 ## 변경 이력
 
 - **v0.2.0** — 구조 재편. 10개 case 스킬 → 7개 영역 스킬 + 52개 상황 참조 문서.

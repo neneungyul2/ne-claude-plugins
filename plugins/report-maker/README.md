@@ -67,10 +67,8 @@
 - HTML 산출물이 사외로 나갈 가능성이 있으면 비밀번호 보호(StatiCrypt 등)를 안내한다.
   자동으로 걸지 않는다.
 
-## 미결 사항 (파일럿에서 확정)
+## 미결 사항
 
-1. `action_title` 명사구 반려 규칙의 강도 — 현재는 고쳐 쓰고 알리는 수준
-2. 한 화면 내 기준 혼재 예외 — 현재는 총출고/반품 병치만 허용
-3. `question_type` 매핑표 누락 유형
-4. `metrics.md` 지표 정의 대부분 미확정 (실무 확인 필요)
-5. 영업일보 임계값 수치 미정
+지표 정의, 영업일보 임계값, `action_title` 반려 강도 등 미확정 항목은
+저장소 루트의 [`docs/open-issues.md`](../../docs/open-issues.md)에서 관리한다.
+설계 근거는 [`docs/design-decisions.md`](../../docs/design-decisions.md) 참조.
