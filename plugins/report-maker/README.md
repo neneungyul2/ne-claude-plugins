@@ -34,7 +34,7 @@
 | 스킬 | 하는 일 |
 |---|---|
 | `report-helper` | 진입점. 모드(quick/report) 판단 후 안내 |
-| `frame-question` | **질문·가정·수신자 레벨·분석 축 합의.** report 필수. 데이터를 열기 전에 돈다 |
+| `frame-question` | **질문·가정·수신자·전달 방식·3분 스토리·긴장·서사 순서 합의.** report 필수. 데이터를 열기 전에 돈다 |
 | `load-data` | 엑셀·CSV·붙여넣기·Metabase → 정규화 데이터셋 + 데이터셋 카드 |
 | `plan-report` | 리포트 스펙 작성 + 자체 검사 |
 | `build-html` | HTML 단일 파일 출력 (외부 의존 없음) |
@@ -47,6 +47,8 @@ v0.2.0~v0.3.0에서 아래가 **필수**가 됐다.
 | 요소 | 규칙 |
 |---|---|
 | **핵심 결론** | 화면 최상단, 가장 큰 글자. 수치와 결론어에 형광펜(`emphasis` 2~4개) |
+| **요청(`ask`)** | 결론은 발견에서 끝나지 않는다. 히어로 안에 요청이 있어야 한다 |
+| **히어로 요약** | 각 exhibit의 `action_title`을 **순서대로 그대로**. 요약을 새로 쓰지 않는다 |
 | **KPI** | 2~4개. 비교값 없는 지표는 KPI가 아니다 |
 | **인사이트 → 액션** | report 모드 3~5개. 발견·근거·제안·우선순위 **표**. 제목은 동사로 끝난다. **담당자는 적지 않는다** |
 | **수신자 레벨** | 액션의 `level`이 `brief.audience_level`보다 두 단계 아래면 "실무 후속 과제"로 내린다 |
@@ -56,15 +58,19 @@ v0.2.0~v0.3.0에서 아래가 **필수**가 됐다.
 | **네비게이션** | exhibit 3개 이상이면 좌측 스티키 목차 + 섹션 번호 배지 |
 | **주장 하나** | `action_title`은 한 exhibit당 주장 하나. `—`로 두 주장 잇기 금지 |
 | **축 전환** | 같은 질문을 다른 각도로 봐야 하면 exhibit을 쪼개지 말고 `views` 토글 |
+| **강조 단계** | 같은 차트로 여러 이야기를 하면 `emphasis_steps`. **정렬을 바꾸지 않는다** |
+| **텍스트** | 모든 차트에 제목, 모든 축에 축 제목. 범례 대신 직접 라벨 |
+| **강조 상한** | 화면의 10% 이하. 계열은 4~5개 이하 (단기기억 한계) |
 | **드릴다운** | 세그먼트에서 개별로 2단계. 시군구 251개를 처음부터 보여주지 않는다 |
 | **가정 명시** | `brief.assumptions`를 산출물에 그대로 표시. 미확인은 `확인 필요` 배지 |
 
 ## 지원 차트
 
-기본형 — `bar` `bar_sorted` `line` `stacked_bar` `stacked_bar_100` `stacked_area`
+기본형 — `simple_text` `bar` `bar_sorted` `line` `stacked_bar` `stacked_bar_100` `stacked_area`
 `dot_plot` `scatter` `histogram` `diverging_bar` `bullet` `kpi` `table`
 
-컨설팅 계열 — **`marimekko`**(크기와 구성을 동시에) **`waterfall`**(증감 분해)
+컨설팅 계열 — **`slopegraph`**(두 시점 증감) **`small_multiples`**(계열이 많을 때)
+**`marimekko`**(크기와 구성을 동시에) **`waterfall`**(증감 분해)
 **`choropleth`**(한국 지도) `heatmap` `sankey`
 
 금칙 — 파이, 도넛, 3D, 이중 Y축, 잘린 축, 무지개 팔레트, 게이지, 워드클라우드
@@ -73,7 +79,8 @@ v0.2.0~v0.3.0에서 아래가 **필수**가 됐다.
 
 | 파일 | 내용 |
 |---|---|
-| `references/design-rules.md` | 배치·색·여백·각주·용어·묶기·네비게이션 |
+| `references/storytelling.md` | **스토리 규칙.** Big Idea·3막 구조·긴장·서사 순서·수평/수직 논리 |
+| `references/design-rules.md` | 게슈탈트·강조 상한·배치·색·정렬·여백·각주·용어·검수 |
 | `references/chart-rules.md` | 질문 유형별 차트 선택, 금칙과 이유, 차트별 세부 규칙 |
 | `references/metrics.md` | 지표 정의와 복수 기준. **glossary의 원본** |
 | `references/korea-map.md` | 한국 지도 그리는 법, 색 계조, 착시 주의 |
@@ -95,6 +102,9 @@ v0.2.0~v0.3.0에서 아래가 **필수**가 됐다.
 6. **읽는 사람이 멈추지 않게 한다.** 모르는 용어, 열어볼 수 없는 묶음, 액션 없는 결론은 거기서 멈추게 만든다.
 7. **질문을 먼저 합의한다.** 데이터가 질문을 정하게 두지 않는다.
 8. **수신자 레벨이 액션의 필터다.** 수신자를 묻기만 하고 쓰지 않으면 실무 과제가 본부장 보고에 섞인다.
+9. **발견에서 끝내지 않는다.** 결론 = 판단 + 요청. 액션 표는 그 전개일 뿐이다.
+10. **위에서부터 좁혀 들어간다.** "다르다"는 말은 비교 틀이 먼저 서야 성립한다.
+11. **같은 데이터를 다시 보여줄 때 순서를 바꾸지 않는다.** 강조만 옮긴다.
 
 ## 사내 사용 전제
 
@@ -110,6 +120,14 @@ v0.2.0~v0.3.0에서 아래가 **필수**가 됐다.
 
 ## 변경 이력
 
+- **v0.4.0** — *Storytelling with Data*(Knaflic, 2015) 전문을 반영.
+  `references/storytelling.md` 신설(Big Idea·3막 구조·긴장·서사 순서·Bing-Bang-Bongo·
+  수평/수직 논리·역스토리보딩). 스펙 2.2: `key_takeaway.ask`, `brief.tension`·`mechanism`·
+  `narrative_order`·`three_minute_story`, exhibit `emphasis_steps`.
+  차트 추가: `slopegraph` `small_multiples` `simple_text`, 스파게티 대응 3전략.
+  규칙 추가: 게슈탈트 6원칙, 강조 10% 상한, 계열 4개 상한, 제로 베이스라인 근거,
+  모든 차트·축에 제목, 범례 대신 직접 라벨, 색맹 근거, 중앙정렬·대각선 금지,
+  "눈이 먼저 가는 곳" 테스트.
 - **v0.3.0** — `frame-question` 스킬 신설(질문·가정·수신자 레벨·분석 축 합의).
   스펙 2.1: `brief`·`segments`, exhibit에 `views`(축 전환)·`drilldown`(계층)·`answers`.
   액션에서 `owner` 제거하고 `level` 추가 — 수신자보다 두 단계 아래면 "실무 후속 과제"로 분리.

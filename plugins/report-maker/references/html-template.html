@@ -89,6 +89,29 @@ h1,h2,h3,h4,p,li,td,th,text{word-break:keep-all;overflow-wrap:anywhere}
 .summary li::before{content:"";position:absolute;left:0;top:.62em;width:5px;height:5px;
                     border-radius:50%;background:var(--gray)}
 .summary li b{color:var(--ink);font-weight:700}
+/* ★ 히어로 요약 = 각 exhibit의 action_title을 순서대로. 요약을 새로 쓰지 않는다 */
+.summary.steps li{padding-left:0;font-size:14px;color:var(--ink);margin:9px 0}
+.summary.steps li::before{display:none}
+.summary.steps li i{font-style:normal;display:inline-grid;place-items:center;width:17px;height:17px;
+       border-radius:5px;background:var(--ink);color:#fff;font-size:10px;font-weight:800;
+       margin-right:8px;vertical-align:1px}
+/* ★ 요청(ask). 결론은 발견에서 끝나지 않는다 */
+.ask{margin:18px 0 0;padding:13px 15px;background:#fff;border:1px solid var(--blueSoft);
+     border-radius:var(--r2);font-size:14px;font-weight:700;color:var(--blueDk);max-width:46em}
+.ask::before{content:"요청";display:inline-block;font-size:10px;font-weight:800;letter-spacing:.04em;
+     color:#fff;background:var(--blueDk);padding:2px 7px;border-radius:5px;margin-right:9px;
+     vertical-align:2px}
+
+/* ── 가설 → 검증 → 판정 ─────────────────────────────── */
+.hyp{display:grid;grid-template-columns:64px 1fr;gap:10px 12px;margin:0 0 18px;
+     background:var(--panel);border:1px solid var(--line2);border-radius:var(--r2);padding:14px 16px}
+.hyp dt{font-size:10.5px;font-weight:800;color:var(--dim);letter-spacing:.03em;padding-top:2px}
+.hyp dd{margin:0;font-size:13px;color:var(--sub)}
+.hyp dd b{color:var(--ink);font-weight:700}
+.vd{display:inline-block;font-size:10.5px;font-weight:800;padding:2px 8px;border-radius:5px;margin-right:7px}
+.vd.ok{background:var(--upBg);color:var(--up)}
+.vd.no{background:var(--dnBg);color:var(--dn)}
+.vd.part{background:var(--warnBg);color:var(--warn)}
 
 .kpi{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:0;
      border:1px solid var(--line2);border-radius:var(--r);overflow:hidden;margin-bottom:14px;background:#fff}
@@ -120,6 +143,11 @@ h1,h2,h3,h4,p,li,td,th,text{word-break:keep-all;overflow-wrap:anywhere}
 .chartwrap svg{display:block;width:100%;height:auto}
 .cell{stroke:#fff;stroke-width:.8;transition:opacity .1s}
 .chartwrap svg.dim .cell{opacity:.2} .chartwrap svg.dim .cell.on{opacity:1}
+/* ★ emphasis_steps — 같은 차트에서 강조만 이동한다. 정렬을 바꾸지 않는다 */
+.cell.dimmed,.serie.dimmed,text.dimmed{opacity:.22;filter:grayscale(1);transition:opacity .15s}
+/* 차트·축 제목. 제목은 진회색, 순수 검정은 강조용으로 아껴 둔다 */
+.chartwrap svg .gtitle{font-size:13px;font-weight:700;fill:var(--sub)}
+.chartwrap svg .axtitle{font-size:10.5px;fill:var(--dim)}
 .legend{display:flex;gap:7px 16px;flex-wrap:wrap;align-items:center;
         font-size:12.5px;color:var(--sub);margin:0 0 12px}
 .legend>span{display:inline-flex;align-items:center;padding:2px 6px;margin:-2px -6px;border-radius:6px}
@@ -294,12 +322,17 @@ td .sw{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:
 <main class="wrap">
 
   <!-- ── 핵심 결론 ───────────────────────────────────── -->
+  <!-- 히어로 = 판단(text) + 섹션 헤더 목록 + 요청(ask). 세 부분이다.
+       요약을 새로 쓰지 않는다. 각 exhibit의 action_title을 순서대로 그대로 넣는다.
+       세부 수치는 여기 넣지 않는다 — 비교 틀이 서기 전에 나오면 읽히지 않는다 -->
   <section class="hero">
     <span class="takelbl">핵심 결론</span>
     <p class="takeaway">{{HEADLINE}} — 강조할 대목은 <b>이렇게</b> 감싼다</p>
-    <ul class="summary">
-      <li><b>수치</b>를 앞에 두고 근거를 잇는다.</li>
+    <ul class="summary steps">
+      <li><i>1</i>첫 번째 exhibit의 action_title</li>
+      <li><i>2</i>두 번째 exhibit의 action_title</li>
     </ul>
+    <p class="ask">{{ASK}}</p>
   </section>
 
   <div class="kpi">
@@ -585,6 +618,33 @@ td .sw{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:
       seg.querySelectorAll('button').forEach(function(x){ x.setAttribute('aria-pressed', String(x===b)); });
       wrap.querySelectorAll('.view').forEach(function(v){ v.hidden = v.dataset.view!==b.dataset.view; });
     });
+  });
+
+  /* ── 강조 단계 (emphasis_steps) ──
+     같은 차트, 같은 정렬. highlight 대상 외에는 .dimmed 를 건다.
+     ★ 정렬이나 데이터를 바꾸지 않는다. 바꾸면 인지 세금이다 */
+  document.querySelectorAll('.seg[data-mode="emph"]').forEach(function(seg){
+    var sec = seg.closest('section');
+    function apply(step){
+      var spec = JSON.parse(seg.dataset.steps || '{}')[step] || [];
+      var any = spec.length > 0;
+      sec.querySelectorAll('.chartwrap [data-key],.chartwrap [data-series]').forEach(function(el){
+        if(!any){ el.classList.remove('dimmed'); return; }
+        var hit = spec.some(function(h){
+          return (h.series && el.dataset.series === h.series)
+              || (h.key    && el.dataset.key    === h.key);
+        });
+        el.classList.toggle('dimmed', !hit);
+      });
+      sec.querySelectorAll('.eread').forEach(function(p){ p.hidden = p.dataset.step !== step; });
+    }
+    seg.addEventListener('click', function(e){
+      var b = e.target.closest('button[data-step]'); if(!b) return;
+      seg.querySelectorAll('button').forEach(function(x){ x.setAttribute('aria-pressed', String(x===b)); });
+      apply(b.dataset.step);
+    });
+    var init = seg.querySelector('button[aria-pressed="true"]');
+    if(init) apply(init.dataset.step);
   });
 
   /* ── 드릴다운 ── */
