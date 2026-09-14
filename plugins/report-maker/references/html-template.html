@@ -183,6 +183,45 @@ td .sw{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:
 .tag.mid{background:var(--warnBg);color:var(--warn)}
 .tag.ev{background:var(--upBg);color:var(--up)}
 
+
+/* ── 축 전환 토글 ─────────────────────────────────────── */
+.seg{display:inline-flex;background:var(--line);border-radius:9px;padding:3px;margin:0 0 14px}
+.seg button{border:0;background:none;font-size:12.5px;font-weight:600;color:var(--dim);
+            padding:6px 14px;border-radius:7px;cursor:pointer;white-space:nowrap}
+.seg button[aria-pressed="true"]{background:#fff;color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.view[hidden]{display:none}
+.vread{margin:0 0 12px;font-size:12.5px;color:var(--sub)}
+.vread b{color:var(--ink);font-weight:700}
+
+/* ── 드릴다운 ─────────────────────────────────────────── */
+.drill{background:var(--panel);border-radius:var(--r2);padding:16px 18px;margin-top:12px;display:none}
+.drill.open{display:block}
+.drill h4{margin:0 0 2px;font-size:13px;font-weight:700}
+.drill .cap{margin:0 0 12px;font-size:11.5px;color:var(--dim)}
+.drillbtn{border:1px solid var(--line2);background:#fff;border-radius:7px;padding:4px 10px;
+          font-size:11.5px;font-weight:600;color:var(--sub);cursor:pointer;margin-left:6px}
+.drillbtn:hover{border-color:var(--blue);color:var(--blueDk)}
+.drillbtn[aria-expanded="true"]{background:var(--blueBg);border-color:var(--blueSoft);color:var(--blueDk)}
+
+/* ── 액션 표 ──────────────────────────────────────────── */
+.acttbl{width:100%;border-collapse:collapse;font-size:12.5px;background:#fff;border-radius:var(--r2);overflow:hidden}
+.acttbl th{background:#fff;font-size:11px;color:var(--dim);padding:11px 12px;border-bottom:1px solid var(--line2)}
+.acttbl td{padding:13px 12px;border-bottom:1px solid var(--line);vertical-align:top;color:var(--sub)}
+.acttbl tbody tr:last-child td{border-bottom:0}
+.acttbl .find{font-weight:700;color:var(--ink)}
+.acttbl .do{font-weight:600;color:var(--ink)}
+.subacts{margin-top:14px;border-top:1px dashed var(--blueSoft);padding-top:14px}
+.subacts h3{margin:0 0 3px;font-size:12.5px;font-weight:700;color:var(--sub)}
+.subacts p.lead{margin:0 0 10px;font-size:11.5px;color:var(--dim)}
+
+/* ── 가정·한계 ────────────────────────────────────────── */
+.assume{margin-top:16px;border:1px solid var(--line2);border-radius:var(--r);padding:18px 20px}
+.assume h3{margin:0 0 8px;font-size:13px;font-weight:800}
+.assume ul{margin:0;padding-left:18px;font-size:12.5px;color:var(--sub)}
+.assume li{margin:5px 0}
+.assume .q{display:inline-block;font-size:10.5px;font-weight:700;padding:1px 7px;border-radius:5px;
+           background:var(--warnBg);color:var(--warn);margin-left:6px}
+
 /* ── 확인 필요 ────────────────────────────────────────── */
 .open{margin-top:16px;border:1px solid var(--amber);background:var(--warnBg);
       border-radius:var(--r);padding:18px 20px}
@@ -302,6 +341,48 @@ td .sw{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:
     <p class="note">출처 {{SOURCE}} · 기간 {{PERIOD}} · 단위 {{UNIT}} · 집계기준 {{BASIS}}</p>
   </section>
 
+  <!-- ── 축 전환 + 드릴다운 ──────────────────────────── -->
+  <div class="shead" id="ex1b"><span class="snum">2</span><h2>{{ACTION_TITLE}} — 주장 하나만</h2></div>
+  <section class="block">
+    <p class="sowhat">{{SO_WHAT}}</p>
+
+    <!-- views 가 2개 이상일 때만 토글을 만든다 -->
+    <div class="seg" role="group" aria-label="축 전환">
+      <button aria-pressed="true"  data-view="by-region">지역별</button>
+      <button aria-pressed="false" data-view="by-grade">학교급별</button>
+    </div>
+
+    <div class="view" data-view="by-region">
+      <p class="vread">이 축에서 읽히는 것 한 줄. <b>서울·세종은 고등 우위, 제주·전북은 초등 우위다.</b></p>
+      <div class="chartwrap"><svg viewBox="0 0 720 300"><!-- … --></svg></div>
+    </div>
+    <div class="view" data-view="by-grade" hidden>
+      <p class="vread">축이 바뀌면 보이는 것도 바뀐다. <b>중등은 어느 지역에서나 절반을 넘는다.</b></p>
+      <div class="chartwrap"><svg viewBox="0 0 720 300"><!-- … --></svg></div>
+    </div>
+
+    <!-- 드릴다운: 세그먼트에서 개별 단위로 -->
+    <p style="margin:14px 0 0;font-size:12.5px;color:var(--sub)">
+      지역 유형별로 묶어 봤다.
+      <button class="drillbtn" data-drill="d-hakgun" aria-expanded="false">학군지 시군구 보기</button>
+      <button class="drillbtn" data-drill="d-sindo" aria-expanded="false">신도시 시군구 보기</button>
+    </p>
+    <div class="drill" data-drill="d-hakgun">
+      <h4>학군지 — 시군구</h4>
+      <p class="cap">고등 비중이 전국 평균 +5%p 이상인 시군구. 이번 분석에서 정의한 구분이다.</p>
+      <div class="tw"><table><thead><tr><th>시군구</th><th class="r">GMV</th><th class="r">고등−초등</th></tr></thead>
+      <tbody><tr><td>서울 강남구</td><td class="r">10.2</td><td class="r">+15.5%p</td></tr></tbody></table></div>
+    </div>
+    <div class="drill" data-drill="d-sindo">
+      <h4>신도시 — 시군구</h4>
+      <p class="cap">초등 비중이 전국 평균 +3%p 이상인 시군구.</p>
+      <div class="tw"><table><tbody><tr><td>경기 김포시</td><td class="r">9.1</td><td class="r">−3.7%p</td></tr></tbody></table></div>
+    </div>
+
+    <p class="note">출처 … · 기간 … · 단위 … · 집계기준 …<br>
+      지역 유형은 이번 분석에서 정의한 구분이다 — 고등 비중 전국 평균 +5%p 이상 학군지, 초등 비중 +3%p 이상 신도시.</p>
+  </section>
+
   <!-- ── 그룹 항목 + 전체 보기 모달 ───────────────────── -->
   <div class="shead" id="ex2"><span class="snum">2</span><h2>{{ACTION_TITLE_2}}</h2></div>
   <section class="block">
@@ -321,21 +402,42 @@ td .sw{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:
 
   <!-- ── 인사이트와 액션 ─────────────────────────────── -->
   <div class="advice">
-    <h2>인사이트와 액션</h2>
-    <p class="lead">위 결론에서 바로 실행할 수 있는 것만 적는다. 근거 없는 제안은 넣지 않는다.</p>
-    <ol class="acts">
-      <li>
-        <div>
-          <p class="at">액션 제목 — 무엇을 할지 한 문장</p>
-          <p class="aw">왜 이 액션인지. 어느 exhibit의 어떤 수치가 근거인지 명시한다.</p>
-          <div class="meta">
-            <span class="tag hi">우선순위 높음</span>
-            <span class="tag">담당 확인 필요</span>
-            <span class="tag ev">확인 지표: 전환율</span>
-          </div>
-        </div>
-      </li>
-    </ol>
+    <h2>인사이트 → 액션</h2>
+    <p class="lead">근거는 데이터, 액션은 제안이다. 담당자는 적지 않는다 — 조직이 정한다.</p>
+    <div class="tw"><table class="acttbl">
+      <thead><tr><th>발견</th><th>근거</th><th>제안 액션</th><th style="width:88px">우선순위</th></tr></thead>
+      <tbody>
+        <tr>
+          <td class="find">구매자는 40대 여성 학부모다</td>
+          <td>40대 여성 51.3%, 40~50대 87.4% <span style="color:var(--dim)">(①)</span></td>
+          <td class="do">상품명·상세페이지를 학년·수준이 먼저 읽히게 정비</td>
+          <td><span class="tag hi">높음</span></td>
+        </tr>
+      </tbody>
+    </table></div>
+
+    <!-- 수신자보다 두 단계 아래 액션은 여기로 내린다. 지우지 않는다 -->
+    <div class="subacts">
+      <h3>실무 후속 과제</h3>
+      <p class="lead">본부장 보고 범위 밖이지만 기록해 둔다.</p>
+      <div class="tw"><table class="acttbl">
+        <tbody><tr>
+          <td class="find">lineage 마스터에 공백이 있다</td>
+          <td>시리즈·영역 미기재가 GMV의 9.9% <span style="color:var(--dim)">(④)</span></td>
+          <td class="do">Build&amp;Grow 라인 시리즈·영역 등록</td>
+          <td><span class="tag">실무</span></td>
+        </tr></tbody>
+      </table></div>
+    </div>
+  </div>
+
+  <!-- ── 가정과 한계 ─────────────────────────────────── -->
+  <div class="assume">
+    <h3>이 리포트의 가정</h3>
+    <ul>
+      <li>쿠팡 리포트 기준(GMV, 반품 차감)으로 본다. 사내 SAP 출고와 합산하지 않는다</li>
+      <li>지역 유형 구분은 이번 분석에서 정의한 것이다 <span class="q">확인 필요</span></li>
+    </ul>
   </div>
 
   <div class="open">
@@ -472,6 +574,30 @@ td .sw{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:
     });
     s.addEventListener('mouseleave',function(){
       document.querySelectorAll('.chartwrap svg').forEach(function(svg){ svg.classList.remove('dim'); });
+    });
+  });
+
+  /* ── 축 전환 토글 ── */
+  document.querySelectorAll('.seg').forEach(function(seg){
+    seg.addEventListener('click',function(e){
+      var b=e.target.closest('button[data-view]'); if(!b)return;
+      var wrap=seg.closest('section');
+      seg.querySelectorAll('button').forEach(function(x){ x.setAttribute('aria-pressed', String(x===b)); });
+      wrap.querySelectorAll('.view').forEach(function(v){ v.hidden = v.dataset.view!==b.dataset.view; });
+    });
+  });
+
+  /* ── 드릴다운 ── */
+  document.querySelectorAll('[data-drill]').forEach(function(el){
+    if(el.tagName!=='BUTTON') return;
+    el.addEventListener('click',function(){
+      var k=el.dataset.drill, panel=document.querySelector('.drill[data-drill="'+k+'"]');
+      var open=!panel.classList.contains('open');
+      // 형제 패널은 닫는다
+      var sec=el.closest('section');
+      sec.querySelectorAll('.drill').forEach(function(p){ p.classList.remove('open'); });
+      sec.querySelectorAll('button[data-drill]').forEach(function(b){ b.setAttribute('aria-expanded','false'); });
+      if(open){ panel.classList.add('open'); el.setAttribute('aria-expanded','true'); }
     });
   });
 

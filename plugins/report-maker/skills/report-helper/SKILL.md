@@ -31,15 +31,17 @@ description: 데이터를 보여줘야 하는 모든 상황의 진입점. "차�
 > quick이라고 품질이 낮아도 되는 게 아니다. 파이차트 금지, 기준 표기, 결론 먼저 —
 > 이 세 가지는 두 모드에 똑같이 적용된다.
 
-## 2. report일 때 확인할 3가지
+## 2. report면 frame-question으로 넘긴다
 
-한 번에 묶어서 묻는다. 이미 대화에서 나온 건 다시 묻지 않는다.
+여기서 수신자·의사결정을 캐묻지 않는다. **질문 설계는 별도 단계다.**
 
-1. **수신자** — 누가 보나 (대표 / 본부장 / 팀장 / 파트원 / 타 부서). 아는 수준과 관심사가 다르다.
-2. **의사결정** — 이걸 보고 무엇을 정해야 하나. "그냥 공유"면 그것도 답이다.
-3. **핵심 메시지** — 이미 알고 있는 결론이 있나. 없으면 데이터에서 찾는다.
+`${CLAUDE_PLUGIN_ROOT}/skills/frame-question/SKILL.md`를 읽고 그 절차를 따른다.
+거기서 핵심 질문 후보를 내놓고 고르게 하고, 수신자 레벨·가정·분석 축을 확정해
+`report-brief.json`으로 남긴다.
 
-추가로 기간·기준이 정해져 있으면 같이 받는다. 없으면 `load-data` 단계에서 데이터를 보고 제안한다.
+**데이터를 먼저 열지 않는다.** 값을 보면 질문이 데이터에 끌려간다.
+
+quick 모드는 이 단계를 건너뛰고 `load-data`로 바로 간다.
 
 ## 3. 산출 포맷 결정
 
@@ -53,7 +55,9 @@ description: 데이터를 보여줘야 하는 모든 상황의 진입점. "차�
 ## 4. 진행 순서
 
 ```
-[이 스킬] 모드·브리프 확정
+[이 스킬] 모드 판단
+   ↓
+frame-question   질문·가정·수신자 레벨·분석 축 합의  ← report 필수
    ↓
 load-data        데이터 확보 + 정규화 + 데이터셋 카드
    ↓
@@ -64,6 +68,7 @@ build-html  또는  build-doc
 
 다음 스킬로 넘어갈 때는 해당 SKILL.md를 Read 도구로 읽고 그 지침을 따른다.
 
+- `${CLAUDE_PLUGIN_ROOT}/skills/frame-question/SKILL.md`
 - `${CLAUDE_PLUGIN_ROOT}/skills/load-data/SKILL.md`
 - `${CLAUDE_PLUGIN_ROOT}/skills/plan-report/SKILL.md`
 - `${CLAUDE_PLUGIN_ROOT}/skills/build-html/SKILL.md`
