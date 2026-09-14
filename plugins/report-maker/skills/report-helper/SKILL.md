@@ -69,6 +69,9 @@ build-html  또는  build-doc
 - `${CLAUDE_PLUGIN_ROOT}/skills/build-html/SKILL.md`
 - `${CLAUDE_PLUGIN_ROOT}/skills/build-doc/SKILL.md`
 
+report 모드에서는 **인사이트·액션(3~5개)이 필수**다. exhibit만 늘어놓고 끝내지 않는다.
+축약어·사내 용어가 나오면 용어 설명을 붙이고, 한 문장으로 안 되는 계산은 산식 모달로 뺀다.
+
 **스펙 단계를 건너뛰지 않는다.** exhibit이 하나뿐이어도 "무엇을 어떤 차트로 어떤 메시지로"를
 먼저 적고 나서 그린다. 이 순서를 지키지 않으면 같은 데이터로 만든 두 산출물의 결론이 달라진다.
 

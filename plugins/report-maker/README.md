@@ -13,12 +13,10 @@
 "일보 만들어줘"
 ```
 
-명시적으로 부르려면:
-
 | 커맨드 | 용도 |
 |---|---|
 | `/quick` | 본인 확인용 빠른 시각화 |
-| `/report` | 정식 보고 (수신자·의사결정 확인 후 진행) |
+| `/report` | 정식 보고 |
 | `/daily` | 영업일보 |
 
 ## 동작 구조
@@ -38,37 +36,69 @@
 | `build-html` | HTML 단일 파일 출력 (외부 의존 없음) |
 | `build-doc` | 문서·슬라이드 출력 |
 
-## 설계 원칙
+## 산출물이 갖춰야 할 것
 
-1. **포맷 중립 스펙을 거친다.** 렌더러가 레이아웃을 스스로 판단하지 않는다.
-2. **기준은 규칙이 아니라 파라미터다.** 총출고든 순출고든 강제하지 않는다.
-   강제하는 것은 *기준을 명시했다는 사실*이다. 기준이 바뀌면 결론문도 다시 쓴다.
-3. **데이터 소스는 어댑터 구조.** Metabase 전용이 아니다. 엑셀·CSV·붙여넣기가 대등한 입력이다.
-4. **참조 문서에는 조회로 알 수 없는 것만 쓴다.** 테이블 목록·컬럼명은 런타임 조회.
-   "YES24는 SCM 기준" 같은 판단만 문서화한다.
-5. **quick과 report는 형식이 다를 뿐 품질 기준은 같다.** 애드혹이라고 파이차트가 나오면 안 된다.
+v0.2.0에서 아래가 **필수**가 됐다.
+
+| 요소 | 규칙 |
+|---|---|
+| **핵심 결론** | 화면 최상단, 가장 큰 글자. 수치와 결론어에 형광펜(`emphasis` 2~4개) |
+| **KPI** | 2~4개. 비교값 없는 지표는 KPI가 아니다 |
+| **인사이트·액션** | report 모드 3~5개. 제목은 동사로 끝나고 근거 exhibit을 명시한다. 없으면 없다고 쓴다 |
+| **용어 설명** | 축약어·사내 용어는 점선 밑줄 + 호버 툴팁. 정의는 `metrics.md`에서 가져온다 |
+| **산식 모달** | 한 문장으로 안 되는 계산은 `i` 아이콘 → 모달 |
+| **묶은 항목** | "기타"·"나머지 N개"는 클릭해서 전체를 볼 수 있어야 한다 (`group_detail`) |
+| **네비게이션** | exhibit 3개 이상이면 좌측 스티키 목차 + 섹션 번호 배지 |
+
+## 지원 차트
+
+기본형 — `bar` `bar_sorted` `line` `stacked_bar` `stacked_bar_100` `stacked_area`
+`dot_plot` `scatter` `histogram` `diverging_bar` `bullet` `kpi` `table`
+
+컨설팅 계열 — **`marimekko`**(크기와 구성을 동시에) **`waterfall`**(증감 분해)
+**`choropleth`**(한국 지도) `heatmap` `sankey`
+
+금칙 — 파이, 도넛, 3D, 이중 Y축, 잘린 축, 무지개 팔레트, 게이지, 워드클라우드
 
 ## 참조 문서
 
 | 파일 | 내용 |
 |---|---|
-| `references/design-rules.md` | 배치·색·여백·각주 |
-| `references/chart-rules.md` | 질문 유형별 차트 선택, 금칙과 이유 |
-| `references/metrics.md` | 지표 정의와 복수 기준. **미확정 항목은 TODO로 비워둠** |
+| `references/design-rules.md` | 배치·색·여백·각주·용어·묶기·네비게이션 |
+| `references/chart-rules.md` | 질문 유형별 차트 선택, 금칙과 이유, 차트별 세부 규칙 |
+| `references/metrics.md` | 지표 정의와 복수 기준. **glossary의 원본** |
+| `references/korea-map.md` | 한국 지도 그리는 법, 색 계조, 착시 주의 |
 | `references/daily-report.md` | 영업일보 임계값 룰 |
 | `references/sources/` | 엑셀·Metabase·붙여넣기 어댑터별 주의사항 |
-| `references/html-template.html` | HTML 디자인 토큰과 레이아웃 기본형 |
-| `skills/plan-report/references/spec-schema.md` | 리포트 스펙 규격 |
+| `references/html-template.html` | **디자인 토큰·컴포넌트·스크립트 원본** |
+| `assets/korea_paths.json` | 시도 17개 + 시군구 전체 SVG 경로 (441KB) |
+| `skills/plan-report/references/spec-schema.md` | 리포트 스펙 규격 v2.0 |
+
+## 설계 원칙
+
+1. **포맷 중립 스펙을 거친다.** 렌더러가 레이아웃을 스스로 판단하지 않는다.
+2. **기준은 규칙이 아니라 파라미터다.** 총출고든 순출고든 강제하지 않는다.
+   강제하는 것은 *기준을 명시했다는 사실*이다. 기준이 바뀌면 결론문도 다시 쓴다.
+3. **데이터 소스는 어댑터 구조.** Metabase 전용이 아니다.
+4. **참조 문서에는 조회로 알 수 없는 것만 쓴다.** 테이블 목록·컬럼명은 런타임 조회.
+5. **quick과 report는 형식이 다를 뿐 품질 기준은 같다.**
+6. **읽는 사람이 멈추지 않게 한다.** 모르는 용어, 열어볼 수 없는 묶음, 액션 없는 결론은 거기서 멈추게 만든다.
 
 ## 사내 사용 전제
 
 - **Metabase는 사내망 전용**이다. 접근 불가 시 붙여넣기·엑셀 경로로 자동 전환된다.
-  권한 문제(`grp_<db>_<schema>_<permission>`)와 연결 문제를 구분해 안내한다.
 - HTML 산출물이 사외로 나갈 가능성이 있으면 비밀번호 보호(StatiCrypt 등)를 안내한다.
-  자동으로 걸지 않는다.
+- 산출물은 **라이트 전용**이다. 보고 문서는 보는 사람마다 색이 달라지면 안 된다.
 
 ## 미결 사항
 
 지표 정의, 영업일보 임계값, `action_title` 반려 강도 등 미확정 항목은
 저장소 루트의 [`docs/open-issues.md`](../../docs/open-issues.md)에서 관리한다.
 설계 근거는 [`docs/design-decisions.md`](../../docs/design-decisions.md) 참조.
+
+## 변경 이력
+
+- **v0.2.0** — 시안 기준 디자인 전면 개편. 한국어 줄바꿈 버그 수정(`word-break:keep-all`).
+  스펙 2.0(`key_takeaway`·`kpis`·`actions`·`glossary`·`calcs`·`group_detail`).
+  마리메코·워터폴·한국 지도·히트맵 추가. 목차·모달·용어 툴팁 도입.
+- **v0.1.0** — 스펙 레이어와 어댑터 구조 골격.
