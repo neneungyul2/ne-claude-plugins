@@ -62,6 +62,40 @@ def style_blocks(html):
     return "\n".join(re.findall(r"<style\b[^>]*>(.*?)</style>", html, re.S | re.I))
 
 
+_TABPANEL = re.compile(r'<div\b[^>]*\bclass="[^"]*\btabpanel\b[^"]*"[^>]*>', re.I)
+
+
+def tab_panels(html):
+    """탭이 있으면 [(이름, 조각)], 없으면 [].
+
+    탭은 한 화면이 아니라 여러 화면이다. 수평 논리도 숫자 중복도 **탭 안에서**
+    성립하고, 탭 경계를 넘어 세면 요약 탭이 하위 탭을 되풀이하는 정상 구성이
+    매번 위반으로 잡힌다. 판정 단위를 탭으로 내린다.
+    """
+    tags = list(_TABPANEL.finditer(html))
+    if len(tags) < 2:
+        return []
+    out = []
+    for i, m in enumerate(tags):
+        end = tags[i + 1].start() if i + 1 < len(tags) else len(html)
+        name = re.search(r'data-tab="([^"]*)"', m.group(0))
+        out.append((name.group(1) if name else str(i + 1), html[m.end():end]))
+    return out
+
+
+def per_tab(fn):
+    """탭이 있으면 탭마다, 없으면 전체에 한 번 돈다."""
+    def wrapped(html, r):
+        panels = tab_panels(html)
+        if panels:
+            for name, frag in panels:
+                fn(frag, r, f" · {name}")
+        else:
+            fn(html, r, "")
+    wrapped.__name__ = fn.__name__
+    return wrapped
+
+
 # ── 개별 검사 ─────────────────────────────────────────────────────────
 
 def c_external(html, r):
@@ -182,19 +216,22 @@ def c_footnote(html, r):
         r.ok("각주 4요소", f"{len(blocks)}개 exhibit 전부")
 
 
-def c_hero_list(html, r):
-    """히어로 요약 항목 수 == exhibit 수 (수평 논리)."""
-    hero = re.search(r"<ul class=\"summary steps\"[^>]*>(.*?)</ul>", html, re.S)
+@per_tab
+def c_hero_list(html, r, tag=""):
+    """히어로 요약 항목 수 == exhibit 수 (수평 논리). 탭마다 따로 성립한다."""
+    hero = re.search(
+        r"<ul[^>]*class=\"[^\"]*\bsummary\b[^\"]*\bsteps\b[^\"]*\"[^>]*>(.*?)</ul>",
+        html, re.S)
     n_ex = len(re.findall(r"<div class=\"shead\"", html))
     if not hero:
         if n_ex:
-            r.warn("히어로 요약", "summary.steps가 없다 — action_title 목록을 넣는다")
+            r.warn(f"히어로 요약{tag}", "summary.steps가 없다 — action_title 목록을 넣는다")
         return
     n_li = len(re.findall(r"<li", hero.group(1)))
     if n_ex and n_li != n_ex:
-        r.fail("히어로 요약 = exhibit 수", f"요약 {n_li}개 vs exhibit {n_ex}개")
+        r.fail(f"히어로 요약 = exhibit 수{tag}", f"요약 {n_li}개 vs exhibit {n_ex}개")
     else:
-        r.ok("히어로 요약 = exhibit 수", f"{n_li}개")
+        r.ok(f"히어로 요약 = exhibit 수{tag}", f"{n_li}개")
 
 
 def c_action_title(html, r):
@@ -238,18 +275,23 @@ def c_legend_series(html, r):
     r.ok(f"계열 수 ≤{MAX_SERIES}", "통과")
 
 
-def c_number_repeat(html, r):
-    """같은 숫자가 화면 여러 곳에. design-rules §5."""
+@per_tab
+def c_number_repeat(html, r, tag=""):
+    """같은 숫자가 화면 여러 곳에. design-rules §5.
+
+    탭마다 센다. 요약 탭이 하위 탭의 수치를 다시 보이는 것은 중복이 아니라
+    구성이다 — 한 화면에 두 번 나오는 것만 잡는다.
+    """
     text = re.sub(r"<[^>]+>", " ", strip_svg(html))
     nums = re.findall(r"\b\d{1,3}(?:,\d{3})+(?:\.\d+)?\b|\b\d+\.\d+\b", text)
     nums = [n for n in nums if n not in {"0.0", "1.0", "100.0"}]
     dup = {n: c for n, c in Counter(nums).items() if c >= MIN_NUMBER_REPEAT}
     if dup:
         top = sorted(dup.items(), key=lambda kv: -kv[1])[:4]
-        r.warn("같은 숫자 반복",
+        r.warn(f"같은 숫자 반복{tag}",
                ", ".join(f"{n}×{c}" for n, c in top) + " — 숫자마다 자리를 하나만 준다")
     else:
-        r.ok("같은 숫자 반복", "없음")
+        r.ok(f"같은 숫자 반복{tag}", "없음")
 
 
 def c_glossary(html, r):
@@ -314,10 +356,19 @@ def c_spec_match(html, spec, r):
         for k in ("tension", "three_minute_story"):
             if not b.get(k):
                 r.fail(f"{rtype} 필수", f"brief.{k}가 없다")
-        if not kt.get("ask"):
-            r.fail(f"{rtype} 필수", "key_takeaway.ask가 없다 — 발견에서 끝났다")
-        if not spec.get("actions"):
-            r.fail(f"{rtype} 필수", "actions가 비어 있다")
+        # stance: data_only — 수신자가 판단·제안을 빼라고 한 보고.
+        # 없는 것이 정답이므로 감점하지 않는다 (report-types.md §3).
+        if (spec.get("stance") or b.get("stance") or "judgment") == "data_only":
+            if kt.get("ask") or spec.get("actions"):
+                r.warn("stance: data_only",
+                       "판단·제안을 빼라고 한 보고인데 ask/actions가 남아 있다")
+            else:
+                r.ok("stance: data_only", "ask·actions 없음 — 요청대로다")
+        else:
+            if not kt.get("ask"):
+                r.fail(f"{rtype} 필수", "key_takeaway.ask가 없다 — 발견에서 끝났다")
+            if not spec.get("actions"):
+                r.fail(f"{rtype} 필수", "actions가 비어 있다")
 
 
 # 템플릿(부품 목록)에도 도는 검사 — CSS 스케일·구조

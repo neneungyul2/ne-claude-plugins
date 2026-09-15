@@ -79,6 +79,23 @@
 | 임계값 정의 | — | 판단기준 가중치 | **필수** | 기준선이 대신한다 |
 | `question_type` 주류 | `deviation` `composition` | `comparison` `ranking` | `single_value` `deviation` | `trend` `change_2point` |
 
+### `stance`가 유형 위에 걸린다
+
+위 표는 `stance: judgment`(기본)일 때다. 브리프가 `stance: data_only`면
+**유형과 무관하게** 아래가 해당 없음으로 내려간다.
+
+| 요소 | `data_only`에서 |
+|---|---|
+| `key_takeaway.ask` | 해당 없음 |
+| `actions` | 해당 없음 |
+| `key_takeaway.text` | **남는다.** 단 판단이 아니라 **무엇이 보이는가**로 쓴다 |
+| `action_title` | **남는다.** 차트를 읽는 방법이지 제안이 아니다 |
+
+"자사는 이 시장에 제품이 없다", "대응이 필요하다" 같은 문장은 `data_only`에서
+빠지는 쪽이다. 읽는 사람이 이미 아는 사실을 결론 자리에 놓지 않는다.
+
+---
+
 ### 유형이 바꾸는 것 — 특히 주의
 
 **감시형은 `actions`가 비어 있는 것이 정답일 수 있다.** "특이사항 없음"을 명시적으로 쓰고

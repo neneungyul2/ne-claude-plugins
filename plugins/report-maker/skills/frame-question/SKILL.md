@@ -192,6 +192,27 @@ report 모드에서는 건너뛸 수 없다. quick 모드는 생략하고 `load-
 발상용 동사: 결정한다 · 승인한다 · 우선순위를 바꾼다 · 중단한다 · 재검토한다 ·
 자원을 배분한다 · 기준을 정한다 · 확인한다 · 위임한다 · 착수한다
 
+### 수위(`stance`) — 레벨과 다른 축이다
+
+위 문단은 "판단은 그분들 몫"이라는 **주저**에 대한 답이다. 주저가 아니라
+**요구**일 때가 있다. "대표 보고인데 데이터만. 의견은 빼라" 는 흔한 지시이고,
+대개 이유가 있다 — 판단의 자리가 이 보고가 아니라 그 다음 회의이거나,
+읽는 사람이 이미 판단을 갖고 있다.
+
+이때 레벨은 `exec`인데 요청·액션은 넣지 말아야 한다. **레벨 하나로는 표현이 안 된다.**
+브리프에 `stance`를 따로 적는다.
+
+| `stance` | 무엇을 내놓나 | `key_takeaway.ask` · `actions` |
+|---|---|---|
+| `judgment` (기본) | 사실 + 판단 + 요청 | 필수 |
+| `data_only` | 사실과 그 구조까지. 판단·제안 없음 | **해당 없음.** 없다고 감점하지 않는다 |
+
+- 사용자가 "데이터만", "의견은 빼고", "판단은 내가 한다"고 하면 `data_only`다.
+  **한 번 확인하고 그대로 간다.** 매 단계에서 다시 권고를 밀어 넣지 않는다
+- `data_only`에서도 `action_title`은 남는다. "무엇이 보이는가"는 판단이 아니라
+  차트를 읽는 방법이다. 빼는 것은 **"그래서 무엇을 하라"** 쪽이다
+- `data_only`라고 해서 사실을 흐리지 않는다. 숫자와 그 구조는 오히려 더 촘촘해야 한다
+
 ---
 
 ## 4-1. 전달 방식과 톤
@@ -320,7 +341,7 @@ HTML 산출물의 기본은 `lead_with_ending`이다. 평소와 다른 순서를
 
 ```
 {
-  brief_version  subject  why_now  report_type  audience  audience_level
+  brief_version  subject  why_now  report_type  audience  audience_level  stance
   decision  mechanism  tone  narrative_order
   three_minute_story
   tension { what_is  what_could_be }
@@ -333,6 +354,10 @@ HTML 산출물의 기본은 `lead_with_ending`이다. 평소와 다른 순서를
 
 `report_type`은 `diagnostic` | `choice` | `watch` | `track`.
 이 값이 `plan-report`와 렌더러에서 **무엇이 필수인지**를 바꾼다 (`references/report-types.md` §3).
+
+`stance`는 `judgment`(기본) | `data_only`. 위 §4를 따른다.
+`data_only`면 `decision`은 "판단은 이 보고 밖에서 한다"로 적고,
+`key_takeaway.ask`와 `actions`는 **해당 없음**으로 둔다.
 
 **질문을 몇 개 둘지는 이 조각이 정하지 않는다.** `decision`을 내리는 데 꼭 필요한 만큼이다.
 `segments`는 데이터에 없는 그룹을 쓸 때만 넣는다 — 쓰지 않으면 키째 뺀다.

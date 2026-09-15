@@ -326,6 +326,7 @@ metrics.md에 없고 확인도 안 됐으면 `desc`에 `확인 필요`를 적고
 - [ ] "기타"·"나머지 N개"로 묶은 항목마다 `group_detail`이 채워져 있는가
 - [ ] 지역 데이터가 있으면 `choropleth`를 검토했는가 (막대만 쓰지 않았는가)
 - [ ] (report) `key_takeaway.ask`가 있는가 — **발견에서 끝나지 않았는가**
+      (`stance: data_only`면 해당 없음. 브리프를 확인한다)
 - [ ] (report) `brief.tension`의 `what_is` / `what_could_be`가 채워져 있는가
 - [ ] `brief.mechanism`에 맞는 밀도인가 (`document`면 화면 안에 so-what이 전부 있는가)
 - [ ] 선·누적 차트의 계열이 5개 이하인가 (넘으면 `small_multiples` 또는 "기타" 묶기)

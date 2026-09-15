@@ -74,6 +74,7 @@ h1,h2,h3,h4,p,li,td,th,text{word-break:keep-all;overflow-wrap:anywhere}
 .toc .tochd{font-size:var(--t1);font-weight:700;color:var(--gray);letter-spacing:.04em;padding:0 8px 8px}
 .toc a{display:flex;align-items:center;gap:8px;padding:4px 8px;border-radius:var(--r3);
        font-size:var(--t1);color:var(--dim);text-decoration:none;line-height:1.35}
+.toc a[hidden]{display:none}  /* display:flex 가 [hidden] 을 덮어쓴다 — 탭별 목차의 전제 */
 .toc a:hover{background:var(--line);color:var(--sub)}
 .toc a.on{color:var(--ink);font-weight:700;background:var(--blueBg)}
 .toc a i{width:16px;height:16px;border-radius:var(--r3);background:var(--line2);color:var(--sub);

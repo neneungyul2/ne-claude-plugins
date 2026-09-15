@@ -24,12 +24,18 @@ MOBILE = (400, 900)
 CLIP_TOL = 2          # px. 브라우저 반올림 여유
 OVERLAP_TOL = 1.0     # px. 이만큼 겹치면 겹친 것으로 본다
 MIN_INK_RATIO = 0.18  # 차트 잉크가 플롯 영역에서 차지하는 최소 비율
+MIN_CHART_PX = 9.0    # 화면 px. 이보다 작으면 인쇄·축소에서 사라진다
+MAX_CHART_RATIO = 1.15  # 차트 글자 / 본문 글자. 넘으면 위계가 뒤집힌다
 FALLBACK_STACK = "'Malgun Gothic','Apple SD Gothic Neo',sans-serif"
 
 # 브라우저 안에서 도는 측정 스크립트. 파이썬으로 못 하는 것만 여기서 한다.
 PROBE = r"""
 () => {
-  const out = {clipped: [], overflowX: null, svgOut: [], overlap: [], ink: [], tiny: []};
+  const out = {clipped: [], overflowX: null, svgOut: [], overlap: [], ink: [],
+               tiny: [], oversize: [], bodyPx: null};
+
+  // 본문 글자 크기 — 차트 글자의 기준이 된다
+  out.bodyPx = parseFloat(getComputedStyle(document.body).fontSize) || 14;
 
   // ① HTML 텍스트 잘림 — 실제 내용이 상자보다 큰가
   for (const el of document.querySelectorAll('body *')) {
@@ -52,6 +58,10 @@ PROBE = r"""
   document.querySelectorAll('svg').forEach((svg, si) => {
     const vb = svg.viewBox && svg.viewBox.baseVal;
     if (!vb || !vb.width) return;
+    // viewBox 좌표계 px ≠ 화면 px. SVG는 컨테이너 폭에 맞춰 늘어난다.
+    // font-size="14" 가 viewBox 720 → 화면 1032px 에서는 20px 로 보인다.
+    const rw = svg.getBoundingClientRect().width;
+    const sc = rw > 0 ? rw / vb.width : 1;
     const texts = [...svg.querySelectorAll('text')];
     const boxes = [];
     for (const t of texts) {
@@ -67,8 +77,15 @@ PROBE = r"""
                                Math.round(b.width), Math.round(b.height)],
                          vb: [vb.x, vb.y, vb.width, vb.height]});
       }
+      // getComputedStyle 은 좌표계 px 을 준다. 화면 px 으로 환산해서 판정한다.
       const fs = parseFloat(getComputedStyle(t).fontSize);
-      if (fs && fs < 9) out.tiny.push({svg: si, label, size: fs});
+      if (fs) {
+        const eff = fs * sc;
+        if (eff < %(minpx)s)
+          out.tiny.push({svg: si, label, size: eff, raw: fs, scale: sc});
+        else if (eff > out.bodyPx * %(maxratio)s)
+          out.oversize.push({svg: si, label, size: eff, raw: fs, scale: sc});
+      }
     }
     for (let i = 0; i < boxes.length; i++)
       for (let j = i + 1; j < boxes.length; j++) {
@@ -91,7 +108,8 @@ PROBE = r"""
   });
   return out;
 }
-""" % {"tol": CLIP_TOL, "ovl": OVERLAP_TOL}
+""" % {"tol": CLIP_TOL, "ovl": OVERLAP_TOL,
+       "minpx": MIN_CHART_PX, "maxratio": MAX_CHART_RATIO}
 
 
 class Report:
@@ -178,25 +196,58 @@ def main():
         pg.goto(url, wait_until="load")
         pg.wait_for_timeout(700)
 
+        def _px(t):
+            # 좌표계 값과 배율을 같이 보여준다 — 고칠 곳은 좌표계 쪽이다
+            return (f"'{t['label']}' {t['size']:.1f}px"
+                    f"(좌표 {t['raw']:g}×{t['scale']:.2f})")
+
+        def chart_checks(probe, tag=""):
+            """차트 안쪽만 보는 검사. 탭마다 다시 돈다."""
+            body_px = probe.get("bodyPx") or 14
+            tiny, big = probe["tiny"], probe.get("oversize", [])
+
+            if tiny:
+                r.fail(f"차트 글자 하한{tag}",
+                       ", ".join(_px(t) for t in tiny[:4])
+                       + f" — 화면 {MIN_CHART_PX:g}px 미만은 인쇄·축소에서 사라진다")
+            else:
+                r.ok(f"차트 글자 하한{tag}", f"화면 {MIN_CHART_PX:g}px 이상")
+
+            if big:
+                r.fail(f"차트 글자 상한{tag}",
+                       ", ".join(_px(t) for t in big[:4])
+                       + f" — 본문 {body_px:g}px 보다 크다. viewBox 가 늘어난 만큼"
+                         " 좌표계 font-size 를 역산해 낮춘다")
+            else:
+                r.ok(f"차트 글자 상한{tag}", f"본문 {body_px:g}px 이하")
+
+            ink = probe["ink"]
+            thin = [i for i in ink if i["marks"] >= 2 and i["ratio"] < MIN_INK_RATIO]
+            if thin:
+                r.warn(f"차트 여백 과다{tag}",
+                       ", ".join(f"svg{i['svg']}: 잉크 {i['ratio']*100:.0f}%" for i in thin[:4])
+                       + " — 가장 큰 자리를 차지했다면 축 범위를 분포에 맞춘다")
+            elif ink:
+                r.ok(f"차트 여백{tag}", f"{len(ink)}개 차트 통과")
+
         probe = pg.evaluate(PROBE)
         judge(r, probe, "데스크톱")
+        chart_checks(probe)
 
-        tiny = probe["tiny"]
-        if tiny:
-            r.fail("차트 글자 크기",
-                   ", ".join(f"'{t['label']}' {t['size']:g}px" for t in tiny[:4])
-                   + " — 9px 미만은 인쇄·축소에서 사라진다")
-        else:
-            r.ok("차트 글자 크기", "9px 이상")
-
-        ink = probe["ink"]
-        thin = [i for i in ink if i["marks"] >= 2 and i["ratio"] < MIN_INK_RATIO]
-        if thin:
-            r.warn("차트 여백 과다",
-                   ", ".join(f"svg{i['svg']}: 잉크 {i['ratio']*100:.0f}%" for i in thin[:4])
-                   + " — 가장 큰 자리를 차지했다면 축 범위를 분포에 맞춘다")
-        elif ink:
-            r.ok("차트 여백", f"{len(ink)}개 차트 통과")
+        # 탭 — 숨은 패널의 SVG는 getBBox가 0이라 위 측정에 아예 안 잡힌다.
+        # 탭마다 열어서 다시 잰다. 열지 않으면 그 탭은 검사된 적이 없는 것이다.
+        TABSEL = '[role="tab"]'
+        tabs = pg.eval_on_selector_all(
+            TABSEL, "els => els.map(e => (e.textContent || '').trim())")
+        for i, name in enumerate(tabs[1:], start=1):
+            pg.eval_on_selector_all(TABSEL, "(els, i) => els[i].click()", i)
+            pg.wait_for_timeout(350)
+            tp = pg.evaluate(PROBE)
+            judge(r, tp, f"탭 「{name}」")
+            chart_checks(tp, f" · {name}")
+        if tabs:
+            pg.eval_on_selector_all(TABSEL, "els => els[0].click()")
+            pg.wait_for_timeout(250)
 
         if a.shot:
             pg.screenshot(path=a.shot, full_page=True)

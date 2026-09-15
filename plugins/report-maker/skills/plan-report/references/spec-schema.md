@@ -475,8 +475,8 @@ metrics.md에 없고 확인도 안 됐으면 `desc`에 `확인 필요`를 적고
 | `trend` | 시간에 따라 어떻게 변했나 | `line` | `area` |
 | `trend_many` | **계열이 많은데 각각의 추이를 봐야 하나** | `small_multiples` | `line`(강조 1개) |
 | `change_2point` | **두 시점 사이에 무엇이 오르고 내렸나** | `slopegraph` | `dot_plot`, `diverging_bar` |
-| `comparison` | 어느 쪽이 큰가 | `bar` | `dot_plot` |
-| `ranking` | 순위가 어떻게 되나 | `bar_sorted` | `dot_plot` |
+| `comparison` | 어느 쪽이 큰가 | `bar` | `grouped_bar` |
+| `ranking` | 순위가 어떻게 되나 | `bar_sorted` | `grouped_bar` |
 | `composition` | 무엇이 전체를 구성하나 | `stacked_bar` | `stacked_bar_100` |
 | `headline_number` | **전할 숫자가 한두 개다** | `simple_text` | `kpi` |
 | `composition_2d` | **두 축으로 동시에 쪼개면 어디에 몰려 있나** | `marimekko` | `heatmap` |
