@@ -1,0 +1,952 @@
+<meta charset="utf-8">
+<title>기간본 재제작 수량 제안</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F6F7F5; --card:#FFFFFF; --ink:#16202C; --muted:#5C6570;
+    --rule:#D9DAD4; --basic:#2E6E8E; --type:#8E3B2F; --warn:#8A6D1F;
+    --on:#2E6E8E; --off:#B0A99C;
+    --serif:"Noto Serif KR","Apple Myungjo","Batang",serif;
+    --sans:"Pretendard","Apple SD Gothic Neo","Malgun Gothic","맑은 고딕",sans-serif;
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{margin:0;background:var(--paper);color:var(--ink);
+    font-family:var(--sans);font-size:15px;line-height:1.7;letter-spacing:-.01em;
+    word-break:keep-all;overflow-wrap:break-word}
+  .wrap{max-width:880px;margin:0 auto;padding:48px 28px 150px}
+  h1,h2,h3{font-family:var(--serif);font-weight:600;letter-spacing:-.02em;margin:0}
+  h1{font-size:30px;line-height:1.35}
+  h2{font-size:20px;line-height:1.4}
+  h3{font-size:16px}
+  p{margin:0}
+
+  .masthead{border-bottom:2px solid var(--ink);padding-bottom:16px;margin-bottom:32px}
+
+  .spec{border:1px solid var(--ink);background:var(--card)}
+  .spec-head{padding:14px 20px;border-bottom:1px solid var(--ink);font-size:13px;color:var(--muted)}
+  .spec-head strong{color:var(--ink);font-weight:600}
+  .spec-grid{display:grid;grid-template-columns:1fr 1fr}
+  .spec-cell{padding:26px 22px 24px}
+  .spec-cell + .spec-cell{border-left:1px solid var(--rule)}
+  .spec-cell h3{font-size:15px;font-weight:600}
+  .dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:7px;vertical-align:1px}
+  .num{font-family:var(--serif);font-size:58px;font-weight:700;line-height:1;letter-spacing:-.03em;margin:14px 0 4px}
+  .num small{font-size:19px;font-weight:400;margin-left:4px;letter-spacing:0}
+  .sub{font-size:13px;color:var(--muted)}
+  .sub b{color:var(--ink)}
+  .spec-foot{border-top:1px solid var(--rule);padding:14px 22px;font-size:13px;color:var(--muted);display:flex;flex-wrap:wrap;gap:4px 26px}
+  .spec-foot b{color:var(--ink);font-weight:600}
+
+  section{margin-top:54px}
+  .shead{display:flex;align-items:baseline;gap:12px;border-bottom:1px solid var(--rule);padding-bottom:10px;margin-bottom:12px;flex-wrap:wrap}
+  .shead .n{font-family:var(--serif);font-size:13px;color:var(--muted);flex:none}
+  .shead h2{flex:1 1 auto}
+  .unit{flex:none;font-size:12px;color:var(--muted);border:1px solid var(--rule);border-radius:2px;
+        padding:3px 9px;background:var(--card);white-space:nowrap;font-family:inherit;line-height:1.4}
+  button.unit{cursor:pointer}
+  button.unit:hover{border-color:var(--ink);color:var(--ink)}
+  button.unit:after{content:" ⓘ";font-size:11px}
+  .unit.alt{border-color:var(--warn);color:var(--warn)}
+  .lede{color:var(--muted);margin:14px 0 22px}
+
+  .panelbox{border:1px solid var(--rule);background:var(--card);padding:22px}
+  .frow{padding:16px 0}
+  .frow:first-child{padding-top:0}
+  .frow + .frow{border-top:1px dashed var(--rule)}
+  .ftop{display:flex;justify-content:space-between;align-items:baseline;gap:16px;flex-wrap:wrap}
+  .ftitle{font-weight:600}
+  .ftitle em{font-style:normal;color:var(--muted);font-weight:400;font-size:13px;margin-left:8px}
+  .fval{font-family:var(--serif);font-size:22px;font-weight:700;white-space:nowrap}
+  .fval small{font-size:13px;font-weight:400;color:var(--muted);margin-left:3px}
+  .track{height:14px;background:#EDEEEA;margin-top:12px;display:flex;gap:2px}
+  .fill{height:100%;background:var(--ink);transition:width .45s ease}
+  .fill.b{background:var(--basic)}
+  .fill.t{background:var(--type)}
+  .fnote{font-size:13px;color:var(--muted);margin-top:9px}
+  .fnote b{color:var(--ink)}
+
+  /* 채널 바 */
+  .chbar{display:flex;height:30px;width:100%;overflow:hidden;background:#EDEEEA;margin-top:10px}
+  .chseg{display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;
+         transition:width .45s ease;white-space:nowrap;overflow:hidden}
+  .chseg.on{background:var(--on)}
+  .chseg.off{background:var(--off);color:var(--ink)}
+
+  .scope{border:1px solid var(--rule);background:var(--card)}
+  .srow{display:flex;align-items:flex-start;gap:14px;padding:15px 20px;width:100%;border:0;background:none;
+        font:inherit;color:inherit;text-align:left;cursor:pointer;transition:opacity .2s}
+  .srow + .srow{border-top:1px solid var(--rule)}
+  .srow:hover{background:#FAFAF8}
+  .srow .mark{flex:none;width:18px;height:18px;border:1.5px solid var(--ink);margin-top:4px;position:relative;background:var(--ink)}
+  .srow .mark:after{content:"";position:absolute;left:4px;top:1px;width:8px;height:12px;
+        border-right:2px solid #fff;border-bottom:2px solid #fff;transform:rotate(40deg)}
+  .srow .body{flex:1;min-width:0}
+  .sname{display:block;font-weight:600}
+  .sdesc{display:block;font-size:13px;color:var(--muted);margin-top:2px}
+  .sqty{flex:none;font-family:var(--serif);font-size:15px;white-space:nowrap;padding-top:2px}
+  .srow.off{opacity:.42}
+  .srow.off .mark{background:transparent}
+  .srow.off .mark:after{display:none}
+  .scope-foot{border-top:1px solid var(--rule);background:#FAFAF8;padding:15px 20px;font-size:13px;color:var(--muted)}
+  .kpi{display:flex;flex-wrap:wrap;gap:10px 30px;margin-top:12px}
+  .kpi div{border-left:2px solid var(--rule);padding-left:11px}
+  .kpi b{font-family:var(--serif);font-size:17px;font-weight:700;display:block;color:var(--ink)}
+
+  .cgroup + .cgroup{margin-top:28px;padding-top:24px;border-top:1px dashed var(--rule)}
+  .chead{display:flex;justify-content:space-between;align-items:baseline;gap:14px;flex-wrap:wrap;margin-bottom:11px}
+  .chead .cn{font-weight:600}
+  .chead .cv{font-family:var(--serif);font-size:16px}
+  .stack{display:flex;height:36px;width:100%;overflow:hidden;background:#EDEEEA}
+  .seg{transition:width .45s ease;min-width:0}
+  .seg.us{outline:2px solid var(--ink);outline-offset:-2px}
+  .legend{display:flex;flex-wrap:wrap;gap:6px 18px;margin-top:13px;font-size:13px}
+  .lg{display:flex;align-items:center;gap:7px;color:var(--muted)}
+  .sw{width:11px;height:11px;flex:none}
+  .lg b{color:var(--ink);font-weight:600}
+
+  #tip{position:fixed;z-index:120;background:var(--ink);color:#fff;font-size:12.5px;line-height:1.65;
+       padding:10px 12px;border-radius:3px;pointer-events:none;opacity:0;transition:opacity .12s;
+       width:max-content;max-width:min(300px,80vw);letter-spacing:0}
+  #tip strong{display:block;font-weight:600;margin-bottom:3px}
+  #tip .share{font-family:var(--serif);font-size:15px}
+
+  .tbl{border:1px solid var(--rule);overflow-x:auto;overflow-y:hidden}
+  table{width:100%;border-collapse:collapse;font-size:14px;background:var(--card)}
+  th,td{padding:11px 14px;border-bottom:1px solid var(--rule);text-align:left;vertical-align:top}
+  thead th{border-bottom:1.5px solid var(--ink);font-weight:600;font-size:13px;color:var(--muted)}
+  td.n,th.n{text-align:right;font-family:var(--serif);white-space:nowrap}
+  tbody tr:last-child td{border-bottom:0}
+  tr.total td{background:#FAFAF8;font-weight:600}
+
+
+
+  /* 점유율 시뮬레이터 */
+  .sim{border:1px solid var(--ink);background:var(--card);padding:20px 22px}
+  .simrow{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+  .simrow + .simrow{margin-top:15px;padding-top:15px;border-top:1px dashed var(--rule)}
+  .simrow .sl{width:92px;flex:none;font-weight:600;font-size:14px}
+  .simrow .slwrap{flex:1;min-width:190px}
+  .simrow input[type=range]{width:100%;margin:0;height:20px;cursor:pointer}
+  .simends{display:flex;justify-content:space-between;font-size:11.5px;color:var(--muted);margin-top:2px}
+  .simval{font-family:var(--serif);font-size:23px;font-weight:700;min-width:62px;text-align:right;flex:none}
+  .simout{font-size:13px;color:var(--muted);min-width:150px;flex:none}
+  .simout b{color:var(--ink);font-family:var(--serif);font-size:15px}
+  .simfoot{margin-top:18px;padding-top:14px;border-top:1px solid var(--rule);
+           display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;font-size:13px;color:var(--muted)}
+  .simfoot .tagnow{border:1px solid var(--rule);padding:3px 9px;border-radius:2px;color:var(--ink);font-weight:600}
+  .btn{border:1px solid var(--rule);background:none;font:inherit;font-size:13px;color:var(--muted);padding:5px 11px;cursor:pointer;border-radius:2px}
+  .btn:hover{border-color:var(--ink);color:var(--ink)}
+  tr.scn{cursor:pointer}
+  tr.scn:hover td{background:#FAFAF8}
+
+  /* 계산 흐름 */
+  .calc{display:flex;flex-direction:column;gap:16px}
+  .calcrow{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+  .calcrow .rl{width:86px;flex:none;font-weight:600;font-size:14px}
+  .chip{border:1px solid var(--rule);background:#FAFAF8;padding:8px 13px;min-width:98px;text-align:center}
+  .chip .cv{font-family:var(--serif);font-size:20px;font-weight:700;display:block;line-height:1.25}
+  .chip .ck{font-size:11.5px;color:var(--muted);display:block;margin-top:1px}
+  .chip.res{border:1.5px solid var(--ink);background:var(--card)}
+  .chip.fix{border-style:dashed}
+  .op{color:var(--muted);font-size:13px;flex:none;white-space:nowrap}
+  .final{margin-top:20px;border-top:1px solid var(--rule);padding-top:18px;
+         display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
+  .final .flabel{font-weight:600}
+  .final .fv{font-family:var(--serif);font-size:38px;font-weight:700;line-height:1;letter-spacing:-.02em}
+  .final .fx{font-size:13px;color:var(--muted)}
+  /* 시나리오 막대 */
+  .scnbar{display:inline-block;height:8px;background:var(--rule);vertical-align:middle;margin-left:8px;min-width:2px}
+  tr.total .scnbar{background:var(--ink)}
+  @media (max-width:680px){ .calcrow .rl{width:100%} }
+
+  .term{border-bottom:1px dotted var(--muted);cursor:help}
+  .term:focus{outline:2px solid var(--basic);outline-offset:2px}
+
+  #ctl{position:fixed;right:20px;bottom:20px;z-index:80;width:300px;max-width:calc(100vw - 40px);
+       background:var(--card);border:1px solid var(--ink);box-shadow:0 6px 28px rgba(22,32,44,.16)}
+  #ctlHead{display:flex;align-items:center;gap:10px;padding:11px 14px;cursor:pointer;
+       background:var(--ink);color:#fff;font-size:13px;font-weight:600;border:0;width:100%;text-align:left;font-family:inherit}
+  #ctlHead .htxt{flex:1;min-width:0}
+  #ctlHead .h1line{display:block;line-height:1.4}
+  #ctlHead .h2line{display:block;font-size:11px;font-weight:400;line-height:1.45;color:rgba(255,255,255,.68)}
+  #ctlHead .live{flex:none;font-family:var(--serif);font-weight:700;font-size:14px;white-space:nowrap}
+  #ctlHead .caret{flex:none;transition:transform .2s;font-size:11px}
+  #ctl.closed .caret{transform:rotate(180deg)}
+  #ctl.closed #ctlBody{display:none}
+  .ctlrow{display:flex;gap:10px;align-items:flex-start;padding:11px 14px;width:100%;border:0;background:none;
+       font:inherit;color:inherit;text-align:left;cursor:pointer}
+  .ctlrow + .ctlrow{border-top:1px solid var(--rule)}
+  .ctlrow:hover{background:#FAFAF8}
+  .ctlrow .mark{flex:none;width:16px;height:16px;border:1.5px solid var(--ink);margin-top:3px;background:var(--ink);position:relative}
+  .ctlrow .mark:after{content:"";position:absolute;left:3px;top:0;width:7px;height:11px;
+       border-right:2px solid #fff;border-bottom:2px solid #fff;transform:rotate(40deg)}
+  .ctlrow.off{opacity:.45}
+  .ctlrow.off .mark{background:transparent}
+  .ctlrow.off .mark:after{display:none}
+  .ctlrow .t1{display:block;font-size:13.5px;font-weight:600;line-height:1.5}
+  .ctlrow .t2{display:block;font-size:12px;color:var(--muted)}
+  #ctlFoot{border-top:1px solid var(--rule);background:#FAFAF8;padding:11px 14px;font-size:12px;color:var(--muted)}
+  #ctlFoot b{color:var(--ink);font-family:var(--serif);font-size:13px}
+  @media (max-width:760px){#ctl{left:12px;right:12px;bottom:12px;width:auto}}
+
+  #ov{position:fixed;inset:0;z-index:200;background:rgba(22,32,44,.55);display:none;align-items:center;justify-content:center;padding:24px}
+  #ov.open{display:flex}
+  #mo{background:var(--card);border:1px solid var(--ink);max-width:760px;width:100%;max-height:86vh;overflow:auto;box-shadow:0 20px 60px rgba(0,0,0,.28)}
+  #moHead{display:flex;align-items:center;gap:14px;padding:16px 20px;border-bottom:1px solid var(--ink);position:sticky;top:0;background:var(--card)}
+  #moHead h3{flex:1}
+  #moClose{border:1px solid var(--rule);background:none;font:inherit;font-size:13px;color:var(--muted);padding:5px 11px;cursor:pointer;border-radius:2px}
+  #moClose:hover{border-color:var(--ink);color:var(--ink)}
+  #moBody{padding:20px}
+
+  ul{margin:0;padding-left:1.15em}
+  li{margin-bottom:8px}
+  .callout{border-left:3px solid var(--warn);background:#FCFAF3;padding:16px 18px;font-size:14px}
+  footer{margin-top:60px;padding-top:18px;border-top:1px solid var(--rule);font-size:12.5px;color:var(--muted)}
+
+  @media (max-width:680px){
+    .wrap{padding:32px 18px 170px}
+    h1{font-size:24px}
+    .spec-grid{grid-template-columns:1fr}
+    .spec-cell + .spec-cell{border-left:none;border-top:1px solid var(--rule)}
+    .num{font-size:46px}
+  }
+  @media print{
+    body{background:#fff}
+    #ctl,#tip,#ov{display:none !important}
+    .wrap{padding-bottom:20px}
+    button.unit:after{content:""}
+  }
+</style><style>
+  /* ── 기간본 전용 ────────────────────────────────────── */
+  :root{ --a:#2E6E8E; --b:#8E3B2F; --late:#A8322A; --ok:#3E6B4A; }
+  .datebox{display:flex;flex-wrap:wrap;gap:0}
+  .datecell{flex:1 1 180px;padding:18px 20px;border-top:1px solid var(--rule)}
+  .datecell + .datecell{border-left:1px solid var(--rule)}
+  .datecell .dk{font-size:12px;color:var(--muted)}
+  .datecell .dv{font-family:var(--serif);font-size:24px;font-weight:700;line-height:1.25;margin-top:3px}
+  .datecell .dn{font-size:12px;color:var(--muted);margin-top:2px}
+  .datecell.late .dv{color:var(--late)}
+  .datecell.late .dn{color:var(--late)}
+
+  .tl{position:relative;width:100%;overflow-x:auto;overflow-y:hidden}
+  .tl svg{display:block;min-width:560px;width:100%;height:230px}
+  .tlkey{display:flex;flex-wrap:wrap;gap:8px 20px;margin-top:12px;font-size:12.5px;color:var(--muted)}
+  .tlkey span{display:flex;align-items:center;gap:7px}
+  .tlkey i{width:14px;height:10px;flex:none;display:inline-block}
+  .tlkey i.line{height:0;border-top:2px solid var(--ink)}
+  .tlkey i.dash{height:0;border-top:2px dashed var(--late)}
+
+  .whrow{display:flex;justify-content:space-between;gap:14px;padding:9px 0;font-size:14px;border-bottom:1px solid var(--rule)}
+  .whrow:last-child{border-bottom:0}
+  .whrow.out{color:var(--muted)}
+  .whrow.out .wq{text-decoration:line-through}
+  .wq{font-family:var(--serif);white-space:nowrap}
+
+  .capbar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:14px;
+          border:1px solid var(--rule);background:#FAFAF8;padding:12px 16px}
+  .capbar.on{border-color:var(--warn);background:#FCFAF3}
+  .capsw{display:flex;align-items:center;gap:9px;border:0;background:none;font:inherit;cursor:pointer;padding:0;color:inherit}
+  .capsw .mark{width:17px;height:17px;border:1.5px solid var(--ink);background:var(--ink);position:relative;flex:none}
+  .capsw .mark:after{content:"";position:absolute;left:4px;top:1px;width:7px;height:11px;
+        border-right:2px solid #fff;border-bottom:2px solid #fff;transform:rotate(40deg)}
+  .capsw.off .mark{background:transparent}
+  .capsw.off .mark:after{display:none}
+  .capnote{font-size:13px;color:var(--muted);flex:1;min-width:180px}
+  .capnote b{color:var(--ink)}
+
+  .trend{display:flex;align-items:flex-end;gap:10px;height:110px;margin-top:6px}
+  .tcol{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:5px;min-width:0}
+  .tbar{width:100%;background:var(--rule);transition:height .4s ease}
+  .tbar.us{background:var(--a)}
+  .tcap{font-size:11.5px;color:var(--muted);white-space:nowrap}
+  .tval{font-family:var(--serif);font-size:13px}
+
+  .sflat{display:flex;align-items:flex-end;gap:3px;height:66px;margin-top:8px}
+  .sflat div{flex:1;background:var(--rule);position:relative}
+  .sflat div.peak{background:var(--a)}
+  .smon{display:flex;gap:3px;margin-top:4px;font-size:10.5px;color:var(--muted)}
+  .smon span{flex:1;text-align:center}
+</style>
+
+<div class="wrap">
+
+  <header class="masthead">
+    <h1>&lt;서명&gt; &lt;n&gt;종 &mdash; 재제작 수량 제안</h1>
+  </header>
+
+  <div class="spec">
+    <div class="spec-head">
+      <strong>결론</strong> &nbsp;&mdash;&nbsp; <span id="headline">발주 마감일이 이미 지났습니다. 수량보다 시점이 급합니다.</span>
+    </div>
+    <div class="spec-grid">
+      <div class="spec-cell">
+        <h3><span class="dot" style="background:var(--a)"></span><span id="nmA">1권</span></h3>
+        <div class="num" style="color:var(--a)" id="qtyA">4,000<small>부</small></div>
+        <div class="sub">가용재고 <b id="stkA">3,200</b>부 &middot; 월 평균 수요 <b id="avgA">734</b>부</div>
+      </div>
+      <div class="spec-cell">
+        <h3><span class="dot" style="background:var(--b)"></span><span id="nmB">2권</span></h3>
+        <div class="num" style="color:var(--b)" id="qtyB">3,000<small>부</small></div>
+        <div class="sub">가용재고 <b id="stkB">1,100</b>부 &middot; 월 평균 수요 <b id="avgB">436</b>부</div>
+      </div>
+    </div>
+    <div class="datebox">
+      <div class="datecell" id="cellDepA">
+        <div class="dk"><span id="dkA">1권</span> 재고 소진 예상</div>
+        <div class="dv" id="depA">2027년 1월</div>
+        <div class="dn" id="depAn">현 재고 기준</div>
+      </div>
+      <div class="datecell" id="cellOrdA">
+        <div class="dk"><span id="okA">1권</span> 발주 마감</div>
+        <div class="dv" id="ordA">2026년 11월</div>
+        <div class="dn" id="ordAn">리드타임 1.5개월 역산</div>
+      </div>
+      <div class="datecell" id="cellDepB">
+        <div class="dk"><span id="dkB">2권</span> 재고 소진 예상</div>
+        <div class="dv" id="depB">2026년 11월</div>
+        <div class="dn" id="depBn">현 재고 기준</div>
+      </div>
+      <div class="datecell" id="cellOrdB">
+        <div class="dk"><span id="okB">2권</span> 발주 마감</div>
+        <div class="dv" id="ordB">2026년 9월</div>
+        <div class="dn" id="ordBn">이미 지났습니다</div>
+      </div>
+    </div>
+    <div class="spec-foot">
+      <span><b>커버 기간</b> <span id="covFoot">5개월 / 5개월</span></span>
+      <span><b>개정 상한</b> <span id="capFoot">적용 (2027-07)</span></span>
+      <span><b>사장 예상 재고</b> <span id="deadFoot">2권 없음</span></span>
+    </div>
+  </div>
+
+  <section>
+    <div class="shead"><span class="n">01</span><h2>수치 기준</h2></div>
+    <p class="lede">세 가지 숫자가 섞여 있습니다. 어느 값이 어디에 쓰이는지 먼저 적습니다.</p>
+    <div class="tbl">
+      <table>
+        <thead><tr><th>값</th><th>기준</th><th>쓰는 곳</th></tr></thead>
+        <tbody>
+          <tr><td><span class="term" data-t="총출고">총출고</span></td>
+              <td>SAP 출고 중 양수만 (반품 제외)</td>
+              <td>노후화율 &middot; 계절지수</td></tr>
+          <tr><td><span class="term" data-t="순출고">순출고</span></td>
+              <td>SAP 출고에서 반품을 뺀 값</td>
+              <td><b>재고 소진 시뮬레이션</b></td></tr>
+          <tr><td><span class="term" data-t="가용재고">가용재고</span></td>
+              <td>정품 창고 재고만. 폐기&middot;반품&middot;수리본&middot;수출&middot;세트 제외</td>
+              <td>소진 시점 &middot; 필요량 차감</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <div class="shead"><span class="n">02</span><h2>가용재고</h2>
+      <span class="unit">창고별 &middot; 최신 스냅샷</span></div>
+    <p class="lede">창고에 있는 재고가 전부 팔 수 있는 재고는 아닙니다. 뺀 창고를 그대로 적습니다.</p>
+    <div class="panelbox">
+      <div id="whList">북마을(중등 정품) 3,100부 쿠팡 900부 본사(정품) 300부 북마을(폐기) — 제외 2,400부 북마을(반품미분류) — 제외 180부</div>
+      <div class="kpi">
+        <div>가용재고<b id="whUse">4,300부</b></div>
+        <div>제외<b id="whOut">2,580부</b></div>
+        <div>미입고분<b id="whInc">없음</b></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="shead"><span class="n">03</span><h2>출고 추세</h2>
+      <span class="unit">총출고 기준</span></div>
+    <p class="lede" id="trendLede">연도별 출고와 월별 계절성입니다.</p>
+    <div class="panelbox">
+      <div class="frow">
+        <div class="ftop"><div class="ftitle">연도별 자사 출고</div>
+          <div class="fval">노후화율 <span id="gVal">0.70</span></div></div>
+        <div class="trend" id="trendBars">12,400 2024 10,100 2025 7,900 2026</div>
+        <div class="fnote" id="trendNote">2024년 대비 -36% .</div>
+      </div>
+      <div class="frow">
+        <div class="ftop"><div class="ftitle">계절지수<em>최근 3개년 월별 평균</em></div>
+          <div class="fval">성수기 <span id="peakVal">1월·2월·3월</span></div></div>
+        <div class="sflat" id="seasonBars"></div>
+        <div class="smon" id="seasonMon">1 2 3 4 5 6 7 8 9 10 11 12</div>
+        <div class="fnote">소진 시점이 성수기 직전이면 발주 마감이 앞당겨집니다.</div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="shead"><span class="n">04</span><h2>시장이 줄었는지, 우리가 뺏겼는지</h2>
+      <span class="unit alt">추정 판매량 기준</span></div>
+    <p class="lede" id="causeLede">자사 출고 감소의 원인을 세그먼트 전체와 대조해 가릅니다.</p>
+    <div class="tbl">
+      <table>
+        <thead><tr><th>연도</th><th class="n">세그먼트 계</th><th class="n">자사</th><th class="n">자사 점유율</th></tr></thead>
+        <tbody id="mktBody">2024 82,000 12,400 15.1% 2025 79,000 10,100 12.8% 2026 76,000 7,900 10.4%</tbody>
+      </table>
+    </div>
+    <div class="callout" id="causeBox" style="margin-top:16px">세그먼트가 3년간 7% 줄어드는 사이 자사는 36% 줄었습니다. 시장 축소가 아니라 점유율 이탈입니다.</div>
+  </section>
+
+  <section>
+    <div class="shead"><span class="n">05</span><h2>재고가 언제 떨어지는가</h2>
+      <span class="unit">순출고 기준</span></div>
+    <p class="lede">재고 잔량 곡선이 0을 끊는 지점이 소진 예상월입니다. 점선은 리드타임을 뺀 발주 마감일입니다.</p>
+    <div class="panelbox">
+      <div class="tl"><svg id="tlSvg" viewBox="0 0 900 230" preserveAspectRatio="none" role="img"
+           aria-label="재고 소진 타임라인">0 1,600 3,200 01월 소진 101월 소진 2026.9월 2026.12월 2027.3월 2027.6월 2027.9월 2027.12월 2028.3월 2028.6월</svg></div>
+      <div class="tlkey">
+        <span><i class="line" style="border-color:var(--a)"></i>1권 잔량</span>
+        <span><i class="line" style="border-color:var(--b)"></i>2권 잔량</span>
+        <span><i style="background:#E4E5E0"></i>월별 수요</span>
+        <span><i class="dash"></i>발주 마감</span>
+      </div>
+      <div class="fnote" id="tlNote" style="margin-top:14px">1권 2027년 1월 소진 · 발주 마감 2026년 11월 &nbsp;|&nbsp; 2권 2026년 11월 소진 · 발주 마감 2026년 9월 (지남)</div>
+    </div>
+  </section>
+
+  <section>
+    <div class="shead"><span class="n">06</span><h2>제작 수량</h2>
+      <span class="unit">순출고 기준</span></div>
+
+    <div class="sim">
+      <div class="simrow">
+        <span class="sl" id="slAname">1권</span>
+        <span class="slwrap">
+          <input type="range" id="slA" min="1" max="24" step="1" value="6" aria-label="1권 커버 기간">
+          <span class="simends"><span>1개월</span><span id="slAmid">기본 5개월</span><span>24개월</span></span>
+        </span>
+        <span class="simval"><span id="slAv">5</span><small style="font-size:13px">개월</small></span>
+        <span class="simout">필요량 <b id="slAout">7,529</b>부</span>
+      </div>
+      <div class="simrow">
+        <span class="sl" id="slBname">2권</span>
+        <span class="slwrap">
+          <input type="range" id="slB" min="1" max="24" step="1" value="6" aria-label="2권 커버 기간">
+          <span class="simends"><span>1개월</span><span id="slBmid">기본 5개월</span><span>24개월</span></span>
+        </span>
+        <span class="simval"><span id="slBv">5</span><small style="font-size:13px">개월</small></span>
+        <span class="simout">필요량 <b id="slBout">4,664</b>부</span>
+      </div>
+      <div class="simfoot">
+        <span>기본값은 <b>다음 성수기 종료월</b>까지입니다. 조정하면 아래 수량과 결론이 함께 바뀝니다.</span>
+        <button class="btn" type="button" id="slReset">기본값으로 되돌리기</button>
+      </div>
+    </div>
+
+    <div class="capbar" id="capBar">
+      <button class="capsw" type="button" id="capSw"><span class="mark"></span><span>개정 상한 적용</span></button>
+      <span class="capnote" id="capNote">2권 2027-07 개정 예정. 잔여 수요 기준 상한 3,056부 — 수요 기준 3,564부에서 낮췄습니다. 사장 예상 재고 0부.</span>
+    </div>
+
+    <div class="panelbox" style="margin-top:18px">
+      <div class="calc">
+        <div class="calcrow"><span class="rl" id="calcAname">1권</span>
+          <span class="chip"><span class="cv" id="c_needA">7,529</span><span class="ck">필요량</span></span>
+          <span class="op">&minus;</span>
+          <span class="chip fix"><span class="cv" id="c_avA">3,200</span><span class="ck">가용재고</span></span>
+          <span class="op">=</span>
+          <span class="chip res"><span class="cv" id="c_rawA">4,329</span><span class="ck">산출값</span></span>
+          <span class="op" id="c_capAop"></span>
+        </div>
+        <div class="calcrow"><span class="rl" id="calcBname">2권</span>
+          <span class="chip"><span class="cv" id="c_needB">4,664</span><span class="ck">필요량</span></span>
+          <span class="op">&minus;</span>
+          <span class="chip fix"><span class="cv" id="c_avB">1,100</span><span class="ck">가용재고</span></span>
+          <span class="op">=</span>
+          <span class="chip res"><span class="cv" id="c_rawB">3,056</span><span class="ck">산출값</span></span>
+          <span class="op" id="c_capBop">← 개정 상한 적용</span>
+        </div>
+      </div>
+      <div class="final">
+        <span class="flabel">제작 수량</span>
+        <span class="fv" style="color:var(--a)" id="c_finA">4,000</span>
+        <span class="fx" id="fxA">부 (1권)</span>
+        <span class="fv" style="color:var(--b)" id="c_finB">3,000</span>
+        <span class="fx" id="fxB">부 (2권)</span>
+      </div>
+      <div class="fnote" id="lotNote" style="margin-top:12px">최소 로트 2,000부 기준으로 하한을 적용했습니다. 반올림은 백 단위 → 천 단위 순입니다.</div>
+    </div>
+  </section>
+
+  <section>
+    <div class="shead"><span class="n">07</span><h2>수치 해석 시 유의사항</h2></div>
+    <ul id="cautions">
+      <li>계절지수 표본 연수와 구품목코드를 이어 붙였는지 적습니다.</li>
+      <li>미입고분이 확정값인지 미확인인지 적습니다.</li>
+      <li>개정&middot;폐간 예정을 "없음"으로 확인받았는지 적습니다.</li>
+      <li>가용재고에서 뺀 창고와 그 수량을 적습니다.</li>
+      <li>세트 품목코드 판매분을 수요에 넣었는지 적습니다.</li>
+      <li>총출고와 순출고 차이가 크면 반품률이 높은 품목입니다. 안전재고를 낮춘 근거를 적습니다.</li>
+    </ul>
+  </section>
+
+  <section id="appendix">
+    <div class="shead"><span class="n">부록</span><h2>계수 &middot; 제작 이력 &middot; 창고 분류</h2></div>
+    <div id="coefSrc">
+      <div class="tbl">
+        <table>
+          <thead><tr><th>계수</th><th class="n">값</th><th>산출</th></tr></thead>
+          <tbody id="coefBody">노후화율 g 1권 0.78 · 2권 0.62 최근 12개월 ÷ 직전 12개월 총출고 계절지수 s(m) 성수기 1월·2월·3월 최근 3개년 월별 총출고 평균, 합 1 리드타임 L 1.5개월 제작팀 확인값 안전재고 SS 1.0배 리드타임 기간 수요의 배수 개정 전 둔화율 r 0.90 개정 공지 후 채널 발주 둔화 반영</tbody>
+        </table>
+      </div>
+      <h3 style="margin-top:32px">제작 이력</h3>
+      <p class="lede">지난 로트가 언제 몇 부였고 몇 개월 만에 소진됐는지입니다. 최소 로트의 근거입니다.</p>
+      <div class="tbl">
+        <table>
+          <thead><tr><th>품목</th><th>입고</th><th class="n">부수</th><th class="n">소진</th></tr></thead>
+          <tbody id="histBody">1권 2025-02 4,000 11개월 1권 2024-01 5,000 13개월 2권 2025-03 3,000 14개월</tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    수치는 SAP 출고&middot;재고와 YES24 추정 판매량에서 산출했습니다. 추정 판매량은 모델 산출값이며 실판매가 아닙니다.
+  </footer>
+</div>
+
+<div id="ctl">
+  <button id="ctlHead" type="button" aria-expanded="true">
+    <span class="htxt">
+      <span class="h1line">제작 수량</span>
+      <span class="h2line">커버 기간 &middot; 개정 상한</span>
+    </span>
+    <span class="live" id="ctlLive">7,000부</span>
+    <span class="caret">&#9650;</span>
+  </button>
+  <div id="ctlBody">
+    <div style="padding:12px 14px">
+      <div style="font-size:12.5px;color:var(--muted);margin-bottom:8px">커버 기간</div>
+      <input type="range" id="ctlSl" min="1" max="24" step="1" value="6" style="width:100%" aria-label="커버 기간 일괄 조정">
+      <div style="display:flex;justify-content:space-between;font-size:11.5px;color:var(--muted)">
+        <span>1개월</span><span id="ctlSlv">5개월</span><span>24개월</span>
+      </div>
+    </div>
+    <button class="ctlrow" type="button" id="ctlCap"><span class="mark"></span>
+      <span><span class="t1">개정 상한 적용</span><span class="t2" id="ctlCapT2">2027-07 개정 예정</span></span></button>
+    <div id="ctlFoot">소진 <b id="ctlDep">2026년 11월</b> &middot; 발주 마감 <b id="ctlOrd">2026년 9월 (지남)</b></div>
+  </div>
+</div>
+
+<div id="tip" role="status"></div>
+
+<div id="ov" role="dialog" aria-modal="true" aria-labelledby="moTitle">
+  <div id="mo">
+    <div id="moHead">
+      <h3 id="moTitle">재제작 수량 &mdash; 산출 계수</h3>
+      <button id="moClose" type="button">닫기</button>
+    </div>
+    <div id="moBody"></div>
+  </div>
+</div>
+
+<script>
+  /* ══════════════════════════════════════════════════════════
+     데이터 블록 — 여기만 채운다. 본문 숫자는 render()가 덮어쓴다.
+     ══════════════════════════════════════════════════════════ */
+
+  var TODAY = "2026-09";              // 기준월 (YYYY-MM)
+
+  var ITEMS = [
+    { key:"A", name:"1권", stock:3200, incoming:0, incomingAt:"",
+      annual:9800, g:0.78, lot:2000, E:"" },
+    { key:"B", name:"2권", stock:1100, incoming:0, incomingAt:"",
+      annual:6400, g:0.62, lot:2000, E:"2027-07" }
+  ];
+
+  // 계절지수 — 1월~12월. 합이 1이어야 한다
+  var SEASON = [0.135,0.120,0.115,0.070,0.060,0.055,0.075,0.070,0.075,0.070,0.075,0.080];
+
+  var LEAD  = 1.5;    // 제작 리드타임 (개월)
+  var SS    = 1.0;    // 안전재고 배수 — 리드타임 기간 수요의 몇 배
+  var R_REV = 0.9;    // 개정 전 둔화율
+
+  // 창고별 재고. use:false면 가용재고에서 뺀 창고
+  var WAREHOUSE = [
+    { name:"북마을(중등 정품)", qty:3100, use:true  },
+    { name:"쿠팡",             qty: 900, use:true  },
+    { name:"본사(정품)",        qty: 300, use:true  },
+    { name:"북마을(폐기)",      qty:2400, use:false },
+    { name:"북마을(반품미분류)", qty: 180, use:false }
+  ];
+
+  // 연도별 시장 대조 (04 항목)
+  var MARKET = [
+    { y:"2024", mkt:82000, ours:12400 },
+    { y:"2025", mkt:79000, ours:10100 },
+    { y:"2026", mkt:76000, ours: 7900 }
+  ];
+
+  // 제작 이력 (부록)
+  var HISTORY = [
+    { item:"1권", date:"2025-02", qty:4000, months:11 },
+    { item:"1권", date:"2024-01", qty:5000, months:13 },
+    { item:"2권", date:"2025-03", qty:3000, months:14 }
+  ];
+
+  var CAUSE = "세그먼트가 3년간 7% 줄어드는 사이 자사는 36% 줄었습니다. 시장 축소가 아니라 점유율 이탈입니다.";
+
+  /* ══════════════════════════════════════════════════════════
+     아래는 고치지 않는다
+     ══════════════════════════════════════════════════════════ */
+
+  var CAP_ON = true;
+  var COVER  = {};
+
+  var $ = function(id){ return document.getElementById(id); };
+  var fmt = function(n){ return Math.round(n).toLocaleString("ko-KR"); };
+  var r100  = function(x){ return Math.round(x/100)*100; };
+  var r1000 = function(x){ return Math.round(x/1000)*1000; };
+  var MON = ["1월","2월","3월","4월","5월","6월","7월","8월","9월","10월","11월","12월"];
+
+  function mIdx(ym){ var p = ym.split("-"); return (+p[0])*12 + (+p[1]) - 1; }
+  function mLabel(idx){ return Math.floor(idx/12) + "년 " + (idx%12 + 1) + "월"; }
+  var T0 = mIdx(TODAY);
+  var L  = Math.ceil(LEAD);
+
+  function D(it, i){
+    var cm = (T0 + i) % 12;
+    return it.annual * Math.pow(it.g, i/12) * SEASON[cm];
+  }
+  function sumD(it, from, to){
+    var s = 0; for (var i = from; i < to; i++) s += D(it, i); return s;
+  }
+  function avail(it){ return it.stock + (it.incoming || 0); }
+
+  function depletion(it){
+    var av = avail(it), c = 0;
+    for (var i = 0; i < 120; i++){ c += D(it, i); if (c >= av) return i; }
+    return 120;
+  }
+
+  function calc(it){
+    var C  = COVER[it.key];
+    var av = avail(it);
+    var safety = sumD(it, 0, L) * SS;
+    var need   = sumD(it, 0, L + C) + safety;
+    var demand = need - av;
+    var cap = null, remain = null, nE = null;
+    if (it.E){
+      nE = Math.max(0, mIdx(it.E) - T0);
+      remain = sumD(it, 0, nE) * R_REV;
+      if (CAP_ON) cap = remain - av;
+    }
+    var raw   = (cap === null) ? demand : Math.min(demand, cap);
+    var capped = (cap !== null) && (cap < demand);
+    var qty   = raw <= 0 ? 0 : r1000(Math.max(it.lot, r100(raw)));
+    var dead  = it.E ? (av + qty - sumD(it, 0, nE)) : null;
+    var dep   = depletion(it);
+    return { C:C, av:av, safety:safety, need:need, demand:demand, cap:cap,
+             raw:raw, capped:capped, qty:qty, dead:dead, dep:dep,
+             order:dep - L, avgM:sumD(it, 0, 12)/12 };
+  }
+
+  function peakMonth(){
+    var bi = 0; for (var i = 1; i < 12; i++) if (SEASON[i] > SEASON[bi]) bi = i;
+    return bi;
+  }
+  // 성수기 = 계절지수가 평균(1/12)을 넘는 달
+  function isPeak(cm){ return SEASON[cm] > 1/12; }
+  function peakRange(){
+    var a = []; for (var i = 0; i < 12; i++) if (isPeak(i)) a.push(i);
+    return a;
+  }
+  function defaultCover(it){
+    // 입고 예정월(오늘 + L)부터 다음 성수기가 끝나는 달까지
+    var start = L;
+    for (var i = start; i < start + 24; i++){
+      if (isPeak((T0 + i) % 12)){
+        var j = i;
+        while (j + 1 < start + 36 && isPeak((T0 + j + 1) % 12)) j++;
+        return Math.max(1, j - start + 1);
+      }
+    }
+    return 6;
+  }
+
+  /* ── 렌더 ───────────────────────────────────────────────── */
+
+  function render(){
+    var res = {};
+    ITEMS.forEach(function(it){ res[it.key] = calc(it); });
+    var A = ITEMS[0], B = ITEMS[1];
+    var rA = res.A, rB = res.B;
+
+    // 결론
+    $("nmA").textContent = A.name; $("nmB").textContent = B.name;
+    $("dkA").textContent = A.name; $("dkB").textContent = B.name;
+    $("okA").textContent = A.name; $("okB").textContent = B.name;
+    $("qtyA").innerHTML = fmt(rA.qty) + "<small>부</small>";
+    $("qtyB").innerHTML = fmt(rB.qty) + "<small>부</small>";
+    $("stkA").textContent = fmt(rA.av); $("stkB").textContent = fmt(rB.av);
+    $("avgA").textContent = fmt(rA.avgM); $("avgB").textContent = fmt(rB.avgM);
+
+    $("depA").textContent = mLabel(T0 + rA.dep);
+    $("depB").textContent = mLabel(T0 + rB.dep);
+    $("ordA").textContent = mLabel(T0 + rA.order);
+    $("ordB").textContent = mLabel(T0 + rB.order);
+    $("cellOrdA").className = "datecell" + (rA.order <= 0 ? " late" : "");
+    $("cellOrdB").className = "datecell" + (rB.order <= 0 ? " late" : "");
+    $("ordAn").textContent = rA.order <= 0 ? "이미 지났습니다" : "리드타임 " + LEAD + "개월 역산";
+    $("ordBn").textContent = rB.order <= 0 ? "이미 지났습니다" : "리드타임 " + LEAD + "개월 역산";
+
+    $("covFoot").textContent = rA.C + "개월 / " + rB.C + "개월";
+    $("capFoot").textContent = (A.E || B.E)
+      ? (CAP_ON ? "적용 (" + [A.E, B.E].filter(Boolean).join(", ") + ")" : "해제")
+      : "없음";
+    var deads = ITEMS.filter(function(x){ return x.E; }).map(function(x){
+      var d = res[x.key].dead;
+      return x.name + " " + (d > 0 ? fmt(d) + "부" : "없음");
+    });
+    $("deadFoot").textContent = deads.length ? deads.join(" / ") : "해당 없음";
+
+    var late = (rA.order <= 0 || rB.order <= 0);
+    $("headline").textContent = late
+      ? "발주 마감일이 이미 지났습니다. 수량보다 시점이 급합니다."
+      : (rA.capped || rB.capped)
+        ? "수요 기준보다 낮습니다. 개정 예정까지의 잔여 수요가 상한입니다."
+        : "다음 성수기 종료월까지를 덮는 수량입니다.";
+
+    // 02 창고
+    var use = 0, out = 0, html = "";
+    WAREHOUSE.forEach(function(w){
+      if (w.use) use += w.qty; else out += w.qty;
+      html += '<div class="whrow' + (w.use ? '' : ' out') + '"><span>' + w.name +
+              (w.use ? '' : ' <span style="font-size:12px">— 제외</span>') +
+              '</span><span class="wq">' + fmt(w.qty) + '부</span></div>';
+    });
+    $("whList").innerHTML = html;
+    $("whUse").textContent = fmt(use) + "부";
+    $("whOut").textContent = fmt(out) + "부";
+    var inc = ITEMS.reduce(function(s, x){ return s + (x.incoming || 0); }, 0);
+    $("whInc").textContent = inc ? fmt(inc) + "부" : "없음";
+
+    // 03 추세
+    var gAvg = ITEMS.reduce(function(s, x){ return s + x.g; }, 0) / ITEMS.length;
+    $("gVal").textContent = gAvg.toFixed(2);
+    var mx = Math.max.apply(null, MARKET.map(function(m){ return m.ours; }));
+    $("trendBars").innerHTML = MARKET.map(function(m){
+      return '<div class="tcol"><span class="tval">' + fmt(m.ours) + '</span>' +
+             '<div class="tbar us" style="height:' + (m.ours / mx * 78) + 'px"></div>' +
+             '<span class="tcap">' + m.y + '</span></div>';
+    }).join("");
+    var first = MARKET[0], last = MARKET[MARKET.length - 1];
+    $("trendNote").innerHTML = first.y + "년 대비 <b>" +
+      Math.round((last.ours / first.ours - 1) * 100) + "%</b>.";
+
+    var smx = Math.max.apply(null, SEASON);
+    $("seasonBars").innerHTML = SEASON.map(function(v, i){
+      return '<div class="' + (isPeak(i) ? 'peak' : '') + '" style="height:' + (v / smx * 100) + '%"></div>';
+    }).join("");
+    $("seasonMon").innerHTML = MON.map(function(m){ return '<span>' + m.replace("월", "") + '</span>'; }).join("");
+    $("peakVal").textContent = peakRange().map(function(i){ return MON[i]; }).join("·");
+
+    // 04 시장
+    $("mktBody").innerHTML = MARKET.map(function(m){
+      return '<tr><td>' + m.y + '</td><td class="n">' + fmt(m.mkt) + '</td><td class="n">' +
+             fmt(m.ours) + '</td><td class="n">' + (m.ours / m.mkt * 100).toFixed(1) + '%</td></tr>';
+    }).join("");
+    $("causeBox").textContent = CAUSE;
+
+    // 05 타임라인
+    drawTimeline(res);
+    $("tlNote").innerHTML = ITEMS.map(function(it){
+      var r = res[it.key];
+      return "<b>" + it.name + "</b> " + mLabel(T0 + r.dep) + " 소진 · 발주 마감 " +
+             mLabel(T0 + r.order) + (r.order <= 0 ? " (지남)" : "");
+    }).join(" &nbsp;|&nbsp; ");
+
+    // 06
+    $("slAname").textContent = A.name; $("slBname").textContent = B.name;
+    $("calcAname").textContent = A.name; $("calcBname").textContent = B.name;
+    $("slAv").textContent = rA.C; $("slBv").textContent = rB.C;
+    $("slAmid").textContent = "기본 " + defaultCover(A) + "개월";
+    $("slBmid").textContent = "기본 " + defaultCover(B) + "개월";
+    $("slA").value = rA.C; $("slB").value = rB.C;
+    $("slAout").textContent = fmt(rA.need); $("slBout").textContent = fmt(rB.need);
+    $("c_needA").textContent = fmt(rA.need); $("c_needB").textContent = fmt(rB.need);
+    $("c_avA").textContent = fmt(rA.av);     $("c_avB").textContent = fmt(rB.av);
+    $("c_rawA").textContent = fmt(Math.max(0, rA.raw));
+    $("c_rawB").textContent = fmt(Math.max(0, rB.raw));
+    $("c_capAop").textContent = rA.capped ? "← 개정 상한 적용" : "";
+    $("c_capBop").textContent = rB.capped ? "← 개정 상한 적용" : "";
+    $("c_finA").textContent = fmt(rA.qty);  $("c_finB").textContent = fmt(rB.qty);
+    $("fxA").textContent = "부 (" + A.name + ")";
+    $("fxB").textContent = "부 (" + B.name + ")";
+
+    var lots = ITEMS.filter(function(x){ return res[x.key].raw > 0 && res[x.key].raw < x.lot; });
+    $("lotNote").innerHTML = lots.length
+      ? "<b>" + lots.map(function(x){ return x.name; }).join(", ") +
+        "</b>은 산출값이 최소 로트(" + fmt(lots[0].lot) + "부)에 못 미칩니다. 찍을지 말지가 판단 대상입니다."
+      : "최소 로트 " + fmt(ITEMS[0].lot) + "부 기준으로 하한을 적용했습니다. 반올림은 백 단위 → 천 단위 순입니다.";
+
+    // 개정 상한 바
+    var withE = ITEMS.filter(function(x){ return x.E; });
+    if (!withE.length){
+      $("capBar").hidden = true; $("ctlCap").hidden = true;
+    } else {
+      $("capBar").className = "capbar" + (CAP_ON ? " on" : "");
+      $("capSw").className = "capsw" + (CAP_ON ? "" : " off");
+      $("ctlCap").className = "ctlrow" + (CAP_ON ? "" : " off");
+      var w = withE[0], rw = res[w.key];
+      $("capNote").innerHTML = CAP_ON
+        ? "<b>" + w.name + "</b> " + w.E + " 개정 예정. 잔여 수요 기준 상한 <b>" +
+          fmt(Math.max(0, rw.cap)) + "부</b>" +
+          (rw.capped ? " — 수요 기준 " + fmt(rw.demand) + "부에서 낮췄습니다. 사장 예상 재고 " +
+            fmt(Math.max(0, rw.dead)) + "부." : " — 수요 기준이 더 낮아 걸리지 않았습니다.")
+        : "상한을 해제한 값입니다. 개정 예정일까지 소화하지 못하는 재고가 생길 수 있습니다.";
+      $("ctlCapT2").textContent = w.E + " 개정 예정";
+    }
+
+    // 부록 계수표
+    $("coefBody").innerHTML = [
+      ["노후화율 g", ITEMS.map(function(x){ return x.name + " " + x.g.toFixed(2); }).join(" · "),
+       "최근 12개월 ÷ 직전 12개월 총출고"],
+      ["계절지수 s(m)", "성수기 " + peakRange().map(function(i){ return MON[i]; }).join("·"),
+       "최근 3개년 월별 총출고 평균, 합 1"],
+      ["리드타임 L", LEAD + "개월", "제작팀 확인값"],
+      ["안전재고 SS", SS.toFixed(1) + "배", "리드타임 기간 수요의 배수"],
+      ["개정 전 둔화율 r", R_REV.toFixed(2), "개정 공지 후 채널 발주 둔화 반영"]
+    ].map(function(r){
+      return "<tr><td>" + r[0] + "</td><td class='n'>" + r[1] + "</td><td>" + r[2] + "</td></tr>";
+    }).join("");
+
+    $("histBody").innerHTML = HISTORY.map(function(h){
+      return "<tr><td>" + h.item + "</td><td>" + h.date + "</td><td class='n'>" +
+             fmt(h.qty) + "</td><td class='n'>" + h.months + "개월</td></tr>";
+    }).join("");
+
+    // 고정 패널
+    $("ctlLive").textContent = fmt(rA.qty + rB.qty) + "부";
+    $("ctlDep").textContent = mLabel(T0 + Math.min(rA.dep, rB.dep));
+    var mo = Math.min(rA.order, rB.order);
+    $("ctlOrd").textContent = mLabel(T0 + mo) + (mo <= 0 ? " (지남)" : "");
+    $("ctlSl").value = rA.C; $("ctlSlv").textContent = rA.C + "개월";
+  }
+
+  /* ── 소진 타임라인 SVG ──────────────────────────────────── */
+
+  function drawTimeline(res){
+    var W = 900, H = 230, P = { l:56, r:16, t:14, b:30 };
+    var N = 24;
+    var iw = W - P.l - P.r, ih = H - P.t - P.b;
+    var maxStock = Math.max.apply(null, ITEMS.map(function(it){ return avail(it); }));
+    var maxDem   = Math.max.apply(null, ITEMS.map(function(it){
+      var m = 0; for (var i = 0; i < N; i++) m = Math.max(m, D(it, i)); return m; }));
+    var x = function(i){ return P.l + iw * i / (N - 1); };
+    var y = function(v){ return P.t + ih * (1 - v / (maxStock * 1.05 || 1)); };
+    var s = [];
+
+    // 가로 기준선
+    [0, 0.5, 1].forEach(function(f){
+      var v = maxStock * f;
+      s.push('<line x1="' + P.l + '" y1="' + y(v) + '" x2="' + (W - P.r) + '" y2="' + y(v) +
+             '" stroke="#E4E5E0" stroke-width="1"/>');
+      s.push('<text x="' + (P.l - 8) + '" y="' + (y(v) + 4) + '" text-anchor="end" font-size="11" fill="#5C6570">' +
+             fmt(v) + '</text>');
+    });
+
+    // 월별 수요 막대 (합산)
+    for (var i = 0; i < N; i++){
+      var d = ITEMS.reduce(function(a, it){ return a + D(it, i); }, 0);
+      var hh = (d / (maxDem * ITEMS.length * 1.2 || 1)) * ih * 0.45;
+      s.push('<rect x="' + (x(i) - 6) + '" y="' + (P.t + ih - hh) + '" width="12" height="' + hh +
+             '" fill="#E4E5E0"/>');
+    }
+
+    // 잔량 곡선
+    ITEMS.forEach(function(it, k){
+      var col = k === 0 ? "#2E6E8E" : "#8E3B2F";
+      var av = avail(it), c = 0, pts = [];
+      for (var i = 0; i < N; i++){
+        pts.push(x(i) + "," + y(Math.max(0, av - c)));
+        c += D(it, i);
+      }
+      s.push('<polyline points="' + pts.join(" ") + '" fill="none" stroke="' + col + '" stroke-width="2.2"/>');
+      var r = res[it.key];
+      if (r.dep < N){
+        s.push('<circle cx="' + x(r.dep) + '" cy="' + y(0) + '" r="4.5" fill="' + col + '"/>');
+        s.push('<text x="' + x(r.dep) + '" y="' + (y(0) - 9) + '" text-anchor="middle" font-size="11" fill="' + col + '">' +
+               (T0 + r.dep) % 12 + 1 + '월 소진</text>');
+      }
+      if (r.order > 0 && r.order < N)
+        s.push('<line x1="' + x(r.order) + '" y1="' + P.t + '" x2="' + x(r.order) + '" y2="' + (P.t + ih) +
+               '" stroke="#A8322A" stroke-width="1.6" stroke-dasharray="5 4"/>');
+    });
+
+    // 오늘
+    s.push('<line x1="' + x(0) + '" y1="' + P.t + '" x2="' + x(0) + '" y2="' + (P.t + ih) +
+           '" stroke="#16202C" stroke-width="1.4"/>');
+
+    // x축 라벨
+    for (var j = 0; j < N; j += 3){
+      s.push('<text x="' + x(j) + '" y="' + (H - 9) + '" text-anchor="middle" font-size="11" fill="#5C6570">' +
+             mLabel(T0 + j).replace("년 ", ".") + '</text>');
+    }
+    $("tlSvg").innerHTML = s.join("");
+  }
+
+  /* ── 인터랙션 ───────────────────────────────────────────── */
+
+  function setCover(key, v){ COVER[key] = Math.max(1, Math.min(24, v)); render(); }
+
+  $("slA").addEventListener("input", function(){ setCover("A", +this.value); });
+  $("slB").addEventListener("input", function(){ setCover("B", +this.value); });
+  $("ctlSl").addEventListener("input", function(){
+    var v = +this.value; ITEMS.forEach(function(it){ COVER[it.key] = v; }); render();
+  });
+  $("slReset").addEventListener("click", function(){
+    ITEMS.forEach(function(it){ COVER[it.key] = defaultCover(it); }); render();
+  });
+  function toggleCap(){ CAP_ON = !CAP_ON; render(); }
+  $("capSw").addEventListener("click", toggleCap);
+  $("ctlCap").addEventListener("click", toggleCap);
+  $("ctlHead").addEventListener("click", function(){
+    var c = $("ctl").classList.toggle("closed");
+    this.setAttribute("aria-expanded", String(!c));
+  });
+
+  // 용어 툴팁
+  var TERMS = {
+    "총출고": "SAP 출고 중 양수만 더한 값. 반품을 빼지 않는다. 추세와 계절지수를 뽑을 때 쓴다.",
+    "순출고": "SAP 출고에서 반품을 뺀 값. 반품은 재고로 돌아오므로 재고 소진 시뮬레이션은 이 값으로 한다.",
+    "가용재고": "정품 창고 재고만. 폐기·반품·수리본·수출·세트 창고는 뺀다.",
+    "노후화율": "최근 12개월 총출고 ÷ 직전 12개월 총출고. 연간 수요가 얼마나 줄어드는지.",
+    "계절지수": "월별 출고를 연 출고로 나눈 값. 합이 1이다.",
+    "리드타임": "제작 발주부터 입고까지 걸리는 기간. 제작팀 확인값."
+  };
+  var tip = $("tip");
+  document.addEventListener("mouseover", function(e){
+    var t = e.target.closest ? e.target.closest(".term") : null;
+    if (!t) return;
+    var k = t.getAttribute("data-t") || t.textContent.trim();
+    if (!TERMS[k]) return;
+    tip.innerHTML = "<strong>" + k + "</strong>" + TERMS[k];
+    tip.style.opacity = "1";
+    var r = t.getBoundingClientRect();
+    tip.style.left = Math.min(window.innerWidth - 320, r.left) + "px";
+    tip.style.top  = (r.bottom + 8) + "px";
+  });
+  document.addEventListener("mouseout", function(e){
+    if (e.target.closest && e.target.closest(".term")) tip.style.opacity = "0";
+  });
+
+  // 계수 모달
+  document.querySelectorAll("button.unit").forEach(function(b){
+    b.addEventListener("click", function(){
+      $("moBody").innerHTML = $("coefSrc").innerHTML;
+      $("ov").classList.add("open");
+    });
+  });
+  $("moClose").addEventListener("click", function(){ $("ov").classList.remove("open"); });
+  $("ov").addEventListener("click", function(e){ if (e.target === this) this.classList.remove("open"); });
+  document.addEventListener("keydown", function(e){ if (e.key === "Escape") $("ov").classList.remove("open"); });
+
+  ITEMS.forEach(function(it){ COVER[it.key] = defaultCover(it); });
+  render();
+</script>

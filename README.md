@@ -11,6 +11,7 @@ Claude Code / Cowork에서 쓰는 사내 스킬 묶음을 한 곳에서 배포�
 /plugin install work-toolkit@ne-claude-plugins
 /plugin install report-maker@ne-claude-plugins
 /plugin install knowledge-notes@ne-claude-plugins
+/plugin install print-quantity@ne-claude-plugins
 ```
 
 이미 추가한 마켓플레이스를 최신으로 당길 때:
@@ -28,6 +29,7 @@ Claude Code / Cowork에서 쓰는 사내 스킬 묶음을 한 곳에서 배포�
 | [`work-toolkit`](plugins/work-toolkit) | 조사·기획·보고·카피·이미지·데이터·자동화 7개 영역 52개 실무 상황 대응 | v0.2.0 |
 | [`report-maker`](plugins/report-maker) | 컨설팅 펌 수준의 대시보드·보고서 제작 (질문 설계 → 데이터 → 스펙 → 스토리 검사 → HTML/문서) | v0.4.0 |
 | [`knowledge-notes`](plugins/knowledge-notes) | 새 지식을 atomic 노트로 분해해 Obsidian vault에 축적 | v0.1.0 (파일럿) |
+| [`print-quantity`](plugins/print-quantity) | 도서 제작 수량 산출. 신간은 시장에서 역산, 기간본은 재고 소진 시점에서 역산 | v0.2.0 |
 
 ## 저장소 구조
 
@@ -41,7 +43,8 @@ ne-claude-plugins/
 └── plugins/
     ├── work-toolkit/
     ├── report-maker/
-    └── knowledge-notes/
+    ├── knowledge-notes/
+    └── print-quantity/
 ```
 
 각 플러그인 디렉터리는 아래 규칙을 따른다.

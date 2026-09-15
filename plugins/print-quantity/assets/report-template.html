@@ -1,0 +1,935 @@
+<meta charset="utf-8">
+<title>신간 제작 수량 제안</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F6F7F5; --card:#FFFFFF; --ink:#16202C; --muted:#5C6570;
+    --rule:#D9DAD4; --basic:#2E6E8E; --type:#8E3B2F; --warn:#8A6D1F;
+    --on:#2E6E8E; --off:#B0A99C;
+    --serif:"Noto Serif KR","Apple Myungjo","Batang",serif;
+    --sans:"Pretendard","Apple SD Gothic Neo","Malgun Gothic","맑은 고딕",sans-serif;
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{margin:0;background:var(--paper);color:var(--ink);
+    font-family:var(--sans);font-size:15px;line-height:1.7;letter-spacing:-.01em;
+    word-break:keep-all;overflow-wrap:break-word}
+  .wrap{max-width:880px;margin:0 auto;padding:48px 28px 150px}
+  h1,h2,h3{font-family:var(--serif);font-weight:600;letter-spacing:-.02em;margin:0}
+  h1{font-size:30px;line-height:1.35}
+  h2{font-size:20px;line-height:1.4}
+  h3{font-size:16px}
+  p{margin:0}
+
+  .masthead{border-bottom:2px solid var(--ink);padding-bottom:16px;margin-bottom:32px}
+
+  .spec{border:1px solid var(--ink);background:var(--card)}
+  .spec-head{padding:14px 20px;border-bottom:1px solid var(--ink);font-size:13px;color:var(--muted)}
+  .spec-head strong{color:var(--ink);font-weight:600}
+  .spec-grid{display:grid;grid-template-columns:1fr 1fr}
+  .spec-cell{padding:26px 22px 24px}
+  .spec-cell + .spec-cell{border-left:1px solid var(--rule)}
+  .spec-cell h3{font-size:15px;font-weight:600}
+  .dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:7px;vertical-align:1px}
+  .num{font-family:var(--serif);font-size:58px;font-weight:700;line-height:1;letter-spacing:-.03em;margin:14px 0 4px}
+  .num small{font-size:19px;font-weight:400;margin-left:4px;letter-spacing:0}
+  .sub{font-size:13px;color:var(--muted)}
+  .sub b{color:var(--ink)}
+  .spec-foot{border-top:1px solid var(--rule);padding:14px 22px;font-size:13px;color:var(--muted);display:flex;flex-wrap:wrap;gap:4px 26px}
+  .spec-foot b{color:var(--ink);font-weight:600}
+
+  section{margin-top:54px}
+  .shead{display:flex;align-items:baseline;gap:12px;border-bottom:1px solid var(--rule);padding-bottom:10px;margin-bottom:12px;flex-wrap:wrap}
+  .shead .n{font-family:var(--serif);font-size:13px;color:var(--muted);flex:none}
+  .shead h2{flex:1 1 auto}
+  .unit{flex:none;font-size:12px;color:var(--muted);border:1px solid var(--rule);border-radius:2px;
+        padding:3px 9px;background:var(--card);white-space:nowrap;font-family:inherit;line-height:1.4}
+  button.unit{cursor:pointer}
+  button.unit:hover{border-color:var(--ink);color:var(--ink)}
+  button.unit:after{content:" ⓘ";font-size:11px}
+  .unit.alt{border-color:var(--warn);color:var(--warn)}
+  .lede{color:var(--muted);margin:14px 0 22px}
+
+  .panelbox{border:1px solid var(--rule);background:var(--card);padding:22px}
+  .frow{padding:16px 0}
+  .frow:first-child{padding-top:0}
+  .frow + .frow{border-top:1px dashed var(--rule)}
+  .ftop{display:flex;justify-content:space-between;align-items:baseline;gap:16px;flex-wrap:wrap}
+  .ftitle{font-weight:600}
+  .ftitle em{font-style:normal;color:var(--muted);font-weight:400;font-size:13px;margin-left:8px}
+  .fval{font-family:var(--serif);font-size:22px;font-weight:700;white-space:nowrap}
+  .fval small{font-size:13px;font-weight:400;color:var(--muted);margin-left:3px}
+  .track{height:14px;background:#EDEEEA;margin-top:12px;display:flex;gap:2px}
+  .fill{height:100%;background:var(--ink);transition:width .45s ease}
+  .fill.b{background:var(--basic)}
+  .fill.t{background:var(--type)}
+  .fnote{font-size:13px;color:var(--muted);margin-top:9px}
+  .fnote b{color:var(--ink)}
+
+  /* 채널 바 */
+  .chbar{display:flex;height:30px;width:100%;overflow:hidden;background:#EDEEEA;margin-top:10px}
+  .chseg{display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;
+         transition:width .45s ease;white-space:nowrap;overflow:hidden}
+  .chseg.on{background:var(--on)}
+  .chseg.off{background:var(--off);color:var(--ink)}
+
+  .scope{border:1px solid var(--rule);background:var(--card)}
+  .srow{display:flex;align-items:flex-start;gap:14px;padding:15px 20px;width:100%;border:0;background:none;
+        font:inherit;color:inherit;text-align:left;cursor:pointer;transition:opacity .2s}
+  .srow + .srow{border-top:1px solid var(--rule)}
+  .srow:hover{background:#FAFAF8}
+  .srow .mark{flex:none;width:18px;height:18px;border:1.5px solid var(--ink);margin-top:4px;position:relative;background:var(--ink)}
+  .srow .mark:after{content:"";position:absolute;left:4px;top:1px;width:8px;height:12px;
+        border-right:2px solid #fff;border-bottom:2px solid #fff;transform:rotate(40deg)}
+  .srow .body{flex:1;min-width:0}
+  .sname{display:block;font-weight:600}
+  .sdesc{display:block;font-size:13px;color:var(--muted);margin-top:2px}
+  .sqty{flex:none;font-family:var(--serif);font-size:15px;white-space:nowrap;padding-top:2px}
+  .srow.off{opacity:.42}
+  .srow.off .mark{background:transparent}
+  .srow.off .mark:after{display:none}
+  .scope-foot{border-top:1px solid var(--rule);background:#FAFAF8;padding:15px 20px;font-size:13px;color:var(--muted)}
+  .kpi{display:flex;flex-wrap:wrap;gap:10px 30px;margin-top:12px}
+  .kpi div{border-left:2px solid var(--rule);padding-left:11px}
+  .kpi b{font-family:var(--serif);font-size:17px;font-weight:700;display:block;color:var(--ink)}
+
+  .cgroup + .cgroup{margin-top:28px;padding-top:24px;border-top:1px dashed var(--rule)}
+  .chead{display:flex;justify-content:space-between;align-items:baseline;gap:14px;flex-wrap:wrap;margin-bottom:11px}
+  .chead .cn{font-weight:600}
+  .chead .cv{font-family:var(--serif);font-size:16px}
+  .stack{display:flex;height:36px;width:100%;overflow:hidden;background:#EDEEEA}
+  .seg{transition:width .45s ease;min-width:0}
+  .seg.us{outline:2px solid var(--ink);outline-offset:-2px}
+  .legend{display:flex;flex-wrap:wrap;gap:6px 18px;margin-top:13px;font-size:13px}
+  .lg{display:flex;align-items:center;gap:7px;color:var(--muted)}
+  .sw{width:11px;height:11px;flex:none}
+  .lg b{color:var(--ink);font-weight:600}
+
+  #tip{position:fixed;z-index:120;background:var(--ink);color:#fff;font-size:12.5px;line-height:1.65;
+       padding:10px 12px;border-radius:3px;pointer-events:none;opacity:0;transition:opacity .12s;
+       width:max-content;max-width:min(300px,80vw);letter-spacing:0}
+  #tip strong{display:block;font-weight:600;margin-bottom:3px}
+  #tip .share{font-family:var(--serif);font-size:15px}
+
+  .tbl{border:1px solid var(--rule);overflow-x:auto;overflow-y:hidden}
+  table{width:100%;border-collapse:collapse;font-size:14px;background:var(--card)}
+  th,td{padding:11px 14px;border-bottom:1px solid var(--rule);text-align:left;vertical-align:top}
+  thead th{border-bottom:1.5px solid var(--ink);font-weight:600;font-size:13px;color:var(--muted)}
+  td.n,th.n{text-align:right;font-family:var(--serif);white-space:nowrap}
+  tbody tr:last-child td{border-bottom:0}
+  tr.total td{background:#FAFAF8;font-weight:600}
+
+
+
+  /* 점유율 시뮬레이터 */
+  .sim{border:1px solid var(--ink);background:var(--card);padding:20px 22px}
+  .simrow{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+  .simrow + .simrow{margin-top:15px;padding-top:15px;border-top:1px dashed var(--rule)}
+  .simrow .sl{width:92px;flex:none;font-weight:600;font-size:14px}
+  .simrow .slwrap{flex:1;min-width:190px}
+  .simrow input[type=range]{width:100%;margin:0;height:20px;cursor:pointer}
+  .simends{display:flex;justify-content:space-between;font-size:11.5px;color:var(--muted);margin-top:2px}
+  .simval{font-family:var(--serif);font-size:23px;font-weight:700;min-width:62px;text-align:right;flex:none}
+  .simout{font-size:13px;color:var(--muted);min-width:150px;flex:none}
+  .simout b{color:var(--ink);font-family:var(--serif);font-size:15px}
+  .simfoot{margin-top:18px;padding-top:14px;border-top:1px solid var(--rule);
+           display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;font-size:13px;color:var(--muted)}
+  .simfoot .tagnow{border:1px solid var(--rule);padding:3px 9px;border-radius:2px;color:var(--ink);font-weight:600}
+  .btn{border:1px solid var(--rule);background:none;font:inherit;font-size:13px;color:var(--muted);padding:5px 11px;cursor:pointer;border-radius:2px}
+  .btn:hover{border-color:var(--ink);color:var(--ink)}
+  tr.scn{cursor:pointer}
+  tr.scn:hover td{background:#FAFAF8}
+
+  /* 계산 흐름 */
+  .calc{display:flex;flex-direction:column;gap:16px}
+  .calcrow{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+  .calcrow .rl{width:86px;flex:none;font-weight:600;font-size:14px}
+  .chip{border:1px solid var(--rule);background:#FAFAF8;padding:8px 13px;min-width:98px;text-align:center}
+  .chip .cv{font-family:var(--serif);font-size:20px;font-weight:700;display:block;line-height:1.25}
+  .chip .ck{font-size:11.5px;color:var(--muted);display:block;margin-top:1px}
+  .chip.res{border:1.5px solid var(--ink);background:var(--card)}
+  .chip.fix{border-style:dashed}
+  .op{color:var(--muted);font-size:13px;flex:none;white-space:nowrap}
+  .final{margin-top:20px;border-top:1px solid var(--rule);padding-top:18px;
+         display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
+  .final .flabel{font-weight:600}
+  .final .fv{font-family:var(--serif);font-size:38px;font-weight:700;line-height:1;letter-spacing:-.02em}
+  .final .fx{font-size:13px;color:var(--muted)}
+  /* 시나리오 막대 */
+  .scnbar{display:inline-block;height:8px;background:var(--rule);vertical-align:middle;margin-left:8px;min-width:2px}
+  tr.total .scnbar{background:var(--ink)}
+  @media (max-width:680px){ .calcrow .rl{width:100%} }
+
+  .term{border-bottom:1px dotted var(--muted);cursor:help}
+  .term:focus{outline:2px solid var(--basic);outline-offset:2px}
+
+  #ctl{position:fixed;right:20px;bottom:20px;z-index:80;width:300px;max-width:calc(100vw - 40px);
+       background:var(--card);border:1px solid var(--ink);box-shadow:0 6px 28px rgba(22,32,44,.16)}
+  #ctlHead{display:flex;align-items:center;gap:10px;padding:11px 14px;cursor:pointer;
+       background:var(--ink);color:#fff;font-size:13px;font-weight:600;border:0;width:100%;text-align:left;font-family:inherit}
+  #ctlHead .htxt{flex:1;min-width:0}
+  #ctlHead .h1line{display:block;line-height:1.4}
+  #ctlHead .h2line{display:block;font-size:11px;font-weight:400;line-height:1.45;color:rgba(255,255,255,.68)}
+  #ctlHead .live{flex:none;font-family:var(--serif);font-weight:700;font-size:14px;white-space:nowrap}
+  #ctlHead .caret{flex:none;transition:transform .2s;font-size:11px}
+  #ctl.closed .caret{transform:rotate(180deg)}
+  #ctl.closed #ctlBody{display:none}
+  .ctlrow{display:flex;gap:10px;align-items:flex-start;padding:11px 14px;width:100%;border:0;background:none;
+       font:inherit;color:inherit;text-align:left;cursor:pointer}
+  .ctlrow + .ctlrow{border-top:1px solid var(--rule)}
+  .ctlrow:hover{background:#FAFAF8}
+  .ctlrow .mark{flex:none;width:16px;height:16px;border:1.5px solid var(--ink);margin-top:3px;background:var(--ink);position:relative}
+  .ctlrow .mark:after{content:"";position:absolute;left:3px;top:0;width:7px;height:11px;
+       border-right:2px solid #fff;border-bottom:2px solid #fff;transform:rotate(40deg)}
+  .ctlrow.off{opacity:.45}
+  .ctlrow.off .mark{background:transparent}
+  .ctlrow.off .mark:after{display:none}
+  .ctlrow .t1{display:block;font-size:13.5px;font-weight:600;line-height:1.5}
+  .ctlrow .t2{display:block;font-size:12px;color:var(--muted)}
+  #ctlFoot{border-top:1px solid var(--rule);background:#FAFAF8;padding:11px 14px;font-size:12px;color:var(--muted)}
+  #ctlFoot b{color:var(--ink);font-family:var(--serif);font-size:13px}
+  @media (max-width:760px){#ctl{left:12px;right:12px;bottom:12px;width:auto}}
+
+  #ov{position:fixed;inset:0;z-index:200;background:rgba(22,32,44,.55);display:none;align-items:center;justify-content:center;padding:24px}
+  #ov.open{display:flex}
+  #mo{background:var(--card);border:1px solid var(--ink);max-width:760px;width:100%;max-height:86vh;overflow:auto;box-shadow:0 20px 60px rgba(0,0,0,.28)}
+  #moHead{display:flex;align-items:center;gap:14px;padding:16px 20px;border-bottom:1px solid var(--ink);position:sticky;top:0;background:var(--card)}
+  #moHead h3{flex:1}
+  #moClose{border:1px solid var(--rule);background:none;font:inherit;font-size:13px;color:var(--muted);padding:5px 11px;cursor:pointer;border-radius:2px}
+  #moClose:hover{border-color:var(--ink);color:var(--ink)}
+  #moBody{padding:20px}
+
+  ul{margin:0;padding-left:1.15em}
+  li{margin-bottom:8px}
+  .callout{border-left:3px solid var(--warn);background:#FCFAF3;padding:16px 18px;font-size:14px}
+  footer{margin-top:60px;padding-top:18px;border-top:1px solid var(--rule);font-size:12.5px;color:var(--muted)}
+
+  @media (max-width:680px){
+    .wrap{padding:32px 18px 170px}
+    h1{font-size:24px}
+    .spec-grid{grid-template-columns:1fr}
+    .spec-cell + .spec-cell{border-left:none;border-top:1px solid var(--rule)}
+    .num{font-size:46px}
+  }
+  @media print{
+    body{background:#fff}
+    #ctl,#tip,#ov{display:none !important}
+    .wrap{padding-bottom:20px}
+    button.unit:after{content:""}
+  }
+</style>
+
+<div class="wrap">
+
+  <header class="masthead">
+    <h1>&lt;서명&gt; &lt;n&gt;종 &mdash; 판매용 제작 수량 제안</h1>
+  </header>
+
+  <div class="spec">
+    <div class="spec-head">
+      <strong>결론</strong> &nbsp;&mdash;&nbsp; 초도 배본 2,300부에 온라인 채널 첫해 수요의 75%를 더한 값입니다.
+    </div>
+    <div class="spec-grid">
+      <div class="spec-cell">
+        <h3><span class="dot" style="background:var(--basic)"></span>기초 독해</h3>
+        <div class="num" style="color:var(--basic)" id="qtyBasic">4,000<small>부</small></div>
+        <div class="sub">개발2팀 계획 3,000부 &rarr; <b id="deltaBasic">1,000부 증량</b></div>
+      </div>
+      <div class="spec-cell">
+        <h3><span class="dot" style="background:var(--type)"></span>유형 독해</h3>
+        <div class="num" style="color:var(--type)" id="qtyType">4,000<small>부</small></div>
+        <div class="sub">개발2팀 계획 3,000부 &rarr; <b id="deltaType">1,000부 증량</b></div>
+      </div>
+    </div>
+    <div class="spec-foot">
+      <span><b>초도 배본</b> 종당 2,300부 (확정)</span>
+      <span><b>온라인 첫해 수요</b> 기초 <span id="onBasic">2,400</span>부 / 유형 <span id="onType">2,800</span>부</span>
+      <span><b>2차 제작 판단</b> 2027년 1월 말</span>
+    </div>
+  </div>
+
+  <section>
+    <div class="shead"><span class="n">01</span><h2>수치 기준</h2></div>
+    <p class="lede">혼동을 막기 위해 이 보고서의 모든 결과값은 하나의 기준으로 통일했습니다.</p>
+    <div class="tbl">
+      <table>
+        <thead><tr><th style="width:30%">구분</th><th>기준</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>시장 규모 · 수요 · 제작 수량</td>
+            <td><b>연간 추정
+              <span class="term" tabindex="0" data-tip="총판(지사)·온라인 서점·쿠팡 등 모든 채널로 나간 물량에서 반품을 뺀 순수량입니다. 실제로 제작해야 하는 부수의 기준이 됩니다.">총출고</span> 부수</b>
+              &nbsp;&mdash;&nbsp; 02 · 04 · 05 항목 동일. 산출 과정은 부록 참조</td>
+          </tr>
+          <tr>
+            <td>채널 비중 (05 항목)</td>
+            <td>온라인 4사는 실판매, 쿠팡은 2025년 SAP · 2026년 입고 확정,
+              총판은 SAP 순출고 중 예스24 · 교보문고 · 영풍문고 · 알라딘 · 쿠팡 거래처 코드를 제외한 나머지
+              <div class="sub" style="margin-top:4px">집계 구간 2025년 1월 ~ 2026년 7월. 2026년 3~4월 대량 반품을 포함해야 총판 수요가 과대 산정되지 않습니다.</div></td>
+          </tr>
+          <tr>
+            <td>경쟁 구도 비교 (03 · 06 항목)</td>
+            <td>YES24
+              <span class="term" tabindex="0" data-tip="YES24 판매지수를 판매 부수로 환산하는 자사 모델(v20)의 산출값입니다. 실제 판매량이 아닌 추정값입니다.">추정 판매량</span>
+              · 2026년 5월 1일 ~ 8월 30일 합계
+              <div class="sub" style="margin-top:4px">경쟁사 실판매는 확보할 수 없어 이 두 항목만 추정값을 씁니다. 품목 간 상대 비교에만 사용합니다.</div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <div class="shead">
+      <span class="n">02</span><h2>시장 규모</h2>
+      <button class="unit" type="button" data-modal>연간 추정 총출고 부수</button>
+    </div>
+    <p class="lede">
+      전체 시장에서 우리 제품이 실제로 겨냥하는 범위까지 좁혔습니다.
+    </p>
+
+    <div class="panelbox">
+      <div class="frow">
+        <div class="ftop">
+          <div class="ftitle">
+            <span class="term" tabindex="0" data-tip="Total Addressable Market. 제품이 속한 시장 전체 규모입니다. 여기서는 중학생이 영어 독해 교재에 지출하는 시장 전부를 뜻합니다.">TAM</span>
+            &nbsp;중학 영어 독해 교재 전체<em>327종</em>
+          </div>
+          <div class="fval">819,000<small>부</small></div>
+        </div>
+        <div class="track"><div class="fill" style="width:100%"></div></div>
+        <div class="fnote">수능 대비가 아닌 일반 독해서(리딩튜터 주니어, 리더스뱅크, 리딩그라피 등)까지 포함한 실질적 대체재 범위입니다.</div>
+      </div>
+
+      <div class="frow">
+        <div class="ftop">
+          <div class="ftitle">
+            <span class="term" tabindex="0" data-tip="Serviceable Addressable Market. TAM 중에서 우리 제품이 실제로 겨냥하는 부분입니다. 여기서는 도서 자체가 수능 대비를 명시적으로 내세운 중학 독해서로 한정했습니다.">SAM</span>
+            &nbsp;중학 수능 독해<em id="samCount">14종</em>
+          </div>
+          <div class="fval" id="samVal">81,000<small>부</small></div>
+        </div>
+        <div class="track">
+          <div class="fill b" id="samBarB" style="width:3.3%"></div>
+          <div class="fill t" id="samBarT" style="width:6.5%"></div>
+        </div>
+        <div class="fnote">
+          TAM의 <b id="samShare">9.9%</b>. 기초 독해 <b id="samBasic">27,000</b>부 · 유형 독해 <b id="samType">53,000</b>부.
+          중학 수능 독해는 아직 니치 시장이며, 그만큼 성장 여지와 수요 한계를 함께 뜻합니다.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="shead">
+      <span class="n">03</span><h2>경쟁 구도는 두 축이 다릅니다</h2>
+      <span class="unit alt">YES24 추정 판매량 · 5~8월</span>
+    </div>
+    <p class="lede">
+      기초 독해는 경쟁이 얕은 대신 시장이 작고, 유형 독해는 시장이 두터운 대신 경쟁이 촘촘합니다.
+      막대에 마우스를 올리면 각 품목의 점유율이 나옵니다.
+    </p>
+    <div class="panelbox">
+      <div class="cgroup">
+        <div class="chead">
+          <span class="cn"><span class="dot" style="background:var(--basic)"></span>기초 독해 <span style="color:var(--muted);font-weight:400" id="cntBasic">5종</span></span>
+          <span class="cv" id="cvBasic">2,207부</span>
+        </div>
+        <div class="stack" id="stackBasic"></div>
+        <div class="legend" id="legBasic"></div>
+      </div>
+      <div class="cgroup">
+        <div class="chead">
+          <span class="cn"><span class="dot" style="background:var(--type)"></span>유형 독해 <span style="color:var(--muted);font-weight:400" id="cntType">9종</span></span>
+          <span class="cv" id="cvType">4,301부</span>
+        </div>
+        <div class="stack" id="stackType"></div>
+        <div class="legend" id="legType"></div>
+      </div>
+      <div class="fnote" style="margin-top:20px">
+        두 그래프는 같은 축척입니다. 막대 길이가 곧 시장 규모 차이입니다. 검은 테두리는 자사 품목.
+        점유율은 각 축(기초 / 유형) 내부 비중입니다.
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="shead">
+      <span class="n">04</span><h2>목표 점유율로 첫해 수요를 정합니다</h2>
+      <button class="unit" type="button" data-modal>연간 추정 총출고 부수</button>
+    </div>
+    <p class="lede">
+      수요를 좌우하는 단 하나의 가정은 목표 점유율입니다. 세 가지로 나눠 놓고 그중 기준안을 택했습니다.
+      아래 슬라이더로 점유율을 직접 조정할 수 있습니다. 점유율은 SAM(중학 수능 독해) 내 비중이고, 첫해 수요는 여기에 신간 보정을 적용한 값입니다.
+    </p>
+    <div class="sim">
+      <div class="simrow">
+        <span class="sl" style="color:var(--basic)">기초 독해</span>
+        <span class="slwrap">
+          <input type="range" id="slB" min="10" max="28" step="1" value="18"
+                 aria-label="기초 독해 목표 점유율">
+          <span class="simends"><span>보수 10%</span><span>낙관 28%</span></span>
+        </span>
+        <span class="simval" id="slBv">18%</span>
+        <span class="simout">첫해 수요 <b id="slBout">0</b>부</span>
+      </div>
+      <div class="simrow">
+        <span class="sl" style="color:var(--type)">유형 독해</span>
+        <span class="slwrap">
+          <input type="range" id="slT" min="7" max="20" step="1" value="13"
+                 aria-label="유형 독해 목표 점유율">
+          <span class="simends"><span>보수 7%</span><span>낙관 20%</span></span>
+        </span>
+        <span class="simval" id="slTv">13%</span>
+        <span class="simout">첫해 수요 <b id="slTout">0</b>부</span>
+      </div>
+      <div class="simfoot">
+        <span>현재 설정 <span class="tagnow" id="slTag">기준</span> &nbsp;&mdash;&nbsp; 조정하면 아래 수치와 05 항목 제작 수량이 함께 바뀝니다.</span>
+        <button class="btn" type="button" id="slReset">기준값으로 되돌리기</button>
+      </div>
+    </div>
+
+    <div class="tbl">
+      <table>
+        <thead>
+          <tr><th>시나리오</th><th>근거</th><th class="n">기초</th><th class="n">유형</th>
+              <th class="n">확보 목표<br>(안정기)</th><th>첫해 수요<br>기초 / 유형</th><th class="n">제작량<br>기초 / 유형</th></tr>
+        </thead>
+        <tbody id="scnBody"></tbody>
+      </table>
+    </div>
+    <div class="panelbox" style="margin-top:20px">
+      <div class="frow">
+        <div class="ftop">
+          <div class="ftitle">
+            <span class="term" tabindex="0" data-tip="Serviceable Obtainable Market. SAM 중에서 우리가 현실적으로 확보할 수 있는 물량입니다. 목표 점유율을 적용해 구합니다.">SOM</span>
+            &nbsp;확보 목표<em>안정기 · 현재 설정 기준</em>
+          </div>
+          <div class="fval" id="somVal">11,000<small>부</small></div>
+        </div>
+        <div class="track">
+          <div class="fill b" id="somBarB" style="width:0.6%"></div>
+          <div class="fill t" id="somBarT" style="width:0.7%"></div>
+        </div>
+        <div class="fnote">
+          기준값 기초 18% · 유형 13%는 자사 기존 품목(첫 번째 수능 영어)의 현 점유율 기초 13% · 유형 9%에
+          신간 효과와 지사 영업력을 더한 수준입니다. 출시 첫해는 인지도가 아직 형성되는 기간이라
+          안정기의 75%인 <b id="somFirst">8,000</b>부로 봅니다.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="shead">
+      <span class="n">05</span><h2>제작 수량 산출</h2>
+      <button class="unit" type="button" data-modal>연간 추정 총출고 부수</button>
+    </div>
+    <p class="lede">
+      첫해 수요를 채널별로 나눕니다. 중학 수능 독해는 수요의 64%가 온라인에서 나갑니다.
+      총판 몫은 확정된 초도 배본 2,300부로 대체합니다. 초도 배본이 총판 첫해 수요를 이미 넘어서기 때문입니다.
+      온라인 몫은 초판에 75%만 싣고 나머지는 2차 제작으로 대응합니다.
+    </p>
+
+    <div class="panelbox">
+      <div class="frow">
+        <div class="ftop">
+          <div class="ftitle" style="color:var(--basic)">기초 독해 &mdash; 첫해 수요 <span id="needBasic">3,700</span>부</div>
+        </div>
+        <div class="chbar">
+          <div class="chseg on" id="chOnB" style="width:64%">온라인 <span id="chOnBv">2,400</span></div>
+          <div class="chseg off" id="chOffB" style="width:36%">총판 <span id="chOffBv">1,300</span></div>
+        </div>
+      </div>
+      <div class="frow">
+        <div class="ftop">
+          <div class="ftitle" style="color:var(--type)">유형 독해 &mdash; 첫해 수요 <span id="needType">4,400</span>부</div>
+        </div>
+        <div class="chbar">
+          <div class="chseg on" id="chOnT" style="width:64%">온라인 <span id="chOnTv">2,800</span></div>
+          <div class="chseg off" id="chOffT" style="width:36%">총판 <span id="chOffTv">1,600</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panelbox" style="margin-top:18px">
+      <div class="calc">
+        <div class="calcrow">
+          <span class="rl" style="color:var(--basic)">기초 독해</span>
+          <span class="chip"><span class="cv" id="c_onB">2,400</span><span class="ck">온라인 수요</span></span>
+          <span class="op">&times; 0.75</span>
+          <span class="chip"><span class="cv" id="c_pOnB">1,800</span><span class="ck">초판 반영분</span></span>
+          <span class="op">+</span>
+          <span class="chip fix"><span class="cv">2,300</span><span class="ck">초도 배본 · 확정</span></span>
+          <span class="op">=</span>
+          <span class="chip res"><span class="cv" id="c_sumB">4,100</span><span class="ck">산출값</span></span>
+        </div>
+        <div class="calcrow">
+          <span class="rl" style="color:var(--type)">유형 독해</span>
+          <span class="chip"><span class="cv" id="c_onT">2,800</span><span class="ck">온라인 수요</span></span>
+          <span class="op">&times; 0.75</span>
+          <span class="chip"><span class="cv" id="c_pOnT">2,100</span><span class="ck">초판 반영분</span></span>
+          <span class="op">+</span>
+          <span class="chip fix"><span class="cv">2,300</span><span class="ck">초도 배본 · 확정</span></span>
+          <span class="op">=</span>
+          <span class="chip res"><span class="cv" id="c_sumT">4,400</span><span class="ck">산출값</span></span>
+        </div>
+      </div>
+      <div class="final">
+        <span class="flabel">제작 수량</span>
+        <span class="fv" style="color:var(--basic)" id="c_finB">4,000</span>
+        <span class="fx">부 · 기초</span>
+        <span class="fv" style="color:var(--type)" id="c_finT">4,000</span>
+        <span class="fx">부 · 유형 &nbsp;&mdash;&nbsp; 각 산출값을 천 단위로 맞춘 값입니다.</span>
+      </div>
+    </div>
+
+    <div class="callout" style="margin-top:20px">
+      계획안 3,000부는 초도 배본 2,300부를 빼면 온라인에 700부가 남습니다. 온라인 첫해 수요의 약 4분의 1입니다.
+      수능 딥독은 2025년 1월 ~ 2026년 7월 사이 쿠팡 한 채널에만 종당 약 3,000부를 냈습니다.
+    </div>
+    <p class="fnote" style="margin-top:14px">
+      초판에 싣지 않은 온라인 수요 25%와 산출값의 반올림 오차는 2차 제작으로 흡수합니다. 판단 시점은 2027년 1월 말이며,
+      12~1월 누계 출고가 초도 배본의 1.5배를 넘는지로 봅니다.
+    </p>
+  </section>
+
+  <section>
+    <div class="shead">
+      <span class="n">06</span><h2>산정에 포함한 경쟁서 범위</h2>
+      <span class="unit alt">YES24 추정 판매량 · 5~8월</span>
+    </div>
+    <p class="lede">
+      제품맵(2026-06-30판)에 등재된 품목만으로는 시장이 과소 집계됩니다. 이번 조사에서 제품맵에 없던 3개 시리즈가 새로 확인되어 추가했습니다.
+      각 항목을 눌러 끄고 켜면 이 보고서의 모든 수치가 함께 바뀝니다. 화면 오른쪽 아래 패널에서도 언제든 조정할 수 있습니다.
+    </p>
+
+    <div class="scope">
+      <button class="srow" data-key="visang" type="button">
+        <span class="mark"></span>
+        <span class="body">
+          <span class="sname">비상교육 &mdash; 중등 수능독해 영어 독해 L1 · L2 · L3</span>
+          <span class="sdesc">중학생 대상 3단계 수능 독해 커리큘럼. L1은 구조 + 유형, L2 · L3은 유형 중심</span>
+        </span>
+        <span class="sqty">1,275부</span>
+      </button>
+      <button class="srow" data-key="first" type="button">
+        <span class="mark"></span>
+        <span class="body">
+          <span class="sname">NE능률 &mdash; 첫 번째 수능 영어 기초편 · 유형편</span>
+          <span class="sdesc">자사 품목. 2020년 출간, 폐간 예정이나 현재 판매 중이므로 시장 규모에는 포함</span>
+        </span>
+        <span class="sqty">661부</span>
+      </button>
+      <button class="srow" data-key="jihak" type="button">
+        <span class="mark"></span>
+        <span class="body">
+          <span class="sname">지학사 &mdash; 중학 수능 첫걸음 영어 독해 기초 · 유형</span>
+          <span class="sdesc">시리즈 명칭이 기초 / 유형으로 본 교재 2권 구성과 그대로 대응</span>
+        </span>
+        <span class="sqty">286부</span>
+      </button>
+      <div class="scope-foot">
+        모두 끄면 제품맵 등재 품목(7종, 4,286부)만 남습니다.
+        <div class="kpi">
+          <div>포함 품목<b id="statCount">14종</b></div>
+          <div>추정 판매량 합계<b id="statEst">6,508부</b></div>
+          <div>제품맵 기준 대비<b id="statDelta">+2,222부</b></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="shead"><span class="n">07</span><h2>수치 해석 시 유의사항</h2></div>
+    <ul>
+      <li>총출고 계수(&times;5.49)는 수능 딥독 실측값입니다. 쎄듀 · 해커스는 온라인 비중이 더 높을 가능성이 있어 경쟁서 시장이 과대 산정되었을 수 있습니다.</li>
+      <li>추정 판매량 보정계수는 품목별로 1.09~2.21의 편차가 있습니다. 판매량이 낮은 품목일수록 모델이 과대 추정하는 경향이 있어, 소형 경쟁서의 시장 기여분은 실제보다 부풀려져 있을 수 있습니다.</li>
+      <li>자사 수능 딥독 L1~L3(동일 기간 추정 2,517부)와 본 교재의 구매층이 겹칩니다. SOM에는 순증 효과만 반영했고 딥독 잠식분은 차감하지 않았습니다.</li>
+      <li>채널 비중은 온라인 4사만 실판매이고 쿠팡 · 총판은 출고 기준입니다. 총판을 잔여로 산출하는 구조상 합계는 SAP 순출고와 일치합니다.</li>
+      <li>쿠팡 입고 데이터는 2026년 1월 22일부터 적재됩니다. 26년 1월 1~21일분이 빠져 쿠팡 물량이 소폭 과소 집계되었습니다.</li>
+      <li>지학사 · 해커스 4종은 목차 원문 대신 시리즈 명칭(기초 / 유형)을 따라 분류했습니다. 비상 L2는 출판사가 제시한 3단계 커리큘럼 설명에 근거한 분류입니다.</li>
+    </ul>
+  </section>
+
+  <section id="appendix">
+    <div class="shead"><span class="n">부록</span><h2>추정 판매량을 총출고로 바꾸는 계수</h2></div>
+    <div id="coefSrc">
+      <p class="lede">
+        YES24 추정 판매량은 한 서점의 추정치일 뿐입니다. 전국 유통 물량으로 바꾸기 위해 계수를 순서대로 적용했습니다.
+        모든 계수는 자사 실적으로 직접 검증한 값입니다.
+      </p>
+      <div class="tbl">
+        <table>
+          <thead><tr><th>단계</th><th class="n">계수</th><th>근거</th></tr></thead>
+          <tbody>
+            <tr>
+              <td>추정 판매량 &rarr; YES24 실판매</td>
+              <td class="n">&divide; 1.15</td>
+              <td>자사 독해 7종의 동일 기간 추정값과 YES24 SCM 실판매 대조. 수능 딥독 3종 물량가중 2,517 &divide; 2,187</td>
+            </tr>
+            <tr>
+              <td>4개월 &rarr; 연간</td>
+              <td class="n">&times; 2.6</td>
+              <td>미리 수능 영어 기초 독해의 2026년 월별 실적에서 역산(5~8월 1,163부 &rarr; 연 3,078부). 신학기 성수기 포함</td>
+            </tr>
+            <tr>
+              <td>YES24 실판매 &rarr; 총출고</td>
+              <td class="n">&times; 5.49</td>
+              <td>수능 딥독 L1~L3의 동일 기간 SAP 순출고 12,004부 &divide; YES24 실판매 2,187부</td>
+            </tr>
+            <tr>
+              <td>안정기 &rarr; 출시 첫해</td>
+              <td class="n">&times; 0.75</td>
+              <td>수능 딥독의 출시 첫해 실적이 2년 차의 74% 수준. 신간 인지도 형성 기간 반영</td>
+            </tr>
+            <tr>
+              <td>첫해 수요 &rarr; 온라인 몫</td>
+              <td class="n">&times; 0.64</td>
+              <td>수능 딥독 3종의 2025.01~2026.07 채널 실측. 온라인 27,593부 &divide; (온라인 27,593 + 총판 15,228)</td>
+            </tr>
+            <tr class="total">
+              <td>제작 수량</td>
+              <td class="n">2,300 + 온라인 &times; 0.75</td>
+              <td>초도 배본은 확정 물량이라 전액 반영, 온라인 몫은 재판 회전이 빠르므로 75%만 초판에 반영. 종별로 천 단위 반올림</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="fnote">
+        지역 서점 판매(LOCAL 채널)는 부분 표본이라 신뢰도가 낮아 제외하고, 총판 출고량으로 갈음했습니다.
+      </p>
+
+      <h3 style="margin-top:32px">채널 비중의 근거 &mdash; 수능 딥독 3종 실적</h3>
+      <p class="lede" style="margin-top:10px">
+        본 교재의 예상치가 아니라, 같은 세그먼트 신간의 지난 실적입니다. 온라인 계수 &times;0.73은 여기서 나왔습니다.
+      </p>
+      <div class="tbl">
+        <table>
+          <thead><tr><th>2025.01 ~ 2026.07</th><th class="n">부수</th><th class="n">비중</th><th>소스</th></tr></thead>
+          <tbody>
+            <tr><td>온라인 4사 (예스24 · 교보 · 알라딘 · 영풍)</td><td class="n">18,670</td><td class="n">44%</td><td>실판매</td></tr>
+            <tr><td>쿠팡</td><td class="n">8,923</td><td class="n">21%</td><td>25년 SAP · 26년 입고 확정</td></tr>
+            <tr class="total"><td>온라인 계</td><td class="n">27,593</td><td class="n">64%</td><td></td></tr>
+            <tr><td>총판 (지사 · 도매)</td><td class="n">15,228</td><td class="n">36%</td><td>SAP 순출고 중 온라인 5사 거래처 코드 제외</td></tr>
+            <tr class="total"><td>합계</td><td class="n">42,821</td><td class="n">100%</td><td></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="fnote">
+        2026년 3~4월 대량 반품을 포함한 구간입니다. 반품을 빼고 보면 총판 수요를 과대평가하게 됩니다.
+        합계 42,821부는 같은 기간 SAP 순출고 37,815부보다 큽니다. 2026년 4월 교보문고 직거래 전환 이전 물량이
+        총판(고앤고에듀 경유)과 교보 실판매에 함께 잡히기 때문이며, 비중 산출에는 영향이 없습니다.
+      </p>
+    </div>
+  </section>
+
+  <footer>
+    데이터 출처 &mdash; YES24 추정 판매량 및 실판매(자사 분석 DB), SAP 순출고, 쿠팡 입고 확정 내역. 조회 기준일 2026-09-02.
+    <br>본 문서의 수량은 영업전략팀 제안이며, 최종 제작 수량은 개발2팀 · 제작팀 협의 후 확정됩니다.
+  </footer>
+</div>
+
+<div id="ctl">
+  <button id="ctlHead" type="button" aria-expanded="true">
+    <span class="htxt">
+      <span class="h1line">경쟁서 범위</span>
+      <span class="h2line">수능영어 제품맵(26.06.30) 미등재 라인업</span>
+    </span>
+    <span class="live" id="ctlLive">5,000</span>
+    <span class="caret">&#9650;</span>
+  </button>
+  <div id="ctlBody">
+    <button class="ctlrow" data-key="visang" type="button">
+      <span class="mark"></span>
+      <span><span class="t1">비상교육 중등 수능독해 3종</span><span class="t2">1,275부</span></span>
+    </button>
+    <button class="ctlrow" data-key="first" type="button">
+      <span class="mark"></span>
+      <span><span class="t1">NE능률 첫 번째 수능 영어 2종</span><span class="t2">661부 · 자사</span></span>
+    </button>
+    <button class="ctlrow" data-key="jihak" type="button">
+      <span class="mark"></span>
+      <span><span class="t1">지학사 중학 수능 첫걸음 2종</span><span class="t2">286부</span></span>
+    </button>
+    <div id="ctlFoot">
+      SAM <b id="ctlSam">81,000</b>부 · 첫해 수요 <b id="ctlNeed">8,000</b>부
+    </div>
+  </div>
+</div>
+
+<div id="ov" role="dialog" aria-modal="true" aria-labelledby="moTitle">
+  <div id="mo">
+    <div id="moHead">
+      <h3 id="moTitle">연간 추정 총출고 부수 &mdash; 산출 계수</h3>
+      <button id="moClose" type="button">닫기</button>
+    </div>
+    <div id="moBody"></div>
+  </div>
+</div>
+
+<div id="tip"></div>
+
+<script>
+(function(){
+  /* ────────────────────────────────────────────────────────────────
+     데이터 블록 — 여기만 채우면 된다.
+     HTML 본문의 숫자는 초기 표시값일 뿐이고 실제 값은 render()가 계산한다.
+     둘이 어긋나면 새로고침할 때 숫자가 바뀐다. scripts/check_qty_report.py 로 검사할 것.
+     ──────────────────────────────────────────────────────────────── */
+
+  // n: 서명 / p: 출판사 / g: "b" 1단계·"t" 2단계 / v: 추정 판매량
+  // grp: 토글 그룹 키 ("core"는 항상 켜짐) / c: 막대 색
+  // us: 자사 품목 여부 / hard: 학년대가 어긋나 목표 점유율 절반만 적용할 품목
+  var BOOKS = [
+    {n:"<서명>", p:"<출판사>", g:"b", v:0, grp:"core", c:"#2E6E8E"},
+    {n:"<자사 품목>", p:"NE능률", g:"b", v:0, grp:"ours", c:"#16202C", us:true},
+    {n:"<서명>", p:"<출판사>", g:"t", v:0, grp:"core", c:"#8E3B2F", hard:true}
+  ];
+
+  var PLAN_QTY = 0;       // 제작 계획서상 부수 (증감 표시용)
+
+  var TAM_EST = 0,        // 카테고리 전체 추정 판매량 (조회 구간 합계)
+      K_EST   = 1.15,     // 추정 → YES24 실판매
+      K_YEAR  = 2.6,      // 조회 기간 → 연간
+      K_SHIP  = 5.49,     // YES24 실판매 → 총출고
+      K_FIRST = 0.75,     // 안정기 → 출시 첫해 (고정)
+      K_PRINT = 0.75,     // 첫해 수요 → 초판 반영분 (고정)
+      ONLINE  = 0.64,     // 첫해 수요 중 온라인 몫
+      INIT    = 0;        // 확정 초도 배본. 분기 B면 쓰지 않는다
+
+  var SCENARIOS = [
+    {k:"보수", b:0.10, t:0.07, why:"<근거>"},
+    {k:"기준", b:0.18, t:0.13, why:"<근거>", pick:true},
+    {k:"낙관", b:0.28, t:0.20, why:"<근거>"}
+  ];
+
+  var toShip = function(e){ return e / K_EST * K_YEAR * K_SHIP; };
+  var fmt = function(x){ return Math.round(x).toLocaleString("ko-KR"); };
+  var r1000 = function(x){ return Math.round(x/1000)*1000; };
+  var r100  = function(x){ return Math.round(x/100)*100; };
+
+  var TAM = toShip(TAM_EST);
+  var state = {map:true, visang:true, first:true, jihak:true};
+
+  var tip = document.getElementById("tip");
+  function hideTip(){ tip.style.opacity = 0; }
+  function showTip(e, html){
+    tip.innerHTML = html; tip.style.opacity = 1;
+    var pad=14, w=tip.offsetWidth, h=tip.offsetHeight;
+    var x = Math.min(e.clientX + pad, window.innerWidth - w - 10);
+    var y = e.clientY - h - pad; if(y < 8) y = e.clientY + pad;
+    tip.style.left = Math.max(8,x)+"px"; tip.style.top = y+"px";
+  }
+  function showTipAtRect(el, text){
+    tip.textContent = text; tip.style.opacity = 1;
+    var r = el.getBoundingClientRect(), w = tip.offsetWidth, h = tip.offsetHeight;
+    var x = Math.min(r.left, window.innerWidth - w - 10);
+    var y = r.bottom + 9;
+    if(y + h > window.innerHeight - 8) y = Math.max(8, r.top - h - 9);
+    tip.style.left = Math.max(8,x)+"px"; tip.style.top = y+"px";
+  }
+  document.querySelectorAll(".term[data-tip]").forEach(function(el){
+    var txt = el.getAttribute("data-tip");
+    el.addEventListener("mouseenter", function(){ showTipAtRect(el, txt); });
+    el.addEventListener("focus",      function(){ showTipAtRect(el, txt); });
+    el.addEventListener("mouseleave", hideTip);
+    el.addEventListener("blur",       hideTip);
+  });
+
+  function drawStack(list, scaleMax, groupTotal, stackEl, legEl){
+    stackEl.innerHTML=""; legEl.innerHTML="";
+    list.forEach(function(b){
+      var share = b.v / groupTotal * 100;
+      var d = document.createElement("div");
+      d.className = "seg" + (b.us ? " us" : "");
+      d.style.background = b.c;
+      d.style.width = (b.v / scaleMax * 100) + "%";
+      d.addEventListener("mousemove", function(e){
+        showTip(e, "<strong>"+b.n+"</strong>"+b.p+(b.us?" · 자사":"")+"<br>추정 "+
+          fmt(b.v)+'부<span class="share"> · 점유율 '+share.toFixed(1)+"%</span>");
+      });
+      d.addEventListener("mouseleave", hideTip);
+      stackEl.appendChild(d);
+      var l = document.createElement("span");
+      l.className = "lg";
+      l.innerHTML = '<span class="sw" style="background:'+b.c+'"></span><b>'+b.n+'</b> '+share.toFixed(1)+"%";
+      legEl.appendChild(l);
+    });
+  }
+
+  function somOf(estB, estT, hardEst, sb, st){
+    return {
+      b: toShip(estB) * sb,
+      t: toShip(hardEst) * (st/2) + toShip(estT - hardEst) * st
+    };
+  }
+
+  function render(){
+    var list = BOOKS.filter(function(b){ return state[b.grp]; });
+    var basic = list.filter(function(b){ return b.g==="b"; });
+    var type  = list.filter(function(b){ return b.g==="t"; });
+    var estB = basic.reduce(function(s,b){ return s+b.v; },0);
+    var estT = type.reduce(function(s,b){ return s+b.v; },0);
+    var hardEst = type.filter(function(b){ return b.hard; }).reduce(function(s,b){ return s+b.v; },0);
+    var mapOnly = BOOKS.filter(function(b){ return b.grp==="map"; }).reduce(function(s,b){ return s+b.v; },0);
+
+    document.getElementById("statCount").textContent = list.length + "종";
+    document.getElementById("statEst").textContent = fmt(estB+estT) + "부";
+    var d = estB + estT - mapOnly;
+    document.getElementById("statDelta").textContent = (d>0?"+":"") + fmt(d) + "부";
+
+    var samB = toShip(estB), samT = toShip(estT), samAll = samB + samT;
+    document.getElementById("samCount").textContent = list.length + "종";
+    document.getElementById("samVal").innerHTML = fmt(r1000(samAll)) + '<small>부</small>';
+    document.getElementById("samBasic").textContent = fmt(r1000(samB));
+    document.getElementById("samType").textContent  = fmt(r1000(samT));
+    document.getElementById("samShare").textContent = (samAll/TAM*100).toFixed(1) + "%";
+    document.getElementById("samBarB").style.width = (samB/TAM*100) + "%";
+    document.getElementById("samBarT").style.width = (samT/TAM*100) + "%";
+
+    var sh = getSH();
+    document.getElementById("slBv").textContent = slB.value + "%";
+    document.getElementById("slTv").textContent = slT.value + "%";
+    var hit = SCENARIOS.filter(function(x){
+      return Math.round(x.b*100) == +slB.value && Math.round(x.t*100) == +slT.value; })[0];
+    document.getElementById("slTag").textContent = hit ? hit.k : "사용자 설정";
+
+    var som = somOf(estB, estT, hardEst, sh.b, sh.t);
+    var somAll = som.b + som.t;
+    document.getElementById("somVal").innerHTML = fmt(r1000(somAll)) + '<small>부</small>';
+    document.getElementById("somBarB").style.width = (som.b/TAM*100) + "%";
+    document.getElementById("somBarT").style.width = (som.t/TAM*100) + "%";
+    document.getElementById("somFirst").textContent = fmt(r1000(somAll * K_FIRST));
+
+    var needB = som.b * K_FIRST, needT = som.t * K_FIRST;
+    var onB = needB * ONLINE, onT = needT * ONLINE;
+    var offB = needB - onB, offT = needT - onT;
+    /* ── 부수 산식. 분기를 골라 한쪽만 남긴다 ──────────────────────
+       분기 A — 초도 배본 > 총판 첫해 수요 : 초도 배본 + 온라인 × K_PRINT
+       분기 B — 초도 배본 ≤ 총판 첫해 수요 : 첫해 수요 × K_PRINT
+       ──────────────────────────────────────────────────────────── */
+    // [분기 A]
+    var pOnB = r100(onB) * K_PRINT, pOnT = r100(onT) * K_PRINT;
+    var rawB = INIT + pOnB, rawT = INIT + pOnT;
+    // [분기 B] — 위 두 줄을 지우고 아래를 쓴다. c_pOnB/c_pOnT 칩도 함께 지운다
+    // var rawB = needB * K_PRINT, rawT = needT * K_PRINT;
+    var finB = r1000(r100(rawB)), finT = r1000(r100(rawT));
+
+    document.getElementById("qtyBasic").innerHTML = fmt(finB) + '<small>부</small>';
+    document.getElementById("qtyType").innerHTML  = fmt(finT) + '<small>부</small>';
+    function dtxt(q){ var d = q - PLAN_QTY;
+      return d===0 ? "유지" : (d>0 ? fmt(d)+"부 증량" : fmt(-d)+"부 감량"); }
+    document.getElementById("deltaBasic").textContent = dtxt(finB);
+    document.getElementById("deltaType").textContent  = dtxt(finT);
+
+    document.getElementById("onBasic").textContent = fmt(r100(onB));
+    document.getElementById("onType").textContent  = fmt(r100(onT));
+
+    document.getElementById("needBasic").textContent = fmt(r100(needB));
+    document.getElementById("needType").textContent  = fmt(r100(needT));
+    document.getElementById("chOnBv").textContent  = fmt(r100(onB));
+    document.getElementById("chOffBv").textContent = fmt(r100(offB));
+    document.getElementById("chOnTv").textContent  = fmt(r100(onT));
+    document.getElementById("chOffTv").textContent = fmt(r100(offT));
+
+    document.getElementById("slBout").textContent = fmt(r100(needB));
+    document.getElementById("slTout").textContent = fmt(r100(needT));
+    document.getElementById("chOnB").style.width  = (ONLINE*100) + "%";
+    document.getElementById("chOffB").style.width = ((1-ONLINE)*100) + "%";
+    document.getElementById("chOnT").style.width  = (ONLINE*100) + "%";
+    document.getElementById("chOffT").style.width = ((1-ONLINE)*100) + "%";
+    document.getElementById("c_onB").textContent  = fmt(r100(onB));
+    document.getElementById("c_onT").textContent  = fmt(r100(onT));
+    document.getElementById("c_pOnB").textContent = fmt(r100(pOnB));
+    document.getElementById("c_pOnT").textContent = fmt(r100(pOnT));
+    document.getElementById("c_sumB").textContent = fmt(r100(rawB));
+    document.getElementById("c_sumT").textContent = fmt(r100(rawT));
+    document.getElementById("c_finB").textContent = fmt(finB);
+    document.getElementById("c_finT").textContent = fmt(finT);
+
+    var scaleMax = Math.max(estB, estT, 1);
+    drawStack(basic, scaleMax, estB||1, document.getElementById("stackBasic"), document.getElementById("legBasic"));
+    drawStack(type,  scaleMax, estT||1, document.getElementById("stackType"),  document.getElementById("legType"));
+    document.getElementById("cntBasic").textContent = basic.length + "종";
+    document.getElementById("cntType").textContent  = type.length + "종";
+    document.getElementById("cvBasic").textContent = fmt(estB) + "부";
+    document.getElementById("cvType").textContent  = fmt(estT) + "부";
+
+    document.getElementById("ctlLive").textContent = fmt(finB) + " / " + fmt(finT);
+    document.getElementById("ctlSam").textContent  = fmt(r1000(samAll));
+    document.getElementById("ctlNeed").textContent = fmt(r1000(needB + needT));
+
+    var sb = document.getElementById("scnBody");
+    sb.innerHTML = "";
+    var maxSom = 0;
+    SCENARIOS.forEach(function(x){
+      var m = somOf(estB, estT, hardEst, x.b, x.t);
+      maxSom = Math.max(maxSom, m.b + m.t);
+    });
+    SCENARIOS.forEach(function(x){
+      var m = somOf(estB, estT, hardEst, x.b, x.t);
+      var somX = m.b + m.t;
+      var fB = m.b * K_FIRST, fT = m.t * K_FIRST;
+      var w = Math.round(somX / maxSom * 90);
+      var tr = document.createElement("tr");
+      tr.className = "scn" + (x.pick ? " total" : "");
+      tr.title = "클릭하면 이 시나리오로 설정됩니다";
+      tr.addEventListener("click", function(){
+        slB.value = Math.round(x.b*100); slT.value = Math.round(x.t*100); render();
+      });
+      tr.innerHTML =
+        "<td>" + x.k + (x.pick ? " &nbsp;&larr; 기준" : "") + "</td><td>" + x.why + "</td>" +
+        '<td class="n">' + (x.b*100).toFixed(0) + '%</td><td class="n">' + (x.t*100).toFixed(0) + "%</td>" +
+        '<td class="n">' + fmt(r1000(somX)) + '<span class="scnbar" style="width:' + w + 'px"></span></td>' +
+        "<td>" + fmt(r100(fB)) + " / " + fmt(r100(fT)) + "</td>" +
+        '<td class="n">' + fmt(r1000(r100(INIT + r100(fB*ONLINE)*K_PRINT))) + " / " + fmt(r1000(r100(INIT + r100(fT*ONLINE)*K_PRINT))) + "</td>";
+      sb.appendChild(tr);
+    });
+
+    document.querySelectorAll("[data-key]").forEach(function(el){
+      el.classList.toggle("off", !state[el.dataset.key]);
+      el.setAttribute("aria-pressed", String(!!state[el.dataset.key]));
+    });
+  }
+
+  document.querySelectorAll("[data-key]").forEach(function(el){
+    el.addEventListener("click", function(){ state[el.dataset.key] = !state[el.dataset.key]; render(); });
+  });
+
+  var ctl = document.getElementById("ctl"), head = document.getElementById("ctlHead");
+  head.addEventListener("click", function(){
+    var closed = ctl.classList.toggle("closed");
+    head.setAttribute("aria-expanded", String(!closed));
+  });
+
+  var ov = document.getElementById("ov"), moBody = document.getElementById("moBody");
+  function openModal(){
+    if(!moBody.hasChildNodes()){
+      var c = document.getElementById("coefSrc").cloneNode(true);
+      c.removeAttribute("id"); moBody.appendChild(c);
+    }
+    ov.classList.add("open"); document.getElementById("moClose").focus();
+  }
+  function closeModal(){ ov.classList.remove("open"); }
+  document.querySelectorAll("[data-modal]").forEach(function(b){ b.addEventListener("click", openModal); });
+  document.getElementById("moClose").addEventListener("click", closeModal);
+  ov.addEventListener("click", function(e){ if(e.target === ov) closeModal(); });
+  document.addEventListener("keydown", function(e){ if(e.key === "Escape") closeModal(); });
+
+  slB.addEventListener("input", render);
+  slT.addEventListener("input", render);
+  document.getElementById("slReset").addEventListener("click", function(){
+    var base = SCENARIOS.filter(function(x){ return x.pick; })[0];
+    slB.value = Math.round(base.b*100); slT.value = Math.round(base.t*100); render();
+  });
+
+  window.addEventListener("scroll", hideTip, {passive:true});
+  render();
+})();
+</script>
