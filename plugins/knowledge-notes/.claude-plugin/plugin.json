@@ -6,8 +6,8 @@
     "name": "choiyh",
     "email": "choiyh@neungyule.com"
   },
-  "homepage": "https://github.com/neneungyul2/ne-claude-plugins/tree/main/plugins/knowledge-notes",
-  "repository": "https://github.com/neneungyul2/ne-claude-plugins",
+  "homepage": "https://github.com/choiyh919/sales-strategy/tree/main/plugins/knowledge-notes",
+  "repository": "https://github.com/choiyh919/sales-strategy",
   "category": "지식 관리",
   "keywords": ["지식화", "Obsidian", "노트", "용어", "atomic", "vault"]
 }
