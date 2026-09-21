@@ -10,14 +10,37 @@ description: 데이터를 보여줘야 하는 모든 상황의 진입점. "차�
 
 ## 0. 먼저 읽을 것
 
-작업 전 아래 두 문서를 Read 도구로 읽는다. quick·report 어느 쪽이든 동일하게 적용된다.
+- `${CLAUDE_PLUGIN_ROOT}/references/product-lines.md` — **필수. 가장 먼저 읽는다.**
+  quick/report보다 앞선 갈림길이 여기서 갈린다 (아래 0-1장)
+
+quick·report 어느 쪽이든 동일하게 적용되는 두 문서:
 
 - `${CLAUDE_PLUGIN_ROOT}/references/design-rules.md`
 - `${CLAUDE_PLUGIN_ROOT}/references/chart-rules.md`
 
 지표 이름이 등장하면 `${CLAUDE_PLUGIN_ROOT}/references/metrics.md`도 읽는다.
 
-## 1. 모드 판단
+## 0-1. 계열 판정 — quick/report보다 먼저 가른다
+
+**quick이냐 report냐를 묻기 전에, 설명형이냐 탐색형이냐를 먼저 가른다.**
+`product-lines.md` §1의 질문을 그대로 쓴다.
+
+> "이 화면을 다음에 열 때, 무엇을 볼지도 그때 정하나요, 아니면 지금 정한 게 계속
+> 유지되나요?"
+
+사용자의 말에서 신호를 먼저 찾는다 — "필터로 볼 수 있게", "날짜·기간을 바꿔가며",
+"대시보드로 계속 쓸", "직접 파볼 수 있게" 같은 말이 나오면 되묻지 않고 **탐색형**으로
+판정한다. "정리해줘", "일보 만들어줘", "이상 있으면 알아야" 같은 말은 **설명형**이다.
+
+**탐색형이면 여기서 갈라진다.** 아래 1~6장(quick/report 모드 판단, frame-question 등)은
+설명형의 것이다. 탐색형은 `${CLAUDE_PLUGIN_ROOT}/skills/frame-explore/SKILL.md`로
+바로 넘어간다 — quick/report 구분도, frame-question도 거치지 않는다.
+
+둘 다 필요하다는 요청("일보도 만들고, 필터로도 보게")이 오면 **산출물 두 개**라고
+알린다. `product-lines.md` §1의 감시형·탐색형 비교표를 보여주며 하나씩 순서대로
+진행한다고 안내한다.
+
+## 1. 모드 판단 — 설명형일 때만
 
 | | quick (빠른 시각화) | report (정식 보고) |
 |---|---|---|
@@ -86,6 +109,14 @@ HTML을 그려서 확인받지 않는다 — 화면을 만들면 사용자는 �
 - `${CLAUDE_PLUGIN_ROOT}/skills/build-html/SKILL.md`
 - `${CLAUDE_PLUGIN_ROOT}/skills/build-doc/SKILL.md`
 - `${CLAUDE_PLUGIN_ROOT}/skills/verify-report/SKILL.md`
+
+탐색형(0-1장에서 그렇게 갈린 경우)은 위 목록이 아니라 아래를 순서대로 읽는다.
+
+- `${CLAUDE_PLUGIN_ROOT}/skills/frame-explore/SKILL.md`
+- `${CLAUDE_PLUGIN_ROOT}/skills/load-data/SKILL.md` (같은 어댑터, 긴 형식으로 남긴다)
+- `${CLAUDE_PLUGIN_ROOT}/skills/plan-explore/SKILL.md`
+- `${CLAUDE_PLUGIN_ROOT}/skills/build-explore/SKILL.md`
+- `${CLAUDE_PLUGIN_ROOT}/skills/verify-report/SKILL.md` (탐색형 분기)
 
 report 모드에서는 **인사이트·액션(3~5개)이 필수**다. exhibit만 늘어놓고 끝내지 않는다.
 축약어·사내 용어가 나오면 용어 설명을 붙이고, 한 문장으로 안 되는 계산은 산식 모달로 뺀다.

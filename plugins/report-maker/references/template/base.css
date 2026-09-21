@@ -297,6 +297,45 @@ td .sw{display:inline-block;width:8px;height:8px;border-radius:var(--r3);margin-
 #tt .tr2{display:flex;justify-content:space-between;gap:16px}
 #tt .tr2 b{color:var(--ink);font-weight:700}
 
+/* ── 감시형(watch): 데이터 시점 배지. 항상 화면 최상단 ── */
+.freshness{display:flex;align-items:center;gap:8px;font-size:var(--t2);color:var(--sub);
+           background:var(--panel);border:1px solid var(--line2);border-radius:var(--r2);
+           padding:12px 16px;margin-bottom:16px}
+.freshness b{color:var(--ink);font-weight:700}
+.freshness .stale{color:var(--warn);font-weight:700}
+
+/* ── 감시형: 지표 행 + 임계값 대비. weight:primary 자리 ── */
+.watchrow{border:1px solid var(--line2);border-radius:var(--r);overflow:hidden;margin-bottom:8px}
+.watchrow>div{display:grid;grid-template-columns:1fr 120px 120px 88px;gap:12px;align-items:center;
+              padding:12px 16px;border-bottom:1px solid var(--line);background:#fff}
+.watchrow>div:last-child{border-bottom:0}
+.watchrow .name{font-weight:600;color:var(--ink)}
+.watchrow .val{font-variant-numeric:tabular-nums;font-weight:700;text-align:right}
+.watchrow .thresh{color:var(--dim);font-size:var(--t1);text-align:right}
+.watchrow .stat{justify-self:end;font-size:var(--t1);font-weight:800;padding:2px 8px;border-radius:var(--rp)}
+.watchrow .stat.ok{background:var(--upBg);color:var(--up)}
+.watchrow .stat.warn{background:var(--warnBg);color:var(--warn)}
+.watchrow .stat.bad{background:var(--dnBg);color:var(--dn)}
+.watchrow.breach>div{background:var(--warnBg)}
+@media (max-width:640px){ .watchrow>div{grid-template-columns:1fr 88px 72px} .watchrow .thresh{display:none} }
+
+/* 정상 항목은 접어둔다. 이탈 항목만 기본으로 펼쳐진다 */
+.normalfold{margin-top:8px}
+.normalfold summary{cursor:pointer;font-size:var(--t2);color:var(--dim);padding:8px 0;font-weight:600;list-style:none}
+.normalfold summary::-webkit-details-marker{display:none}
+.normalfold summary::before{content:"▸ ";color:var(--gray)}
+.normalfold[open] summary::before{content:"▾ "}
+
+/* ── 추적형(track): 기준선 + 현재 위치 + 이벤트 마커 ── */
+.baseline{stroke:var(--dim);stroke-width:1.5;stroke-dasharray:4 4;fill:none}
+.baseline-label{fill:var(--dim);font-size:var(--t1)}
+.curpos{fill:var(--blue)}
+.eventmark{stroke:var(--gray);stroke-width:1}
+.eventmark text{fill:var(--dim);font-size:var(--t1)}
+.projection{margin-top:12px;padding:12px 16px;background:var(--blueBg);border-radius:var(--r2);
+            font-size:var(--t2);color:var(--ink);font-weight:600}
+.projection b{color:var(--blueDk)}
+
 @media (max-width:520px){
   .takeaway{font-size:var(--t4)}
   .block{padding:16px 16px}

@@ -1,0 +1,40 @@
+/* ══════════════════════════════════════════════════════════════
+   탐색형 전용 추가 스타일. base.css 위에 이어 붙인다
+   (assemble.py --css base.css,explore.css). 토큰은 base.css를 그대로 쓴다 —
+   여기서 새 색·크기를 만들지 않는다.
+   ══════════════════════════════════════════════════════════════ */
+
+/* ── 축 컨트롤 바 — 항상 최상단, 스크롤해도 고정 ── */
+.axisbar{position:sticky;top:0;z-index:41;background:rgba(255,255,255,.96);
+         backdrop-filter:saturate(180%) blur(12px);border-bottom:1px solid var(--line2);
+         display:flex;flex-wrap:wrap;gap:12px 20px;align-items:center;
+         padding:12px 20px;max-width:1120px;margin:0 auto}
+.axisitem{display:flex;align-items:center;gap:8px}
+.axisitem .lbl{font-size:var(--t1);font-weight:700;color:var(--dim);white-space:nowrap}
+.axisitem select{font-size:var(--t2);color:var(--ink);border:1px solid var(--line2);
+                  border-radius:var(--r3);padding:8px 12px;background:#fff;cursor:pointer}
+.axisitem select:focus{outline:2px solid var(--blueSoft)}
+.chipgroup{display:flex;gap:8px;flex-wrap:wrap}
+.chip{border:1px solid var(--line2);background:#fff;border-radius:var(--rp);
+      padding:4px 12px;font-size:var(--t1);font-weight:600;color:var(--sub);cursor:pointer}
+.chip:hover{border-color:var(--blue)}
+.chip.sel{background:var(--blueDk);border-color:var(--blueDk);color:#fff}
+
+/* 현재 선택된 축 조합 — 늘 화면에 보인다 (스크린샷 공유 시 무슨 조합인지 알 수 있게) */
+[data-state-badge]{font-size:var(--t1);color:var(--dim);white-space:nowrap;
+                    margin-left:auto;padding:4px 12px;background:var(--line);border-radius:var(--rp)}
+
+/* ── 패널 서열 — plan-explore의 weight: primary_view만 강조. kpi_row는 .kpi 그대로,
+   detail은 .block 기본값 그대로 쓴다 ── */
+.block.panel-primary{background:var(--panel);border-color:var(--blueSoft)}
+
+/* ── 비교 토글(전기·전년)은 .seg를 그대로 쓴다. 별도 클래스가 필요 없다 ── */
+
+/* ── "이 조합은 볼 수 없음" 표시 — 그레인이 못 받치는 조합을 추정치로 채우지 않고 이걸 보여준다 ── */
+.nodata{padding:32px 16px;text-align:center;color:var(--dim);font-size:var(--t2);
+        background:var(--line);border-radius:var(--r2)}
+
+@media (max-width:720px){
+  .axisbar{position:static;padding:12px 16px}
+  [data-state-badge]{margin-left:0;display:block;order:99}
+}

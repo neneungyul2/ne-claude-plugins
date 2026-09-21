@@ -16,9 +16,14 @@
 | 커맨드 | 용도 |
 |---|---|
 | `/quick` | 본인 확인용 빠른 시각화 |
-| `/report` | 정식 보고 (5단계 전부) |
+| `/report` | 정식 보고 (5단계 전부) — 결론을 내미는 설명형 |
+| `/explore` | **축을 바꿔가며 보는 탐색형 대시보드.** 결론이 아니라 틀을 만든다 |
 | `/verify` | **이미 있는 산출물을 검수만 한다** — 남이 만든 것도 |
 | `/refresh` | **기존 리포트를 새 데이터로** — 구성은 그대로 |
+
+`report-helper`가 요청을 받으면 `references/product-lines.md`의 질문("다음에 열 때
+무엇을 볼지도 그때 정하나요?")으로 설명형/탐색형을 먼저 가르고, 그다음 설명형 안에서
+진단·선택·감시·추적 유형을 가른다. 두 계열은 아예 다른 파이프라인이다 — 아래 표.
 
 ## 산출물 유형 — 독자가 무엇을 모르는가
 
@@ -35,7 +40,12 @@
 **유형을 사용자에게 묻지 않는다.** 사용자가 한 말에서 읽어내고 형태를 보여 확인받는다.
 유형에 따라 **무엇이 필수인지가 달라진다** (`references/report-types.md`).
 
-## 동작 구조 — 5단계
+위 네 유형은 전부 **설명형**이다. "필터로 볼 수 있게", "날짜·기간을 바꿔가며",
+"직접 파볼 수 있게" 같은 요청은 다섯 번째 유형이 아니라 **다른 계열, 탐색형**이다 —
+`key_takeaway`·`action_title`·`weight: primary`가 원천적으로 성립하지 않는다.
+`references/product-lines.md`가 왜 나뉘는지, `/explore`가 어떻게 도는지 정리한다.
+
+## 동작 구조 — 5단계 (설명형)
 
 ```
 질문·유형 → 데이터 → [스펙·배치] → 렌더 → 검수
@@ -72,6 +82,26 @@
 | `scripts/check_html.py` | 항상. 소스를 읽는다. 의존성 없음 |
 | `scripts/lint_render.py` | 항상. **브라우저로 칠해보고 픽셀을 잰다** (playwright) |
 | `scripts/verify_docs_sync.py` | 개발용. 릴리스 전에 플러그인 자신을 검사한다 |
+
+## 동작 구조 — 탐색형
+
+```
+축·그레인·패널 합의 → 데이터(그레인 전체) → [탐색 스펙] → 공용 엔진 렌더링 → 검수
+     ①확인                                       ②확인
+```
+
+결론을 검사하지 않는다 — **축 조합을 바꿔도 화면이 안 깨지는가**를 검사한다.
+
+| 스킬 | 설명형 대응 | 하는 일 |
+|---|---|---|
+| `frame-explore` | `frame-question` | 질문이 아니라 **축(axis)**을 합의한다 |
+| `plan-explore` | `plan-report` | 축·그레인·패널을 확정한 탐색 스펙을 만든다 |
+| `build-explore` | `build-html` | 공용 계산 엔진(`template/explore-engine.js`) 위에 패널을 조립한다 |
+
+`references/explore-model.md`가 데이터 그레인(long format)·축 유형·패널 유형·계산
+엔진 원칙을 담는다. `template/explore-engine.js`(계산: 필터·rollup·wavg·상위N+기타)와
+`template/explore.css`·`template/explore-parts.html`(패널 부품)이 `base.css`·`base.js` 위에
+얹힌다 — `assemble.py --css base.css,explore.css --js base.js,explore-engine.js`.
 
 ## 산출물이 갖춰야 할 것
 
@@ -125,13 +155,17 @@
 | `skills/frame-question/SKILL.md` | 질문 후보 도출, 수신자 레벨, 가정, 분석 축 정의 |
 | `references/watch-thresholds.md` | 감시형 임계값 설정·결론문 |
 | `references/sources/` | 엑셀·Metabase·붙여넣기 어댑터별 주의사항 |
-| `references/template/parts.html` | **부품 목록. 리포트 만들 때 읽는 것은 이것뿐** |
+| `references/template/parts.html` | **부품 목록(설명형). 리포트 만들 때 읽는 것은 이것뿐** |
 | `references/template/base.css` `base.js` | 읽지 않는다. `assemble.py`가 붙인다 |
 | `references/html-template.html` | 위 셋의 **조립 결과.** 검사용. 직접 고치지 않는다 |
 | `assets/korea_paths.json` | 시도 17개 + 시군구 전체 SVG 경로 (441KB) |
-| `references/report-types.md` | **산출물 유형 4종과 유형별 필수·해당없음** |
-| `references/examples/` | 스키마 확인용 사례. **형태가 아니다** |
-| `skills/plan-report/references/spec-schema.md` | 리포트 스펙 규격 v2.4 |
+| `references/report-types.md` | **산출물 유형 4종과 유형별 필수·해당없음** (설명형 안의 갈래) |
+| `references/product-lines.md` | **설명형 vs 탐색형.** `report-types.md`보다 앞서 읽는 문서 |
+| `references/explore-model.md` | 탐색형 데이터 그레인·축·패널 유형·계산 엔진 원칙 |
+| `references/examples/` | **의도적으로 비어 있다.** 완결 예시가 형태를 고정시켰다 — 좋은 패턴은 `design-rules.md`로 옮겼다 |
+| `skills/plan-report/references/spec-schema.md` | 설명형 스펙 규격 v2.5 (`groups` 추가) |
+| `skills/plan-explore/references/explore-spec-schema.md` | 탐색형 스펙 규격 v1.0 (신설) |
+| `references/template/explore-engine.js` `explore.css` `explore-parts.html` | 탐색형 부품·계산 엔진. `build-explore`에서만 읽는다 |
 
 ## 설계 원칙
 
@@ -162,6 +196,22 @@
 
 ## 변경 이력
 
+- **v0.10.0** — **설명형/탐색형 계열 분리.** "필터로 볼 수 있게" 요청을 다섯 번째
+  `report_type`으로 억지로 끼우지 않는다 — `references/product-lines.md`가 계열을
+  가르고, 탐색형은 별도 파이프라인(`frame-explore` → `plan-explore` → `build-explore`,
+  `/explore`)으로 돈다. `explore-model.md`(데이터 그레인·축·패널 카탈로그),
+  `explore-spec-schema.md`(v1.0), `template/explore-engine.js`(공용 계산: 필터·rollup·
+  wavg·상위N+기타·기간비교)·`explore.css`·`explore-parts.html` 신설.
+  `assemble.py`가 `--css`/`--js`에 쉼표로 여러 파일을 받아 이어 붙이도록 확장.
+  `report-helper`·`verify-report`에 계열 판정·탐색형 검수 분기 추가.
+  설명형 쪽은: 자체검사를 실패마다 줄을 추가하던 방식에서 **"이것만 봐도 알 수 있나"·
+  "제일 큰 얘기가 먼저 나오나"** 두 질문 × 다섯 크기(리포트 전체·그룹·exhibit·문단·용어)
+  틀로 재구성(`plan-report/SKILL.md` §6). 결론이 두 갈래 이상 나뉠 때 exhibit을 묶는
+  `groups` 스펙 필드 신설(v2.5, §5-1). `so_what`·모달 소개문에도 "주장 하나" 규칙 적용,
+  glossary `desc`에 "쉬운 말이 먼저" 규칙 적용. 완결 예시(`examples/quick-minimal.json`)를
+  삭제하고 그게 보여주던 좋은 패턴(목차·결론 먼저·헤더 위계)은 `design-rules.md`의
+  기존 절로 명시적으로 연결. 감시형·추적형 전용 렌더 부품(`.freshness`·`.watchrow`·
+  `.normalfold`·`.baseline`·`.projection`)을 실제로 구현 — 이전에는 진단형 부품만 있었다.
 - **v0.8.0** — **수정이 오래 걸리던 원인을 고쳤다.** 라벨 하나 옮기려고 9만 자를 다시 쓰고 있었다.
   템플릿을 `template/{parts.html, base.css, base.js}`로 쪼개고 `scripts/assemble.py` 신설 —
   **CSS 18K와 JS 7K를 이제 읽지도 쓰지도 않는다.**

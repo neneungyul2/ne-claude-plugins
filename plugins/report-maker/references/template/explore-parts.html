@@ -1,0 +1,174 @@
+<!-- ══════════════════════════════════════════════════════════════
+     이 아래는 **부품 목록**이지 대시보드 레이아웃이 아니다.
+     parts.html(설명형)과 같은 원칙 — 패널이 몇 개인지, 어떤 순서인지는
+     explore-spec.json의 panels가 정한다. 필요 없는 부품은 통째로 지운다.
+     값·라벨·용어는 전부 자리표시자다. 가져갈 것은 클래스 이름과 중첩 구조,
+     그리고 EXPLORE.* 로 표시된 스크립트 연결 지점뿐이다.
+
+     assemble.py 호출 시 반드시 두 인자를 이어 붙인다:
+       --css base.css,explore.css   --js base.js,explore-engine.js
+     ══════════════════════════════════════════════════════════════ -->
+
+<header class="mast">
+  <div class="masti">
+    <h1>{{TITLE}} <i>탐색형</i></h1>
+    <div class="basis">기준 <b>{{BASIS}}</b> · 단위 {{UNIT}}</div>
+  </div>
+</header>
+
+<!-- ── 축 컨트롤 바. 항상 최상단, 스크롤해도 고정 ──
+     select 는 EXPLORE.bindAxisControls() 가 [data-axis] 로 찾아 건다.
+     칩(다중 선택)은 [data-axis][data-chip-value] -->
+<div class="axisbar">
+  <div class="axisitem">
+    <span class="lbl">{{기간}}</span>
+    <select data-axis="date">
+      <option value="__all__">전체</option>
+      <option value="{{2026-08}}">{{2026년 8월}}</option>
+    </select>
+  </div>
+  <div class="axisitem">
+    <span class="lbl">{{부문}}</span>
+    <div class="chipgroup">
+      <button class="chip" data-axis="category" data-chip-value="{{값A}}">{{값A}}</button>
+      <button class="chip" data-axis="category" data-chip-value="{{값B}}">{{값B}}</button>
+    </div>
+  </div>
+  <!-- 현재 선택된 축 조합. EXPLORE.reflectState() 가 채운다. 지우지 않는다 —
+       스크린샷을 공유해도 무슨 조합인지 알 수 있어야 한다 -->
+  <span data-state-badge></span>
+</div>
+
+<main class="wrap">
+
+  <!-- ── KPI 행. panels 중 type:kpi. 항상 최상단, 패널 중 가장 먼저 그려진다 ── -->
+  <div class="kpi" id="panel-kpi">
+    <div>
+      <div class="k">{{KPI_LABEL}}</div>
+      <div class="v">000.0<em>{{UNIT}}</em></div>
+      <div class="d up">▲ 0.0% <span>전기 대비</span></div>
+    </div>
+    <div>
+      <div class="k"><abbr class="term" data-term="{{TERM_ID}}">{{TERM}}</abbr></div>
+      <div class="v">00.0<em>%</em></div>
+      <div class="d flat">— <span>전기와 동일</span></div>
+    </div>
+  </div>
+
+  <!-- ── 부품 A. trend 패널 ── 제목은 명사구로 충분하다.
+       "이것만 봐도 무엇을 보여주는지 알 수 있나"만 통과하면 된다 -->
+  <div class="shead" id="p1"><span class="snum">1</span><h2>{{PANEL_TITLE — 예: 기간별 매출 추이}}</h2></div>
+  <section class="block" data-panel="p1">
+    <!-- 비교 토글(전기·전년)이 있으면 .seg 를 그대로 쓴다. 없으면 지운다 -->
+    <div class="seg" role="group" aria-label="비교 기준">
+      <button aria-pressed="true">전기 대비</button>
+      <button aria-pressed="false">전년 대비</button>
+    </div>
+    <div class="chartwrap">
+      <svg viewBox="0 0 720 320" role="img" aria-label="{{PANEL_TITLE}}">
+        <!-- EXPLORE.registerPanel('p1', {axes_used:['date','category'], render:fn}) 이
+             현재 state로 필터한 rows를 받아 이 svg 내부를 다시 그린다 -->
+      </svg>
+    </div>
+    <p class="note">출처 {{SOURCE}} · 기간 {{데이터 전체 범위 — 필터로 좁혀도 이 값은 그대로}} · 단위 {{UNIT}} · 집계기준 {{BASIS}}</p>
+  </section>
+
+  <!-- ── 부품 B. mix 패널 + 기타 드릴다운 ──
+       기타는 축이 바뀔 때마다 다시 계산된다 (렌더 시점 고정 목록이 아니다) -->
+  <div class="shead" id="p2"><span class="snum">2</span><h2>{{PANEL_TITLE — 예: 채널별 구성}}</h2></div>
+  <section class="block" data-panel="p2">
+    <div class="mix" id="p2-mix"><!-- EXPLORE 렌더 시 <b style="width:..%;background:..">라벨</b> 를 채운다 --></div>
+    <div class="tw"><table>
+      <thead><tr><th>{{항목}}</th><th class="r">{{지표}}</th><th class="r">비중</th></tr></thead>
+      <tbody id="p2-rows">
+        <tr><td>{{값}}</td><td class="r">000.0</td><td class="r">00.0%</td></tr>
+        <tr class="clickable" data-modal="p2-etc">
+          <td>기타 <button class="infoi" aria-label="전체 보기">i</button></td>
+          <td class="r">00.0</td><td class="r">0.0%</td>
+        </tr>
+      </tbody>
+    </table></div>
+    <p class="note">출처 … · 기간 … · 단위 … · 집계기준 …</p>
+  </section>
+
+  <!-- ── 부품 C. map 패널 — 지도만 두지 않는다. 표를 나란히 둬야 값 비교가 된다 ── -->
+  <div class="shead" id="p3"><span class="snum">3</span><h2>{{PANEL_TITLE — 예: 지역별 분포}}</h2></div>
+  <section class="block" data-panel="p3">
+    <div class="maprow">
+      <div class="kmap"><svg viewBox="0 0 500 560"><!-- korea-map.md 좌표. path[data-key] --></svg></div>
+      <div class="tw"><table>
+        <thead><tr><th>{{지역}}</th><th class="r">{{지표}}</th></tr></thead>
+        <tbody id="p3-rows"><tr data-key="{{코드}}"><td>{{값}}</td><td class="r">000.0</td></tr></tbody>
+      </table></div>
+    </div>
+    <p class="note">출처 … · 기간 … · 단위 … · 집계기준 …</p>
+  </section>
+
+  <!-- ── 부품 D. table 패널 — 상세 행. 12행 넘으면 스크롤 컨테이너 안에 ── -->
+  <div class="shead" id="p4"><span class="snum">4</span><h2>{{PANEL_TITLE — 예: 상세 내역}}</h2></div>
+  <section class="block" data-panel="p4">
+    <div class="tw" style="max-height:420px;overflow-y:auto">
+      <table id="p4-table">
+        <thead><tr><th>{{열1}}</th><th class="r">{{열2}}</th></tr></thead>
+        <tbody><tr><td>{{값}}</td><td class="r">000.0</td></tr></tbody>
+      </table>
+    </div>
+    <p class="note">출처 … · 기간 … · 단위 … · 집계기준 …</p>
+  </section>
+
+  <!-- ── 이 조합에서 볼 수 없을 때 ── 그레인이 못 받치는 조합을 추정치로 채우지 않고
+       이 블록으로 대체한다. EXPLORE 렌더 함수가 조건에 따라 넣고 뺀다 -->
+  <!-- <div class="nodata">이 조합은 데이터 단위상 볼 수 없습니다.</div> -->
+
+  <div class="foot">
+    출처 {{SOURCE}} · 기간 {{PERIOD}} · 단위 {{UNIT}} · 집계기준 {{BASIS}} · 추출 {{EXTRACTED_AT}}
+  </div>
+</main>
+
+<!-- ── 모달 ───────────────────────────────────────────── -->
+<div class="mask" id="mask">
+  <div class="modal" data-id="p2-etc" hidden>
+    <header>
+      <div>
+        <h3>기타 — 전체</h3>
+        <p class="msub">현재 축 조합 기준. 축을 바꾸면 이 목록도 바뀐다</p>
+      </div>
+      <button class="x" data-close aria-label="닫기">×</button>
+    </header>
+    <div class="body">
+      <div class="tw"><table id="p2-etc-rows">
+        <thead><tr><th>{{항목}}</th><th class="r">{{지표}}</th></tr></thead>
+        <tbody></tbody>
+      </table></div>
+      <p class="note">묶기 전 전체 항목. 여기서 또 줄이지 않는다.</p>
+    </div>
+  </div>
+
+  <div class="modal" data-id="calc-1" hidden>
+    <header>
+      <div><h3>{{지표}} 산출 방법</h3></div>
+      <button class="x" data-close aria-label="닫기">×</button>
+    </header>
+    <div class="body">
+      <!-- 가변값을 여기 하드코딩하지 않는다. 산식 자체만 설명한다 -->
+      <p class="formula">{{지표}} = <b>{{구성 항목 A}}</b> − <b>{{구성 항목 B}}</b></p>
+      <p class="note">포함·제외 조건, 원본 위치를 함께 적는다.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ── 데이터·구동. 본문 맨 끝에 둔다 ──
+     EXPLORE.DATA/AXES를 채우고 패널을 등록한 뒤 EXPLORE.start()를 한 번 부른다.
+     데이터가 크면(1MB 이상) 이 script를 별도 data.json + fetch로 뺀다 -->
+<script>
+  window.EXPLORE = window.EXPLORE || {};
+  EXPLORE.AXES = [ /* {id,name,type,control,values,default} … */ ];
+  EXPLORE.DATA = [ /* 긴 형식 원자료. {date, category, channel, rev, qty, …} … */ ];
+
+  EXPLORE.registerPanel('p1', { axes_used:['date','category'], render:function(state, rows){ /* svg#p1 다시 그림 */ } });
+  EXPLORE.registerPanel('p2', { axes_used:['date','category'], render:function(state, rows){ /* mix + etc 다시 계산 */ } });
+  EXPLORE.registerPanel('p3', { axes_used:['date'],            render:function(state, rows){ /* 지도 + 표 다시 그림 */ } });
+  EXPLORE.registerPanel('p4', { axes_used:['date','category'], render:function(state, rows){ /* 상세 표 다시 채움 */ } });
+
+  EXPLORE.start();
+</script>

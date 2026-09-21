@@ -52,19 +52,25 @@ def main():
     ap.add_argument("content", help="본문 HTML (<main> 안쪽 + 선택적 모달)")
     ap.add_argument("-o", "--out", required=True)
     ap.add_argument("--title", help="생략하면 본문의 <h1>에서 가져온다")
-    ap.add_argument("--css", help="base.css 대신 쓸 파일")
-    ap.add_argument("--js", help="base.js 대신 쓸 파일")
+    ap.add_argument("--css", help="base.css 대신 쓸 파일. 쉼표로 여러 개 이으면 순서대로 붙인다"
+                                  " (예: --css base.css,explore.css)")
+    ap.add_argument("--js", help="base.js 대신 쓸 파일. 쉼표로 여러 개 이으면 순서대로 붙인다"
+                                 " (예: --js base.js,explore-engine.js)")
     a = ap.parse_args()
 
-    for p in (a.content, a.css or os.path.join(TPL, "base.css"),
-              a.js or os.path.join(TPL, "base.js")):
+    css_paths = (a.css or os.path.join(TPL, "base.css")).split(",")
+    js_paths = (a.js or os.path.join(TPL, "base.js")).split(",")
+    css_paths = [p if os.path.isabs(p) or os.path.dirname(p) else os.path.join(TPL, p) for p in css_paths]
+    js_paths = [p if os.path.isabs(p) or os.path.dirname(p) else os.path.join(TPL, p) for p in js_paths]
+
+    for p in [a.content] + css_paths + js_paths:
         if not os.path.isfile(p):
             print(f"파일이 없다: {p}", file=sys.stderr)
             return 2
 
     body = open(a.content, encoding="utf-8").read().strip()
-    css = open(a.css or os.path.join(TPL, "base.css"), encoding="utf-8").read().strip()
-    js = open(a.js or os.path.join(TPL, "base.js"), encoding="utf-8").read().strip()
+    css = "\n\n".join(open(p, encoding="utf-8").read().strip() for p in css_paths)
+    js = "\n\n".join(open(p, encoding="utf-8").read().strip() for p in js_paths)
 
     # 본문이 셸까지 들고 있으면 벗긴다 — 흔한 실수다
     if "<!doctype" in body.lower() or "<html" in body.lower():

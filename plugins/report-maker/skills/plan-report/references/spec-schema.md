@@ -2,7 +2,7 @@
 
 포맷 중립 스펙. HTML 렌더러와 문서 렌더러가 동일하게 이 구조를 입력으로 받는다.
 
-**현재 버전: 2.4**
+**현재 버전: 2.5**
 
 - 2.0 — `key_takeaway` · `kpis` · `actions` · `glossary` · `calcs` · `group_detail` 추가
 - 2.1 — `brief` · `segments` 추가. exhibit에 `views`(축 전환) · `drilldown`(계층) 추가.
@@ -12,6 +12,9 @@
 - 2.3 — exhibit에 `weight` 추가 (화면 비중). `encoding`에 `claim` 추가 (주장을 만드는 값).
   완결 예시를 `references/examples/`로 분리
 - 2.4 — `report_type` 추가. **필수 여부가 유형에 따라 달라진다** (`references/report-types.md` §3)
+- 2.5 — `groups` 추가 (exhibit을 묶는 단위, §5-1). 결론이 두 갈래 이상이면 exhibit을
+  세우기 전에 그룹으로 나눈다. `references/examples/`를 비웠다 — 완결 예시는
+  스키마 확인 용도로도 결국 형태를 고정시켰다
 
 ---
 
@@ -25,8 +28,10 @@
 - **채워야 할 키의 목록이 아니다.** 필수 여부는 각 절의 표가 정한다.
   선택 필드를 "예시에 있으니까" 채우지 않는다
 
-완결된 스펙 한 벌이 필요하면 `${CLAUDE_PLUGIN_ROOT}/references/examples/`를 본다.
-거기 있는 것도 **하나의 사례일 뿐 형태가 아니다.**
+**완결된 스펙 예시 파일은 두지 않는다.** 완결 예시는 스키마를 확인하는 용도로 만들어도
+결국 exhibit 개수·순서·문구를 그대로 베끼게 만든다 (`references/examples/README.md`
+경위 참조). 중첩 구조가 안 잡히면 이 문서의 코드 조각을 다시 읽거나, 렌더러가 스펙을
+못 읽는 구체적인 오류를 본다.
 
 ---
 
@@ -39,13 +44,13 @@ spec_version  mode  report_type  title  period_badge
 key_takeaway { text  emphasis  ask }
 audience  decision  period  basis  unit
 brief { }  segments [ ]  dataset_card { }
-kpis [ ]  exhibits [ ]  actions [ ]
+kpis [ ]  groups [ ]  exhibits [ ]  actions [ ]
 glossary [ ]  calcs [ ]  footnote { }  open_questions [ ]
 ```
 
 | 필드 | 필수 | 설명 |
 |---|---|---|
-| `spec_version` | O | 현재 `"2.4"` |
+| `spec_version` | O | 현재 `"2.5"` |
 | `mode` | O | `quick` \| `report` |
 | `report_type` | **report 필수** | `diagnostic` \| `choice` \| `watch` \| `track`. **아래 표의 필수 여부를 바꾼다** |
 | `title` | O | 문서 제목. 명사구 허용 (문서 이름이지 결론이 아님) |
@@ -59,6 +64,7 @@ glossary [ ]  calcs [ ]  footnote { }  open_questions [ ]
 | `dataset_card` | O | `load-data` 산출 카드 그대로 |
 | `kpis` | report만 | 2~4개. 아래 3장 |
 | `summary` | report만 | 3줄 이내 요약 문장 배열 |
+| `groups` | 조건부 | 결론이 두 갈래 이상이면 필수. exhibit을 묶는 단위. 아래 5-1장 |
 | `exhibits` | O | 아래 4장 |
 | `actions` | **report 필수** | 인사이트·액션아이템. 아래 5장 |
 | `glossary` | 조건부 필수 | 축약어·사내 용어가 등장하면 필수. 아래 6장 |
@@ -356,6 +362,48 @@ drilldown { label  by  columns[]  rows{ 그룹명: [[...]] } }
 
 ---
 
+## 5-1. groups — exhibit을 묶는 단위
+
+결론이 두 갈래 이상으로 나뉘면, exhibit을 늘어놓기 전에 먼저 묶는다.
+나누지 않으면 몇 번째 exhibit부터 갈래가 바뀌었는지 독자가 스스로 찾아야 한다 —
+`plan-report/SKILL.md` §1 순서 5번.
+
+```
+groups [
+  { id  label  exhibit_ids[]  summary }
+]
+```
+
+| 필드 | 필수 | 설명 |
+|---|---|---|
+| `id` | O | `g1`, `g2` … |
+| `label` | O | 그룹 이름. 명사구로 충분하다 (`온라인 채널`, `오프라인 채널`) |
+| `exhibit_ids` | O | 이 그룹에 속하는 exhibit id 배열. **exhibit 하나는 그룹 하나에만 속한다** |
+| `summary` | O | **그룹 한 줄 요약.** `action_title`과 같은 판정을 받는다 — 주장 하나,
+  서술형. 이 그룹의 exhibit들을 다 보지 않고 이 한 줄만 읽어도 그룹이 무슨 얘기인지 알아야 한다 |
+
+### 언제 만드는가
+
+`brief.questions`에 답하다 보니 결론이 자연스럽게 두 갈래 이상으로 나뉠 때만 만든다.
+질문이 하나로 수렴하면 `groups`를 두지 않는다 — 키째 뺀다.
+
+- **`weight: primary` exhibit이 그룹마다 하나씩 있을 수 있다.** 문서 전체의
+  "`primary`는 정확히 하나" 규칙(§5)은 **그룹이 없을 때**의 규칙이다. 그룹이 있으면
+  그룹마다 하나의 `primary`가 그 그룹 안에서의 결론을 만든다
+- 렌더러는 그룹 경계에 `label`과 `summary`를 헤더로 얹고, 그 아래 `exhibit_ids`
+  순서대로 exhibit을 그린다. 목차도 그룹 단위로 한 번 더 접힌다
+- 히어로 요약(`build-html/SKILL.md` §2)은 그룹이 있으면 **각 exhibit의 `action_title`이
+  아니라 각 그룹의 `summary`**를 순서대로 나열한다 — 그룹이 없을 때만 exhibit 단위로 나열한다
+
+### 감시형(watch)의 고정 슬롯과는 다르다
+
+감시형의 온라인/오프라인 채널 같은 **고정 섹션**은 `groups`가 아니다. `groups`는
+**이번 리포트의 결론이 갈리는 지점**을 표시하는 것이고, 감시형 고정 슬롯은
+결론과 무관하게 매번 같은 구조로 열리는 것이다 (`report-types.md` §4).
+감시형에서 섹션을 그룹으로 묶으려 하지 않는다 — 이미 고정 슬롯 자체가 구조다.
+
+---
+
 ## 6. actions — 인사이트와 액션
 
 **report 모드에서 필수다.** exhibit만 늘어놓고 끝나는 리포트는 보고서가 아니라 자료집이다.
@@ -424,6 +472,10 @@ glossary [ { id term full desc } ]
 `desc`는 뜻만 적고 끝내지 않는다. **그 말이 오해받는 지점이 있으면 그것까지 적는다.**
 예: 외부 플랫폼 기준 금액 지표라면 "사내 출고 기준과 다르므로 합산하지 않는다"를 `desc`에 넣는다.
 
+**쉬운 말이 먼저 온다.** `desc`의 첫 문장은 전문 용어·산식 없이 뜻이 서는 쉬운 말이고,
+정확한 산식이나 통계 용어는 그 뒤에 붙인다. "SKU별 순출고 합계 − 반품" 앞에 "— 실제로
+팔려나간 양"이 없으면, 툴팁을 열어도 또 다른 용어에서 멈춘다.
+
 **다음이 본문에 등장하면 반드시 등록한다.**
 
 - 영문 축약어 (GMV, SKU, MAU, DOS, ITR …)
@@ -463,6 +515,10 @@ metrics.md에 없고 확인도 안 됐으면 `desc`에 `확인 필요`를 적고
 | 산식 + 단계 2개 이상, 또는 예외·제외 조건이 있음 | `calcs` 모달 |
 
 모달을 여는 자리는 `i` 아이콘이다. KPI는 `calc_ref`, 본문·각주는 인라인 `i`.
+
+**`scope`도 주장 하나다.** 모달을 여는 순간 처음 읽히는 문장이 두 가지를 말하면
+`so_what`·`action_title`과 같은 문제다. "이 화면의 모든 매출 수치" 처럼 **범위 하나만**
+말한다.
 
 ---
 
@@ -547,6 +603,8 @@ metrics.md에 없고 확인도 안 됐으면 `desc`에 `확인 필요`를 적고
 - `rows`는 **묶기 전 원자료 전체**다. 여기서 또 줄이지 않는다
 - 렌더러는 해당 항목에 `i` 아이콘 또는 클릭 행을 만들고 모달로 띄운다
 - 묶은 항목이 여러 개면 `group_detail`을 배열로 둔다
+- `note`도 주장 하나다. 무엇이 묶였는지 한 가지만 말한다. 두 가지를 말하려면
+  각주 별도 줄로 나눈다
 
 ---
 
@@ -684,7 +742,6 @@ quick 모드는 `brief` · `kpis` · `actions` · `nav_label` · `answers` · `a
 
 exhibit의 `views`는 quick에서도 배열이다. 하나만 넣으면 토글 없이 그려진다.
 
-형식이 맞는 스펙 한 벌을 대조해봐야 하면
-`${CLAUDE_PLUGIN_ROOT}/references/examples/quick-minimal.json`을 본다.
-**거기서 가져올 수 있는 것은 키의 중첩 위치와 자료형뿐이다** — exhibit 개수·순서·차트·흐름은 아니다.
-자세한 것은 같은 폴더의 `README.md`.
+중첩 구조가 안 잡히면 완결 예시로 대조하지 않는다 (`references/examples/`는 의도적으로
+비어 있다 — §0, 변경 이력 2.5). 이 문서의 코드 조각을 다시 읽거나, 렌더러가 스펙을
+못 읽는 구체적인 오류(어느 필드, 어떤 값)를 사용자와 함께 본다.
