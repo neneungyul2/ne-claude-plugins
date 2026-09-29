@@ -58,6 +58,31 @@ def strip_svg(html):
     return re.sub(r"<svg\b.*?</svg>", "", html, flags=re.S | re.I)
 
 
+def strip_divs(html, pred):
+    """여는 태그가 pred(태그 문자열)를 만족하는 <div>를 짝 맞춰 통째로 지운다.
+    정규식 비탐욕 매칭은 안쪽 </div>에서 멈춰 모달·드릴다운을 제대로 못 걷었다."""
+    out, i = [], 0
+    tag = re.compile(r"<(/?)div\b[^>]*>", re.I)
+    while True:
+        m = next((m for m in tag.finditer(html, i) if not m.group(1) and pred(m.group(0))), None)
+        if not m:
+            out.append(html[i:]); break
+        out.append(html[i:m.start()])
+        depth, j = 0, m.start()
+        for t in tag.finditer(html, m.start()):
+            depth += -1 if t.group(1) else 1
+            if depth == 0:
+                j = t.end(); break
+        else:
+            j = len(html)
+        i = j
+    return "".join(out)
+
+
+def strip_scripts(html):
+    return re.sub(r"<script\b.*?</script>", "", html, flags=re.S | re.I)
+
+
 def style_blocks(html):
     return "\n".join(re.findall(r"<style\b[^>]*>(.*?)</style>", html, re.S | re.I))
 
@@ -114,7 +139,9 @@ def c_external(html, r):
 
 
 def c_placeholder(html, r):
-    found = [p for p in PLACEHOLDERS if p in html]
+    # 숫자 모양 자리표시자(000.0, 0,000)는 스크립트 안 원자료(예: 상품명의 "20,000")와 겹친다 — 스크립트 밖에서만 찾는다
+    nos = strip_scripts(html)
+    found = [p for p in PLACEHOLDERS if (p in nos if p[:1].isdigit() else p in html)]
     if found:
         r.fail("템플릿 자리표시자 잔존", ", ".join(found[:6]))
     else:
@@ -172,7 +199,9 @@ def c_hardcoded_color(html, r):
     """토큰 밖 색. :root 정의부는 제외."""
     css = style_blocks(html)
     css_wo_root = re.sub(r":root\s*\{.*?\}", "", css, flags=re.S)
-    hexes = set(re.findall(r"#[0-9a-fA-F]{3,8}\b", css_wo_root))
+    # 선언 블록 {…} 안에서만 찾는다 — 선택자의 #id(예: #c31)가 색으로 잡히던 오탐
+    decls = " ".join(re.findall(r"\{([^{}]*)\}", css_wo_root))
+    hexes = set(re.findall(r"#[0-9a-fA-F]{3,8}\b", decls))
     hexes -= {"#fff", "#ffffff", "#FFF", "#FFFFFF", "#000", "#000000"}
     if hexes:
         r.warn("토큰 밖 색", f"{len(hexes)}개: " + ", ".join(sorted(hexes)[:6]))
@@ -251,10 +280,10 @@ def c_action_title(html, r):
 
 
 def c_body_table(html, r):
-    """본문 표 12행 상한. 모달·드릴다운 안은 제외."""
-    body = html
-    for pat in (r"<div class=\"mask\".*?</div>\s*$", r"<div class=\"drill\".*?</div>"):
-        body = re.sub(pat, "", body, flags=re.S)
+    """본문 표 12행 상한. 모달·드릴다운·ⓘ 보관함·스크롤 컨테이너 안은 제외."""
+    cls = re.compile(r'class="[^"]*\b(mask|modal|drill|xinfo-hold)\b')
+    scroll = re.compile(r'style="[^"]*overflow-y\s*:\s*(auto|scroll)', re.I)
+    body = strip_divs(html, lambda t: bool(cls.search(t) or scroll.search(t)))
     over = []
     for i, t in enumerate(re.findall(r"<table\b.*?</table>", body, re.S), 1):
         n = len(re.findall(r"<tr\b", re.sub(r"<thead\b.*?</thead>", "", t, flags=re.S)))
@@ -282,7 +311,7 @@ def c_number_repeat(html, r, tag=""):
     탭마다 센다. 요약 탭이 하위 탭의 수치를 다시 보이는 것은 중복이 아니라
     구성이다 — 한 화면에 두 번 나오는 것만 잡는다.
     """
-    text = re.sub(r"<[^>]+>", " ", strip_svg(html))
+    text = re.sub(r"<[^>]+>", " ", strip_svg(strip_scripts(html)))  # 스크립트 안 원자료는 화면 숫자가 아니다
     nums = re.findall(r"\b\d{1,3}(?:,\d{3})+(?:\.\d+)?\b|\b\d+\.\d+\b", text)
     nums = [n for n in nums if n not in {"0.0", "1.0", "100.0"}]
     dup = {n: c for n, c in Counter(nums).items() if c >= MIN_NUMBER_REPEAT}

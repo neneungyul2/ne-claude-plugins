@@ -59,7 +59,8 @@
        "이것만 봐도 무엇을 보여주는지 알 수 있나"만 통과하면 된다 -->
   <div class="shead" id="p1"><span class="snum">1</span><h2>{{PANEL_TITLE — 예: 기간별 매출 추이}}</h2></div>
   <section class="block" data-panel="p1">
-    <!-- 비교 토글(전기·전년)이 있으면 .seg 를 그대로 쓴다. 없으면 지운다 -->
+    <!-- 비교 토글(전기·전년 또는 비교군 — 예: 전국 평균 / 시도 평균 / 세그먼트 평균)이 있으면
+         .seg 를 그대로 쓴다. 비교군 토글은 축(axes의 compare)이므로 축 컨트롤 바에 두는 편이 낫다. 없으면 지운다 -->
     <div class="seg" role="group" aria-label="비교 기준">
       <button aria-pressed="true">전기 대비</button>
       <button aria-pressed="false">전년 대비</button>
@@ -125,6 +126,86 @@
   </div>
 </main>
 
+
+<!-- ══ v0.11.0 부품 ══════════════════════════════════════════════
+     아래는 필요할 때만 쓴다. 쓰지 않으면 통째로 지운다. -->
+
+<!-- ── 부품 S. 사이드바 셸 — 스펙에 sections가 있을 때만 ──
+     위의 header·axisbar·main 전체를 .xmain 안에 넣고, 그 옆에 .gnb를 둔다.
+     EXPLORE.bindGnb() 가 스크롤 연동·접기·현재 위치를 처리한다 (EXPLORE.start()가 부른다).
+     a.l1 = 대분류(섹션), a.l2 = 중분류(패널). 번호는 <i>, 이름은 <span class="tx"> — 접으면 번호만 남는다 -->
+<div class="xapp">
+  <aside class="gnb" aria-label="목차">
+    <div class="gtop"><b>{{TITLE}}</b><button class="fold" aria-expanded="true" aria-controls="gnbnav" aria-label="목차 접기">«</button></div>
+    <nav id="gnbnav">
+      <a class="l1" href="#sec1"><i>1</i><span class="tx">{{섹션 이름}}</span></a>
+      <a class="l2" href="#p1">1.1 {{패널 이름}}</a>
+    </nav>
+  </aside>
+  <div class="xmain">
+    <!-- header.mast · .axisbar · main.wrap 을 여기로 옮긴다.
+         .axisbar 안 [data-state-badge] 옆에 현재 위치 자리를 둔다: -->
+    <span data-loc></span>
+  </div>
+</div>
+
+<!-- ── 부품 T. 섹션(대분류) 머리 — sections의 각 항목 ── -->
+<div class="xsec" id="sec1"><span class="snum">1</span><h2>{{섹션 이름}}</h2>
+  <p class="note">{{섹션 전체에 걸리는 기준 — 예: 기간 정의}}</p>
+</div>
+
+<!-- ── 부품 U. 숫자 칩 + ⓘ 뒤 문구 — 패널 위 설명 문장 대신 ──
+     .pills 에 이름·숫자 쌍만 넣는다. 문장으로 이어 쓰지 않는다.
+     p.note(기준·비고)와 p.note.guide(사용법)는 패널 안에 그대로 두면
+     EXPLORE.bindInfo() 가 화면에서 걷고 제목 옆 ⓘ 뒤로 옮긴다 -->
+<div class="shead" id="p5"><span class="snum">1.1</span><h2>{{PANEL_TITLE}}</h2></div>
+<section class="block" data-panel="p5">
+  <div class="pills" id="p5-pills"><span class="pl"><em>{{이름}}</em><b>000.0</b></span></div>
+  <p class="note">{{기준·비고 — 산식, 제외 조건, 출처 세부}}</p>
+  <p class="note guide">{{사용법 — 예: 행을 누르면 한 단계 아래로 내려간다}}</p>
+</section>
+
+<!-- ── 부품 V. KPI + 비교군 표 — 큰 숫자는 원래 단위(금액·부수), 아래 작은 표에 비교군 ── -->
+<div class="kpi">
+  <div>
+    <div class="k">{{KPI_LABEL}}</div>
+    <div class="v">000.0<em>{{UNIT}}</em></div>
+    <div class="crs">
+      <div class="cr h"><span>{{비교군}}</span><b>{{값}}</b><i>{{차이·배수}}</i></div>
+      <div class="cr"><span>{{비교군 A 평균}}</span><b>000.0</b><i>×0.0</i></div>
+    </div>
+  </div>
+</div>
+
+<!-- ── 부품 W. 계층 드릴다운 구성 (mix + hierarchy) ──
+     EXPLORE.hierShares(rows, levels, path, valueKey) 로 한 단계씩 그린다.
+     .crumb 버튼으로 올라가고, .mixrow.click[data-drill] 을 누르면 내려간다.
+     막대 세 줄 = 대상 · 비교군 평균 · 전체 평균. 각 단계 비중은 상위 분류 안 비중 -->
+<div class="shead" id="p6"><span class="snum">1.2</span><h2>{{PANEL_TITLE — 예: 분류별 구성}}</h2></div>
+<section class="block" data-panel="p6">
+  <div class="crumb" id="p6-crumb"><button disabled>전체</button></div>
+  <div id="p6-rows">
+    <div class="mixrow click" data-drill="{{값}}" role="button" tabindex="0">
+      <div class="nm">{{항목}} ›<small>00.0%</small></div>
+      <div class="bars"><div class="bar t" style="width:0%"></div><div class="bar s" style="width:0%"></div><div class="bar" style="width:0%"></div></div>
+      <div class="diff">+0.0</div>
+    </div>
+  </div>
+  <p class="note guide">행(›)을 누르면 한 단계 아래로 내려간다. 위 경로를 누르면 올라간다.</p>
+</section>
+
+<!-- ── 부품 X. 트리 표 (tree_table) ──
+     EXPLORE.treeRows(rows, levels, valueKey, open) 결과를 tr.lv{depth} 로 그린다.
+     ▸(button.tg[data-open=pathKey])를 누르면 open[pathKey]를 뒤집고 다시 그린다. 처음엔 최상위만 -->
+<div class="shead" id="p7"><span class="snum">1.3</span><h2>{{PANEL_TITLE — 예: 분류별 상세}}</h2></div>
+<section class="block" data-panel="p7">
+  <div class="tw"><table id="p7-table">
+    <thead><tr><th>{{분류}}</th><th class="r">{{지표}}</th><th class="r">{{비교군 평균}}</th><th class="r">차이</th></tr></thead>
+    <tbody><tr class="lv0"><td><button class="tg" data-open="{{경로키}}" aria-expanded="false">▸</button>{{값}}</td><td class="r">000.0</td><td class="r">000.0</td><td class="r">+0.0</td></tr></tbody>
+  </table></div>
+  <p class="note guide">▸를 누르면 한 단계 아래가 펼쳐진다.</p>
+</section>
+
 <!-- ── 모달 ───────────────────────────────────────────── -->
 <div class="mask" id="mask">
   <div class="modal" data-id="p2-etc" hidden>
@@ -161,14 +242,19 @@
      EXPLORE.DATA/AXES를 채우고 패널을 등록한 뒤 EXPLORE.start()를 한 번 부른다.
      데이터가 크면(1MB 이상) 이 script를 별도 data.json + fetch로 뺀다 -->
 <script>
+  /* 이 스크립트는 assemble.py가 붙이는 explore-engine.js보다 **먼저** 실행된다.
+     그래서 패널 등록·구동은 DOMContentLoaded 안에서 한다 — 밖에서 부르면
+     "EXPLORE.registerPanel is not a function"으로 멈춘다. 데이터 할당은 밖에 둬도 된다 */
   window.EXPLORE = window.EXPLORE || {};
   EXPLORE.AXES = [ /* {id,name,type,control,values,default} … */ ];
   EXPLORE.DATA = [ /* 긴 형식 원자료. {date, category, channel, rev, qty, …} … */ ];
 
+  document.addEventListener('DOMContentLoaded', function(){
   EXPLORE.registerPanel('p1', { axes_used:['date','category'], render:function(state, rows){ /* svg#p1 다시 그림 */ } });
   EXPLORE.registerPanel('p2', { axes_used:['date','category'], render:function(state, rows){ /* mix + etc 다시 계산 */ } });
   EXPLORE.registerPanel('p3', { axes_used:['date'],            render:function(state, rows){ /* 지도 + 표 다시 그림 */ } });
   EXPLORE.registerPanel('p4', { axes_used:['date','category'], render:function(state, rows){ /* 상세 표 다시 채움 */ } });
 
   EXPLORE.start();
+  });
 </script>

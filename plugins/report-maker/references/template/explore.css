@@ -38,3 +38,99 @@
   .axisbar{position:static;padding:12px 16px}
   [data-state-badge]{margin-left:0;display:block;order:99}
 }
+
+/* ══ v0.11.0 ══════════════════════════════════════════════════ */
+
+/* ── 사이드바 목차 (sections가 있을 때). 대분류 a.l1 > 중분류 a.l2 ──
+   접으면 번호만 남은 띠. 지금 보는 대분류(.pa)·항목(.on)은 접어도 강조된다 */
+.xapp{display:grid;grid-template-columns:232px minmax(0,1fr);min-height:100vh}
+.xapp.collapsed{grid-template-columns:56px minmax(0,1fr)}
+.xapp>.xmain{min-width:0}
+.gnb{position:sticky;top:0;height:100vh;overflow-y:auto;border-right:1px solid var(--line2);
+     background:#fff;padding:20px 12px 32px}
+.gnb .gtop{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:16px}
+.gnb .gtop b{font-size:var(--t2);color:var(--ink)}
+.gnb .fold{flex:none;width:28px;height:28px;border:1px solid var(--line2);background:#fff;
+           border-radius:var(--r3);color:var(--sub);cursor:pointer;font-size:var(--t2);line-height:1;padding:0}
+.gnb nav{display:flex;flex-direction:column;gap:2px}
+.gnb a{display:flex;gap:8px;align-items:baseline;padding:4px 8px;border-radius:var(--r3);
+       color:var(--sub);text-decoration:none;font-size:var(--t1)}
+.gnb a.l1{font-weight:700;color:var(--ink);font-size:var(--t2);margin-top:8px}
+.gnb a.l1 i{font-style:normal;color:var(--dim);width:16px}
+.gnb a.l2{padding-left:32px}
+.gnb a:hover{background:var(--line)}
+.gnb a.on{color:var(--blueDk);background:var(--blueBg);box-shadow:inset 2px 0 0 var(--blueDk)}
+.gnb a.pa,.gnb a.pa i,.gnb a.on i{color:var(--blueDk)}
+.xapp.collapsed .gnb{padding:16px 8px;overflow-x:hidden}
+.xapp.collapsed .gnb .gtop{justify-content:center}
+.xapp.collapsed .gnb .gtop b,.xapp.collapsed .gnb a.l2,.xapp.collapsed .gnb a .tx{display:none}
+.xapp.collapsed .gnb a.l1{justify-content:center;padding:8px 0}
+.xapp.collapsed .gnb a.l1 i{width:auto;font-weight:800}
+.xapp.collapsed .gnb a.pa{background:var(--blueBg);box-shadow:inset 2px 0 0 var(--blueDk)}
+[data-loc]{flex-basis:100%;font-size:var(--t1);color:var(--sub)}
+.axisbar{max-width:none}
+
+/* ── 섹션(대분류) 머리 ── */
+.xsec{display:flex;gap:8px;align-items:baseline;padding-bottom:8px;border-bottom:2px solid var(--ink);
+      margin:40px 0 16px;scroll-margin-top:120px}
+.xsec h2{margin:0;font-size:var(--t4);display:flex;align-items:center;gap:8px}
+.xsec .snum{color:var(--blueDk)}
+
+/* ── 숫자 칩 — 패널 위 설명 문장 대신 ── */
+.pills{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 12px}
+.pills:empty{display:none}
+.pl{display:inline-flex;align-items:baseline;gap:8px;background:var(--line);border-radius:var(--r2);
+    padding:4px 12px;font-size:var(--t1)}
+.pl em{font-style:normal;color:var(--sub)}
+.pl b{color:var(--ink);font-size:var(--t2);font-variant-numeric:tabular-nums}
+
+/* ── ⓘ 버튼 — 사용법·기준·비고를 숨겨 두는 자리 (EXPLORE.bindInfo) ── */
+.xinfo{display:inline-flex;align-items:center;gap:4px;height:20px;margin-left:8px;padding:0 8px 0 0;border:1px solid var(--line2);
+       border-radius:var(--rp);background:#fff;color:var(--sub);font-size:var(--t1);font-weight:600;cursor:pointer;vertical-align:middle}
+.xinfo span{display:inline-grid;place-items:center;width:20px;height:20px;font-style:italic;font-weight:800}
+.xinfo.bare{padding:0}
+.xinfo:hover{border-color:var(--blue);color:var(--blueDk)}
+.modal .body h4{margin:12px 0 4px;font-size:var(--t1);color:var(--blueDk)}
+.modal .body p{margin:0 0 8px}
+
+/* ── KPI 아래 비교 표 (비교군·전국 값과 차이·배수) ── */
+.crs{margin-top:8px;display:grid;gap:2px}
+.cr{display:grid;grid-template-columns:minmax(0,1fr) auto 64px;gap:8px;font-size:var(--t1);align-items:baseline}
+.cr span{color:var(--sub)} .cr b{color:var(--ink);font-variant-numeric:tabular-nums}
+.cr i{font-style:normal;text-align:right;font-weight:700;color:var(--sub)}
+.cr i.up{color:var(--up)} .cr i.dn{color:var(--dn)}
+.cr.h{border-bottom:1px solid var(--line2);padding-bottom:2px}
+.cr.h span,.cr.h b,.cr.h i{color:var(--dim);font-weight:600}
+
+/* ── 계층 드릴다운 (mix + hierarchy) ── */
+.crumb{display:flex;flex-wrap:wrap;gap:4px;align-items:center;font-size:var(--t2);margin-bottom:8px}
+.crumb button{border:0;background:none;padding:2px 4px;color:var(--blueDk);font-weight:600;cursor:pointer}
+.crumb button[disabled]{color:var(--ink);cursor:default}
+.crumb span{color:var(--dim)}
+.mixrow{display:grid;grid-template-columns:minmax(120px,220px) minmax(0,1fr) 88px;gap:4px 12px;
+        align-items:center;padding:8px;border-radius:var(--r2)}
+.mixrow.click{cursor:pointer} .mixrow.click:hover{background:var(--line)}
+.mixrow .nm{font-size:var(--t2);color:var(--ink);font-weight:600;min-width:0}
+.mixrow .nm small{display:block;font-weight:400;color:var(--dim);font-size:var(--t1)}
+.mixrow .bars{display:grid;gap:2px}
+.mixrow .bar{height:8px;border-radius:var(--r3);min-width:1px;background:var(--g4)}
+.mixrow .bar.t{background:var(--blue);height:12px}
+.mixrow .bar.s{background:var(--g1)}
+.mixrow .diff{font-size:var(--t2);font-weight:700;text-align:right;font-variant-numeric:tabular-nums}
+
+/* ── 트리 표 (tree_table) ── */
+tr.lv0 td{font-weight:700;color:var(--ink)}
+tr.lv1 td:first-child{padding-left:32px}
+tr.lv2 td{color:var(--sub)} tr.lv2 td:first-child{padding-left:56px;white-space:normal}
+.tg{border:0;background:none;width:20px;padding:0;color:var(--sub);cursor:pointer}
+
+@media (max-width:900px){
+  .xapp,.xapp.collapsed{grid-template-columns:minmax(0,1fr)}
+  .gnb{position:static;height:auto;border-right:0;border-bottom:1px solid var(--line2);padding:12px 16px}
+  .gnb nav{flex-direction:row;overflow-x:auto;gap:4px}
+  .gnb a.l2,.gnb .fold{display:none}
+  .gnb a.l1{margin-top:0;white-space:nowrap}
+  .xapp.collapsed .gnb a .tx{display:inline}
+  .mixrow{grid-template-columns:minmax(88px,120px) minmax(0,1fr) 64px}
+  [data-loc]{display:none}
+}

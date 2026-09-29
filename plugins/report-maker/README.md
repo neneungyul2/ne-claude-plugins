@@ -103,6 +103,14 @@
 `template/explore.css`·`template/explore-parts.html`(패널 부품)이 `base.css`·`base.js` 위에
 얹힌다 — `assemble.py --css base.css,explore.css --js base.js,explore-engine.js`.
 
+탐색형 화면은 이렇게 생긴다 (v0.11.0):
+
+- 패널이 여러 주제로 갈리면 **대분류 > 중분류 사이드바 목차**. 접을 수 있고, 접어도 현재 위치가 보인다
+- 위계 있는 분류는 **계층 드릴다운**(행을 눌러 한 단계씩)과 **트리 표**(▸로 펼침)
+- 비교에는 **비교군**(예: 전국 평균·시도 평균·세그먼트 평균)을 **함께** 두고, 첫 비교는 **금액·부수 같은 원래 단위**
+- 평균으로 묶인 비교는 **줄 세우기 모달**로 펼쳐 구성원 전체를 내림차순·순위로 본다
+- 패널 위에는 숫자 칩만. 사용법·기준·비고는 제목 옆 **ⓘ 버튼 뒤**(호버 툴팁·클릭 모달)
+
 ## 산출물이 갖춰야 할 것
 
 아래는 **진단형 기준**이다. 유형에 따라 달라진다 (`references/report-types.md` §3).
@@ -164,7 +172,7 @@
 | `references/explore-model.md` | 탐색형 데이터 그레인·축·패널 유형·계산 엔진 원칙 |
 | `references/examples/` | **의도적으로 비어 있다.** 완결 예시가 형태를 고정시켰다 — 좋은 패턴은 `design-rules.md`로 옮겼다 |
 | `skills/plan-report/references/spec-schema.md` | 설명형 스펙 규격 v2.5 (`groups` 추가) |
-| `skills/plan-explore/references/explore-spec-schema.md` | 탐색형 스펙 규격 v1.0 (신설) |
+| `skills/plan-explore/references/explore-spec-schema.md` | 탐색형 스펙 규격 v1.1 (`sections`·비교군·`hierarchy`·`tree_table`·`guide`/`notes` 추가) |
 | `references/template/explore-engine.js` `explore.css` `explore-parts.html` | 탐색형 부품·계산 엔진. `build-explore`에서만 읽는다 |
 
 ## 설계 원칙
@@ -196,6 +204,20 @@
 
 ## 변경 이력
 
+- **v0.11.0** — **탐색형 첫 실사용 피드백 반영.** "flat하다, 목차가 없고 드릴다운이 약하다",
+  "줄글이 많아 안 읽힌다", "지수·비율부터 나와 한 번에 이해가 안 된다"는 세 가지를 고쳤다.
+  ① 패널을 섹션으로 묶는 `sections`와 접이식 사이드바 목차(접어도 현재 위치 표시, `EXPLORE.bindGnb`).
+  v0.10.0의 "탐색형은 목차를 두지 않는다"를 바꿨다 — 섹션이 없으면 여전히 목차 없음.
+  ② 위계 있는 분류의 계층 드릴다운과 트리 표(`hierarchy`, `tree_table`, `EXPLORE.hierShares`·`treeRows`).
+  ③ 비교할 때는 비교군을 두고 여럿이면 한 화면에 함께 보인다는 원칙(`compare` 축의 `groups`)과, 첫 비교는 금액·부수 같은
+  원래 단위로 한다는 원칙(`units`, `EXPLORE.perUnit`·`groupAvg`). ④ 패널 위 설명 문장을 숫자
+  칩으로, 사용법·기준·비고를 ⓘ 뒤로(`guide`·`notes`, `EXPLORE.bindInfo`). 스펙 v1.1 —
+  새 필드는 전부 선택이라 v1.0 스펙은 그대로 돈다.
+  고친 버그: `explore-parts.html`의 구동 스크립트가 엔진보다 먼저 실행돼
+  `registerPanel is not a function`으로 멈추던 문제(`DOMContentLoaded` 안으로 옮김).
+  `check_html.py` 오탐 4건: 선택자의 `#id`를 색으로 잡던 것, 스크립트 안 원자료의 숫자를
+  자리표시자·반복 숫자로 잡던 것, 모달·드릴다운 안 표를 본문 표로 세던 것(정규식이
+  안쪽 `</div>`에서 멈췄다), 스크롤 컨테이너 안 상세 표를 12행 상한에 걸던 것.
 - **v0.10.0** — **설명형/탐색형 계열 분리.** "필터로 볼 수 있게" 요청을 다섯 번째
   `report_type`으로 억지로 끼우지 않는다 — `references/product-lines.md`가 계열을
   가르고, 탐색형은 별도 파이프라인(`frame-explore` → `plan-explore` → `build-explore`,

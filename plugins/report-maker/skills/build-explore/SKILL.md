@@ -55,18 +55,28 @@ python3 ${CLAUDE_PLUGIN_ROOT}/scripts/assemble.py <이름>.content.html -o <이�
 ## 2. 조립 순서
 
 ```
-헤더(스티키)   제목 · 기준 배지
-축 컨트롤 바   axes 전부. 항상 최상단, 스크롤해도 고정
-KPI 행         panels 중 type: kpi
-① 패널         패널 제목(명사구 가능) → [비교토글] → 차트 → [기타 드릴다운]
-② 패널 …
-각주           footnote
-모달           기타 드릴다운 전체 보기 · calcs
+[사이드바 목차]  sections가 있을 때만. 대분류 > 중분류, 접을 수 있음
+헤더(스티키)     제목 · 기준 배지
+축 컨트롤 바     axes 전부 + 현재 조합 배지 + 현재 위치. 항상 최상단, 스크롤해도 고정
+KPI 행           panels 중 type: kpi
+섹션 1 제목      번호 · 이름 · [ⓘ]
+  1.1 패널       패널 제목(명사구) · [ⓘ] → 숫자 칩 → [비교토글] → 차트 → [드릴다운]
+  1.2 패널 …
+섹션 2 …
+각주             보이는 한 줄(출처·기간·단위·집계기준) · [ⓘ 세부]
+모달             드릴다운 전체 보기 · calcs · ⓘ 내용
 ```
 
 - 패널은 스펙 배열 순서 그대로 — `plan-explore` 2장에서 정한 개요→추이→구성→위치→상세 순
-- **목차·탭은 기본적으로 두지 않는다.** 패널이 8개를 넘거나 성격이 크게 갈릴 때만 검토한다
-  — 탐색형은 필터로 이미 화면을 좁히는 도구라, 탭까지 더하면 통제축이 두 겹이 된다
+- **`sections`가 있으면 왼쪽에 접이식 사이드바 목차를 둔다** (`explore-model.md` §6).
+  `explore-parts.html`의 `.xapp`·`.gnb` 부품을 쓰고 `EXPLORE.bindGnb()`를 부른다.
+  접으면 번호만 남고 현재 섹션이 강조된다. 조건 바의 `[data-loc]`에 현재 위치가 늘 보인다.
+  접힘 상태는 브라우저 저장소에 기억하되 실패해도 동작하게 한다(엔진이 처리한다)
+- `sections`가 없으면 목차를 두지 않는다. 탭은 두지 않는다 — 필터와 탭이 겹치면
+  통제축이 두 겹이 된다
+- **패널 위에 줄글을 쓰지 않는다.** 읽는 법은 `.pills` 칩(이름·숫자 쌍)으로, 스펙의
+  `guide`는 `<p class="note guide">`, `notes`는 `<p class="note">`로 패널 안에 넣는다.
+  `EXPLORE.bindInfo()`가 이것들을 화면에서 걷어 제목 옆 ⓘ 버튼 뒤(호버 툴팁·클릭 모달)로 옮긴다
 - 히어로·`key_takeaway`·번호 배지 요약을 만들지 않는다 — 결론이 없다
 
 ### 축 컨트롤 바
@@ -89,9 +99,10 @@ KPI 행         panels 중 type: kpi
 
 | type | 구현 요점 |
 |---|---|
-| `kpi` | 현재 `state`로 필터한 값의 합·비교값. `explore-engine.rollup`으로 계산. 비교값 없으면 KPI가 아니다 |
+| `kpi` | 현재 `state`로 필터한 값의 합·비교값. `explore-engine.rollup`으로 계산. 비교값 없으면 KPI가 아니다. 큰 숫자는 원래 단위(금액·부수), 아래 작은 표에 비교군·전국 값과 차이·배수(`.crs`) |
 | `trend` | 시간축 line/bar. 계열 5개 초과면 상위 N + 기타로 접는다(`explore-engine.renorm`) |
-| `mix` | 구성 비중(막대·stacked_bar_100). 기타는 `etc_drilldown` 설정대로 클릭해 열린다 |
+| `mix` | 구성 비중. `hierarchy`가 있으면 `.crumb` 경로 + `.mixrow` 행(누르면 한 단계 아래, `EXPLORE.hierShares`). 없으면 막대·stacked_bar_100 + `etc_drilldown` |
+| `tree_table` | `EXPLORE.treeRows`로 행을 만들고 ▸(`data-open`)로 펼친다. 처음엔 최상위 단계만 |
 | `map` | `korea-map.md` 좌표 사용. 지도만 있고 표가 없으면 값 비교가 안 되므로 `maprow`로 표를 나란히 둔다 |
 | `table` | 상세 행. 12행 넘으면 페이지네이션 또는 스크롤 컨테이너. 정렬 가능 헤더 |
 
@@ -116,6 +127,17 @@ function renderMix(panel, state) {
 
 `references/template/explore-engine.js`의 함수만 쓴다. 목록은 `explore-model.md` §4.
 패널 코드에서 직접 합산·평균 루프를 새로 짜지 않는다 — 엔진 함수를 부른다.
+
+v0.11.0에서 추가한 함수:
+
+| 함수 | 하는 일 |
+|---|---|
+| `hierShares(rows, levels, path, valueKey)` | 위계 `levels`의 `path` 아래 한 단계 항목별 합과 비중(상위 분류 안 비중) |
+| `treeRows(rows, levels, valueKey, open)` | 트리 표용 행 목록. `open`에 펼친 경로 키가 있는 곳만 아래 단계를 넣는다 |
+| `perUnit(value, denom, scale)` | 크기 맞춘 값(예: 인구 1천 명당 = `perUnit(매출, 인구, 1000)`). 분모 0이면 null |
+| `groupAvg(rows, keyOf, valueKey)` | 비교군 1곳 평균 = 비교군 합 ÷ 대상 수 |
+| `bindGnb()` | 사이드바 목차 스크롤 연동·접기·현재 위치(`[data-loc]`) |
+| `bindInfo()` | 패널 안 `.note`·`.note.guide`를 ⓘ 버튼 뒤(툴팁·모달)로 옮긴다 |
 
 엔진에 없는 계산이 필요해지면:
 1. 다른 패널에서도 쓸 만한 계산인가 확인한다 — 대개 그렇다
@@ -142,6 +164,11 @@ function renderMix(panel, state) {
 - [ ] 기타 드릴다운이 축을 바꿔도 다시 계산되는가 (고정된 목록이 남아 있지 않은가)
 - [ ] KPI가 항상 최상단이고, 축 컨트롤 바가 스크롤해도 보이는가
 - [ ] 현재 선택된 축 조합이 화면에서 항상 보이는가
+- [ ] `sections`가 있으면: 목차를 접어도 현재 섹션이 강조되고, 조건 바에 현재 위치가 보이는가
+- [ ] 계층 드릴다운을 끝까지 내려갔다가 경로로 올라와도 값이 맞는가
+- [ ] 패널 위에 줄글이 없는가, ⓘ를 누르면 사용법·기준이 모달로 열리는가
+- [ ] 첫 비교가 원래 단위(금액·부수)인가, 비교군이 보이는가
+- [ ] 비교군 평균에서 구성원 전체 줄 세우기 모달이 열리는가 (내림차순·순위·평균선·선택 대상 강조, 모달 안에서 비교군·지표 전환)
 - [ ] 파일 크기가 관리 가능한가 (`explore-model.md` §5)
 - [ ] `check_html.py`·`lint_render.py`가 FAIL 0인가
 

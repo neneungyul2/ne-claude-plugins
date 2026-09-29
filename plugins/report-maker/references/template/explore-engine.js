@@ -159,11 +159,120 @@
     });
   };
 
+
+  /* ── 위계(대분류 > 중분류 > 소분류) ──
+     levels: 상위→하위 차원 키 배열. path: 지금까지 고른 상위 값들.
+     반환: path 바로 아래 단계 항목별 {key, value, share} (share = 상위 분류 안 비중, %) 내림차순 */
+  E.hierShares = function(rows, levels, path, valueKey){
+    path = path || [];
+    var sub = rows.filter(function(r){ return path.every(function(v, i){ return r[levels[i]] === v; }); });
+    var lv = levels[path.length];
+    if(lv == null) return [];
+    var rolled = E.rollupBy(sub, lv, [valueKey]);
+    var total = E.sum(rolled, valueKey);
+    return rolled.map(function(g){ return { key: g.key, value: g[valueKey], share: E.pct(g[valueKey], total), __rows: g.__rows }; })
+                 .sort(function(a, b){ return b.value - a.value; });
+  };
+
+  /* 트리 표 행. open: {'<경로 키>': true} — 펼친 곳만 아래 단계를 넣는다.
+     반환: [{depth, key, path, pathKey, value, share, hasChild, open}] 화면 순서대로 */
+  E.treeRows = function(rows, levels, valueKey, open){
+    open = open || {};
+    var out = [];
+    (function walk(path){
+      E.hierShares(rows, levels, path, valueKey).forEach(function(n){
+        var p = path.concat([n.key]), pk = p.join('›'), hasChild = p.length < levels.length;
+        out.push({ depth: path.length, key: n.key, path: p, pathKey: pk, value: n.value, share: n.share, hasChild: hasChild, open: !!open[pk], __rows: n.__rows });
+        if(hasChild && open[pk]) walk(p);
+      });
+    })([]);
+    return out;
+  };
+
+  /* ── 비교 단위 ──
+     perUnit: 크기 맞춘 값. 예) 인구 1천 명당 매출 = perUnit(매출, 인구, 1000). 분모가 0이면 null
+     groupAvg: 비교군 1곳 평균 = 비교군 합 ÷ 대상 수. keyOf(r) → 대상 id */
+  E.perUnit = function(value, denom, scale){ return denom ? value / denom * (scale || 1) : null; };
+  E.groupAvg = function(rows, keyOf, valueKey){
+    var ids = {}; rows.forEach(function(r){ ids[keyOf(r)] = 1; });
+    var n = Object.keys(ids).length;
+    return n ? E.sum(rows, valueKey) / n : null;
+  };
+
+  /* ── 사이드바 목차 (sections가 있을 때) ──
+     .xapp > .gnb 안의 a.l1 / a.l2 (href="#섹션id"), 접기 버튼 .fold, 현재 위치 [data-loc].
+     스크롤하면 지금 보는 항목(.on)과 그 대분류(.pa)를 표시하고, 접힘 상태를 기억한다. */
+  E.bindGnb = function(){
+    var app = document.querySelector('.xapp'); if(!app) return;
+    var links = [].slice.call(app.querySelectorAll('.gnb a[href^="#"]'));
+    var fold = app.querySelector('.gnb .fold');
+    function spy(){
+      var y = window.scrollY + 140, cur = null;
+      links.forEach(function(a){ var t = document.querySelector(a.getAttribute('href')); if(t && t.getBoundingClientRect().top + window.scrollY <= y) cur = a; });
+      var i0 = links.indexOf(cur), par = null;
+      for(var j = i0; j >= 0; j--) if(links[j].classList.contains('l1')){ par = links[j]; break; }
+      links.forEach(function(a){ a.classList.toggle('on', a === cur); a.classList.toggle('pa', a === par && a !== cur); });
+      var loc = document.querySelector('[data-loc]');
+      var lab = function(a){ var i = a.querySelector('i'), t = a.querySelector('.tx'); return i && t ? i.textContent.trim() + ' ' + t.textContent.trim() : a.textContent.trim(); };
+      if(loc) loc.textContent = cur ? '현재 위치: ' + (par ? lab(par) : '') + (cur !== par ? ' › ' + lab(cur) : '') : '';
+    }
+    function setFold(c){
+      app.classList.toggle('collapsed', c);
+      if(fold){ fold.textContent = c ? '»' : '«'; fold.setAttribute('aria-expanded', String(!c)); fold.setAttribute('aria-label', c ? '목차 펼치기' : '목차 접기'); }
+      try { localStorage.setItem('xgnbFold', c ? '1' : '0'); } catch(x) {}
+    }
+    if(fold) fold.addEventListener('click', function(){ setFold(!app.classList.contains('collapsed')); });
+    try { if(localStorage.getItem('xgnbFold') === '1') setFold(true); } catch(x) {}
+    window.addEventListener('scroll', spy, { passive: true });
+    spy();
+  };
+
+  /* ── ⓘ 뒤로 옮기기 ──
+     .block / .xsec / .foot 안의 직계 p.note(기준·비고)와 p.note.guide(사용법)를 화면에서 걷고,
+     제목 옆에 ⓘ 버튼을 단다. 호버 → 짧은 툴팁(data-tip), 클릭 → 모달(#mask 안, base.js가 연다).
+     렌더 함수가 note 내용을 바꿔도 모달은 열 때마다 새로 채운다. */
+  E.bindInfo = function(){
+    var mask = document.getElementById('mask'); if(!mask) return;
+    var n = 0;
+    document.querySelectorAll('.block, .xsec, .foot').forEach(function(box){
+      var notes = [].filter.call(box.children, function(c){ return c.classList.contains('note'); });
+      if(!notes.length) return;
+      var prev = box.previousElementSibling;
+      var hd = box.querySelector(':scope > h2, :scope > h3, :scope > .fh') || (prev && prev.classList.contains('shead') ? prev.querySelector('h2') : null);
+      if(!hd) return;
+      var id = 'xinfo-' + (++n), hold = document.createElement('div');
+      hold.className = 'xinfo-hold'; hold.hidden = true; hold.id = id + '-hold';
+      notes.forEach(function(x){ hold.appendChild(x); }); box.appendChild(hold);
+      var g = notes.some(function(x){ return x.classList.contains('guide'); });
+      var b = document.createElement('button');
+      b.type = 'button'; b.className = 'xinfo' + (g ? '' : ' bare'); b.setAttribute('data-modal', id); b.dataset.hold = hold.id;
+      b.setAttribute('aria-label', (g ? '사용법·' : '') + '기준 보기');
+      b.innerHTML = '<span aria-hidden="true">i</span>' + (g ? '가이드' : '');
+      hd.appendChild(b);
+      var m = document.createElement('div');
+      m.className = 'modal'; m.dataset.id = id; m.hidden = true;
+      m.innerHTML = '<header><div><h3></h3></div><button class="x" data-close aria-label="닫기">×</button></header><div class="body"></div>';
+      mask.appendChild(m);
+    });
+    function fill(b){
+      var hold = document.getElementById(b.dataset.hold), m = mask.querySelector('.modal[data-id="' + b.getAttribute('data-modal') + '"]');
+      var gs = [], ks = [];
+      [].forEach.call(hold.children, function(x){ if(x.textContent.trim()) (x.classList.contains('guide') ? gs : ks).push('<p>' + x.innerHTML + '</p>'); });
+      m.querySelector('h3').textContent = b.parentNode.textContent.replace(/i(가이드)?$/, '').trim();
+      m.querySelector('.body').innerHTML = (gs.length ? '<h4>사용법</h4>' + gs.join('') : '') + (ks.length ? '<h4>기준·비고</h4>' + ks.join('') : '');
+      b.setAttribute('data-tip', hold.textContent.replace(/\s+/g, ' ').replace(/\|/g, '/').trim().slice(0, 160) + ' … 누르면 전체');
+    }
+    document.addEventListener('mouseover', function(e){ var b = e.target.closest && e.target.closest('.xinfo'); if(b) fill(b); }, true);
+    document.addEventListener('click', function(e){ var b = e.target.closest && e.target.closest('.xinfo'); if(b) fill(b); }, true);
+  };
+
   /* ── 초기 구동 ──
      본문에서 DATA·AXES·패널 등록을 마친 뒤 EXPLORE.start()를 한 번 부른다. */
   E.start = function(){
     E.initState();
     E.bindAxisControls();
     E.renderAll();
+    E.bindGnb();
+    E.bindInfo();
   };
 })();
