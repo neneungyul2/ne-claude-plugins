@@ -195,6 +195,12 @@ def main():
         pg.on("requestfailed", lambda q: req_fail.append(q.url[:120]))
         pg.goto(url, wait_until="load")
         pg.wait_for_timeout(700)
+        # 메뉴·사이드바 배치에서는 숨은 단락의 SVG가 크기 0으로 잡힌다.
+        # 렌더 검사는 모든 단락을 펼친 한 페이지 배치로 돈다 (design-rules §13)
+        pg.evaluate("""() => { const m = document.querySelector('main.wrap[data-layout]');
+            if (m) m.dataset.layout = 'one';
+            document.querySelectorAll('.pg.pg-off').forEach(p => p.classList.remove('pg-off')); }""")
+        pg.wait_for_timeout(200)
 
         def _px(t):
             # 좌표계 값과 배율을 같이 보여준다 — 고칠 곳은 좌표계 쪽이다

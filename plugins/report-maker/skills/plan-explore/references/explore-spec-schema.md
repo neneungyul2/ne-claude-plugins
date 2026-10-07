@@ -1,6 +1,6 @@
 # 탐색 스펙 규격 (explore-spec-schema)
 
-`spec-schema.md`(설명형)와 같은 자리지만 별도 파일이다. 필드 절반이 "해당 없음"이 되는
+`spec-schema.md`(보고형)와 같은 자리지만 별도 파일이다. 필드 절반이 "해당 없음"이 되는
 공유 스키마를 만들지 않는다 — 탐색형에 없는 개념(`action_title`, `key_takeaway`,
 `weight`)은 이 스키마 자체에 없다.
 
@@ -8,7 +8,7 @@
 
 ## 0. 읽는 법
 
-설명형 `spec-schema.md` §0과 같다 — 코드 조각은 스펙에 실제로 들어갈 필드만 보여준다.
+보고형 `spec-schema.md` §0과 같다 — 코드 조각은 스펙에 실제로 들어갈 필드만 보여준다.
 주석은 스펙에 넣지 않는다.
 
 ## 1. 최상위 구조
@@ -22,9 +22,9 @@
   sections        [ ]            // 4-1장. 선택 — 패널을 대분류로 묶어 목차를 만들 때
   grain           { }            // 3장
   panels          [ ]            // 4장
-  glossary        [ ]            // 설명형과 동일 규칙
-  calcs           [ ]            // 설명형과 동일 규칙
-  footnote        { }            // 출처·기간·단위·집계기준 4요소. 설명형과 동일
+  glossary        [ ]            // 보고형과 동일 규칙
+  calcs           [ ]            // 보고형과 동일 규칙
+  footnote        { }            // 출처·기간·단위·집계기준 4요소. 보고형과 동일
   out_of_scope    [ ]
 }
 ```
@@ -38,7 +38,7 @@
 | `grain` | 필수 | 원자료 단위. 3장 |
 | `sections` | 선택 | 패널을 대분류(섹션)로 묶는다. 있으면 접이식 목차가 생긴다. 4-1장 |
 | `panels` | 필수, 1개 이상 | 4장 |
-| `glossary` / `calcs` | 조건부 | 설명형 규칙과 동일 — 축약어·사내용어가 있으면 필수 |
+| `glossary` / `calcs` | 조건부 | 보고형 규칙과 동일 — 축약어·사내용어가 있으면 필수 |
 | `footnote` | 필수 | 4요소(출처·기간·단위·집계기준) |
 | `out_of_scope` | 필수 | 이 화면이 답하지 않는 것 |
 
@@ -104,14 +104,14 @@ panels: [
     notes         [ ]           // 기준·비고. 화면에 펼치지 않고 ⓘ 뒤에 둔다
     axes_used     [ "date", "category" ]
     chart         string        // question_type 대신 panel type이 차트를 좁힌다. chart-rules.md 참고
-    encoding      { }           // 설명형과 동일 개념 — 값이 어느 채널에 실리는지
+    encoding      { }           // 보고형과 동일 개념 — 값이 어느 채널에 실리는지
     etc_drilldown { top_n, basis, opens_to }   // type이 mix일 때만. 3장(plan-explore) 참고
     weight        "kpi_row" | "primary_view" | "detail"   // 서열 표시. 결론을 만드는 게 아니라 화면 위치 우선순위
   }
 ]
 ```
 
-- `weight`가 설명형과 이름은 비슷해도 뜻이 다르다 — **결론의 무게가 아니라 화면에서
+- `weight`가 보고형과 이름은 비슷해도 뜻이 다르다 — **결론의 무게가 아니라 화면에서
   먼저 봐야 할 순서**다. `primary`라는 값 이름을 재사용하지 않는다 (`kpi_row` /
   `primary_view` / `detail` 3단계)
 - `hierarchy`가 있는 `mix`는 `etc_drilldown` 대신 계층 드릴다운을 쓴다 — 모든 항목을
@@ -137,7 +137,7 @@ sections: [
 
 ## 5. glossary / calcs / footnote
 
-설명형 `spec-schema.md` §7과 완전히 동일한 규칙을 쓴다 — desc는 쉬운 말 먼저,
+보고형 `spec-schema.md` §7과 완전히 동일한 규칙을 쓴다 — desc는 쉬운 말 먼저,
 한 문장을 넘는 계산은 calcs 모달, footnote는 출처·기간·단위·집계기준 4요소.
 별도로 정의하지 않고 그대로 재사용한다.
 
@@ -157,5 +157,5 @@ out_of_scope: [
 - 1.1 (2026-09) — 선택 필드 추가: `sections`, `axes[].groups`(비교군), `panels[].section`·
   `hierarchy`·`units`·`guide`·`notes`, panel type `tree_table`. 1.0 스펙은 그대로 유효하다.
 
-- 1.0 (2026-09) — 신설. `product-lines.md`의 탐색형 계열 분리에 따라
-  `spec-schema.md`(설명형)와 별도로 만듦.
+- 1.0 (2026-09) — 신설. 탐색형 계열 분리(지금은 `report-types.md`의 탐색형)에 따라
+  `spec-schema.md`(보고형)와 별도로 만듦.

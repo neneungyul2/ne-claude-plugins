@@ -190,8 +190,8 @@ def c_question_types(root, files, r):
 
 
 def c_report_types(root, files, r):
-    """유형 슬러그가 report-types·spec-schema·check_html.py 세 곳에서 같은가."""
-    want = {"diagnostic", "choice", "watch", "track"}
+    """종류 슬러그가 report-types·spec-schema·check_html.py 세 곳에서 같은가."""
+    want = {"decide", "diagnose", "check", "survey"}
     places = {
         "report-types.md": read(root, "references/report-types.md"),
         "spec-schema.md": read(root, "skills/plan-report/references/spec-schema.md"),
@@ -206,9 +206,9 @@ def c_report_types(root, files, r):
         if found != want:
             bad.append(f"{name}에 없음: {', '.join(sorted(want - found)) or '—'}")
     if bad:
-        r.fail("유형 슬러그 3곳 일치", "; ".join(bad))
+        r.fail("종류 슬러그 3곳 일치", "; ".join(bad))
     else:
-        r.ok("유형 슬러그 3곳 일치", ", ".join(sorted(want)))
+        r.ok("종류 슬러그 3곳 일치", ", ".join(sorted(want)))
 
 
 def c_thresholds(root, files, r):

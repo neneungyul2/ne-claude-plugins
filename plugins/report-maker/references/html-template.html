@@ -351,18 +351,111 @@ td .sw{display:inline-block;width:8px;height:8px;border-radius:var(--r3);margin-
 @media print{
   .mast{position:static} .toc,.tabs{display:none} .block{break-inside:avoid}
 }
+
+/* ══════════════════════════════════════════════════════════════
+   단락 · 배치 · 편집 (v0.12)
+   본문은 .pg(단락) 단위. main[data-layout] = one | side | menu
+   ══════════════════════════════════════════════════════════════ */
+.pg{position:relative}
+.pnav{display:none}
+.pager{display:none}
+.pnav button{border:0;background:none;cursor:pointer;font-family:inherit;font-size:var(--t1);
+             color:var(--dim);text-align:left;padding:4px 8px;border-radius:var(--r3);line-height:1.4}
+.pnav button:hover{background:var(--line);color:var(--sub)}
+.pnav button[aria-current="true"]{color:var(--ink);font-weight:700;background:var(--blueBg)}
+.pnav button:focus-visible,.pgbtn:focus-visible,.edbar button:focus-visible,.pgctl button:focus-visible{
+             outline:2px solid var(--blue);outline-offset:2px}
+/* 사이드바: 왼쪽 목차가 따라오고 지금 읽는 단락이 표시된다 */
+main.wrap[data-layout="side"]{max-width:1312px;display:grid;grid-template-columns:168px minmax(0,1fr);column-gap:32px}
+main.wrap[data-layout="side"] .pnav{display:flex;flex-direction:column;gap:4px;position:sticky;
+             top:calc(var(--mastH,0px) + 16px);align-self:start;border-right:1px solid var(--line2);padding-right:12px}
+main.wrap[data-layout="side"] .pbody{min-width:0}
+/* 메뉴: 위쪽 메뉴에서 단락을 골라 하나씩 본다 */
+main.wrap[data-layout="menu"] .pnav{display:flex;gap:4px;overflow-x:auto;position:sticky;top:var(--mastH,0px);
+             z-index:20;background:#fff;border-bottom:1px solid var(--line2);padding:8px 0;margin-bottom:24px}
+main.wrap[data-layout="menu"] .pnav button{white-space:nowrap;font-size:var(--t2)}
+main.wrap[data-layout="menu"] .pg:not(.cur){display:none}
+main.wrap[data-layout="menu"] .pager{display:flex;justify-content:space-between;margin-top:32px;
+             padding-top:16px;border-top:1px solid var(--line2)}
+.pgbtn{border:1px solid var(--line2);background:#fff;border-radius:var(--r3);padding:4px 12px;
+       font-family:inherit;font-size:var(--t1);color:var(--sub);cursor:pointer}
+.pgbtn:disabled{opacity:.4;cursor:default}
+@media (max-width:880px){
+  main.wrap[data-layout="side"]{display:block}
+  main.wrap[data-layout="side"] .pnav{flex-direction:row;overflow-x:auto;position:static;border-right:0;
+             border-bottom:1px solid var(--line2);padding:0 0 8px;margin-bottom:16px}
+  main.wrap[data-layout="side"] .pnav button{white-space:nowrap}
+}
+/* 편집: 작성자가 글·순서·숨김을 고친다 */
+.pg.pg-off{display:none}
+body.editing .pg.pg-off{display:block;opacity:.4}
+body.editing .pg{padding-top:32px}
+body.editing [contenteditable="true"]{outline:1px dashed var(--amber);outline-offset:2px;cursor:text}
+body.editing [contenteditable="true"]:focus{outline:2px solid var(--amber);background:var(--amberBg)}
+.pgctl{display:none}
+body.editing .pgctl{display:flex;gap:4px;position:absolute;top:0;right:0;z-index:5}
+.pgctl button{border:1px solid var(--amber);background:var(--amberBg);color:var(--warn);border-radius:var(--r3);
+              font-family:inherit;font-size:var(--t1);padding:0 8px;cursor:pointer}
+.edbar{position:fixed;right:16px;bottom:16px;z-index:60;display:flex;flex-wrap:wrap;align-items:center;gap:8px;
+       background:#fff;border:1px solid var(--line2);border-radius:var(--r2);padding:8px;
+       box-shadow:0 4px 16px rgba(25,31,40,.12);max-width:calc(100vw - 32px)}
+.edbar button{border:1px solid var(--line2);background:#fff;border-radius:var(--r3);padding:4px 12px;
+              font-family:inherit;font-size:var(--t1);color:var(--ink);cursor:pointer}
+.edbar button.pri{background:var(--blue);border-color:var(--blue);color:#fff;font-weight:700}
+.edbar button:disabled{opacity:.4;cursor:default}
+.edbar button[aria-pressed="true"]{background:var(--amberBg);border-color:var(--amber);color:var(--warn);font-weight:700}
+.edbar .edlay{display:inline-flex;gap:0}
+.edbar .edlay button{margin-left:-1px}
+.edmsg{font-size:var(--t1);color:var(--sub)}
+.edbar .edonly{display:none}
+body.editing .edbar .edonly{display:inline-flex}
+
+/* ── 배경을 모르는 독자: 맨 위에 질문, 그다음 전체 그림 ── */
+.hero.question{background:#fff}
+.hero.question .takelbl{color:var(--sub);border-color:var(--line2)}
+.hero.question .ask::before{content:"기한"}
+.ptitle{font-size:var(--t3);font-weight:700;margin:32px 0 8px}
+.picture{display:grid;gap:8px;margin:0 0 16px}
+.picture .row{display:grid;grid-template-columns:48px minmax(0,1fr);gap:12px;align-items:baseline;
+              border-bottom:1px solid var(--line2);padding-bottom:8px}
+.picture .lv{font-size:var(--t1);font-weight:800;color:var(--dim)}
+.crumb{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:var(--t1);margin:0 0 12px;color:var(--dim)}
+.crumb span{padding:2px 8px;border-radius:var(--r3);background:var(--line);color:var(--sub)}
+.crumb span.on{background:var(--blueBg);color:var(--blueDk);font-weight:700}
+/* ── 조망형 ── */
+.scope{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:16px 0 0;
+       border:1px solid var(--line2);border-radius:var(--r2);padding:12px 16px}
+.scope div{min-width:0}
+.scope dt{font-size:var(--t1);color:var(--dim)}
+.scope dd{margin:0;font-size:var(--t2)}
+.obs{margin:12px 0 0;padding-left:12px;border-left:2px solid var(--g4);color:var(--ink)}
+.lookat li{margin:8px 0}
+@media (max-width:720px){ .scope{grid-template-columns:1fr 1fr} }
+/* ── 결정형 ── */
+.opttbl tr.pick td{background:var(--blueBg)}
+.opttbl .pickmark{display:inline-block;font-size:var(--t1);font-weight:800;color:#fff;background:var(--blueDk);
+                  padding:0 8px;border-radius:var(--r3);margin-right:8px}
+.reject li{margin:8px 0}
+/* ── 점검형: 배경을 모르는 독자에게 지표 뜻을 함께 ── */
+.watchrow .mean{display:block;font-size:var(--t1);font-weight:400;color:var(--dim)}
+/* ── 계산 방법 창: 실제 숫자로 쓴 계산 ── */
+.worked{background:var(--panel);border:1px solid var(--line2);border-radius:var(--r2);padding:12px 16px;
+        margin:12px 0 0;font-variant-numeric:tabular-nums}
+.worked p{margin:4px 0}
+@media print{ .edbar,.pnav,.pager,.pgctl{display:none!important} main.wrap .pg{display:block!important} }
 </style>
 </head>
 <body>
 <!-- ══════════════════════════════════════════════════════════════
      이 아래는 **부품 목록**이지 리포트 레이아웃이 아니다.
 
-     - 섹션이 몇 개인지, 어떤 순서인지는 스펙의 exhibit이 정한다.
-       여기 세 개가 있다고 세 개를 만들지 않는다
-     - 여기 있는 부품 중 그 리포트에 필요 없는 것은 통째로 지운다
-       (탭·목차·축 전환·드릴다운·모달·실무 후속 과제는 전부 조건부다)
+     - 섹션이 몇 개인지, 어떤 순서인지는 스펙이 정한다.
+       여기 있다고 만들지 않는다. 그 리포트의 종류(report_type)에 맞는 부품만 쓴다
      - 값·라벨·용어는 전부 자리표시자다. 하나도 남기지 않는다
      - 가져갈 것은 **클래스 이름과 중첩 구조**뿐이다
+
+     ★ 본문은 단락(.pg) 단위로 쓴다. 단락 하나 = 목차 한 줄 = 작성자가 순서를 옮기는 단위.
+       data-nav 에 목차에 보일 짧은 라벨을 적는다. 목차는 스크립트가 만든다 — 손으로 쓰지 않는다
      ══════════════════════════════════════════════════════════════ -->
 
 <header class="mast">
@@ -370,261 +463,358 @@ td .sw{display:inline-block;width:8px;height:8px;border-radius:var(--r3);margin-
     <h1>{{TITLE}} <i>{{PERIOD_BADGE}}</i></h1>
     <div class="basis">기준 <b>{{BASIS}}</b> · {{PERIOD}} · 단위 {{UNIT}}</div>
   </div>
-  <!-- 탭: 섹션이 8개를 넘거나 성격이 갈릴 때만. 아니면 이 nav를 지운다 -->
-  <nav class="tabs" role="tablist">
-    <button class="tab" role="tab" aria-selected="true" data-tab="all">전체</button>
-  </nav>
 </header>
 
-<!-- 목차: 1420px 이상에서만 보인다. 섹션 id와 짝을 맞춘다 -->
-<aside class="toc">
-  <div class="tochd">목차</div>
-  <a href="#ex1" class="on"><i>1</i>짧은 라벨</a>
-</aside>
+<!-- 배치(layout): one = 한 페이지 | side = 사이드바(왼쪽 목차가 따라온다) | menu = 메뉴(단락을 하나씩 본다)
+     기본값 — 결정형·진단형·점검형 one, 조망형 side. 스펙 layout 을 그대로 쓴다.
+     작성자가 편집 막대에서 바꿀 수 있다. 편집을 막으려면 data-editable="false" -->
+<main class="wrap" data-layout="one">
 
-<main class="wrap">
-
-  <!-- ── 핵심 결론 ───────────────────────────────────── -->
-  <!-- 히어로 = 판단(text) + 섹션 헤더 목록 + 요청(ask). 세 부분이다.
+  <!-- ══════════════════════════════════════════════════
+       맨 위 — 결정형·진단형 (독자 배경 앎)
+       히어로 = 판단(text) + 섹션 헤더 목록 + 요청(ask). 세 부분이다.
        요약을 새로 쓰지 않는다. 각 exhibit의 action_title을 순서대로 그대로 넣는다.
-       그래서 <li> 개수는 exhibit 개수와 같다 — 여기 둘이 있는 건 형태를 보이려는 것이다.
-       세부 수치는 여기 넣지 않는다 — 비교 틀이 서기 전에 나오면 읽히지 않는다 -->
-  <section class="hero">
-    <span class="takelbl">핵심 결론</span>
-    <p class="takeaway">{{HEADLINE}} — 강조할 대목은 <b>이렇게</b> 감싼다</p>
-    <ul class="summary steps">
-      <li><i>1</i>첫 번째 exhibit의 action_title</li>
-      <li><i>2</i>두 번째 exhibit의 action_title</li>
-    </ul>
-    <p class="ask">{{ASK}}</p>
-  </section>
+       ══════════════════════════════════════════════════ -->
+  <div class="pg" data-nav="요약">
+    <section class="hero">
+      <span class="takelbl">핵심 결론</span>
+      <p class="takeaway">{{HEADLINE}} — 강조할 대목은 <b>이렇게</b> 감싼다</p>
+      <ul class="summary steps">
+        <li><i>1</i>첫 번째 exhibit의 action_title</li>
+        <li><i>2</i>두 번째 exhibit의 action_title</li>
+      </ul>
+      <p class="ask">{{ASK}}</p>
+    </section>
 
-  <!-- KPI: 2~4개. 비교값(delta)을 못 붙이는 지표는 KPI가 아니다 -->
-  <div class="kpi">
-    <div>
-      <div class="k">{{KPI_LABEL}} <button class="infoi" data-modal="calc-1" aria-label="산출 방법">i</button></div>
-      <div class="v">000.0<em>{{UNIT}}</em></div>
-      <div class="d up">▲ 0.0% <span>전월 대비</span></div>
-    </div>
-    <div>
-      <!-- 축약어·사내 용어는 abbr.term 으로 감싸고 glossary에 등록한다 -->
-      <div class="k"><abbr class="term" data-term="{{TERM_ID}}">{{TERM}}</abbr> 비중</div>
-      <div class="v">00.0<em>%</em></div>
-      <div class="d flat">— <span>전월과 동일</span></div>
+    <!-- KPI: 2~4개. 비교값(delta)을 못 붙이는 지표는 KPI가 아니다.
+         첫 화면은 원래 단위(부수·금액·%)로 쓴다. 지수·비율은 그 아래 -->
+    <div class="kpi">
+      <div>
+        <div class="k">{{KPI_LABEL}} <button class="infoi" data-modal="calc-1" aria-label="산출 방법">i</button></div>
+        <div class="v">000.0<em>{{UNIT}}</em></div>
+        <div class="d up">▲ 0.0% <span>전월 대비</span></div>
+      </div>
+      <div>
+        <!-- 축약어·사내 용어는 abbr.term 으로 감싸고 rm-glossary에 등록한다 -->
+        <div class="k"><abbr class="term" data-term="{{TERM_ID}}" tabindex="0">{{TERM}}</abbr> 비중</div>
+        <div class="v">00.0<em>%</em></div>
+        <div class="d flat">— <span>전월과 동일</span></div>
+      </div>
     </div>
   </div>
 
   <!-- ══════════════════════════════════════════════════
-       감시형(watch) 전용 부품. report_type: watch일 때만 쓴다.
-       히어로(핵심 결론 배지 세 줄)와 KPI 카드는 쓰지 않는다 — 감시형은
-       "판단 문장"이 아니라 "지표 행 + 임계값"이 결론 자리다.
-       report-types.md §4 뼈대: 데이터 시점 → 지표 행(primary) → 이탈만 펼침 → 정상 접기
+       독자 배경 모름 — 결정형·진단형 전용 (reader_context: new)
+       맨 위에 답 대신 질문 → 전체 그림(숲→나무→가지) → 답(위의 히어로) 순서.
+       그림 없이 답부터 보면 독자는 그 답이 전체의 어느 부분인지 모른다
        ══════════════════════════════════════════════════ -->
-
-  <!-- 데이터 시점. 감시·추적형은 항상 최상단. 값보다 신선도가 먼저다 -->
-  <div class="freshness">
-    데이터 시점 <b>{{TIMESTAMP}}</b>
-    <!-- 갱신 주기를 넘겼으면 stale 표시. 정상 주기 안이면 이 span을 지운다 -->
-    <span class="stale">· {{경과}} 지연 — 확인 필요</span>
+  <div class="pg" data-nav="질문">
+    <section class="hero question">
+      <span class="takelbl">{{정할 것 / 풀 질문}}</span>
+      <p class="takeaway">{{결정해야 할 것 또는 풀어야 할 질문 — 한 문장}}</p>
+      <p class="ask">{{결정 기한 · 답은 전체 그림 다음에 있다}}</p>
+    </section>
   </div>
-
-  <!-- 지표 행. weight:primary 자리. 제목은 명사구 허용 — 결론이 매번 바뀌므로 -->
-  <div class="shead" id="wex1"><span class="snum">1</span><h2>{{채널·부문 이름 — 명사구 가능}}</h2></div>
-  <div class="watchrow">
-    <div class="breach">
-      <span class="name">{{지표명}}</span>
-      <span class="val">000.0<em style="font-weight:400;font-size:11px">{{단위}}</em></span>
-      <span class="thresh">기준 {{임계값}}</span>
-      <span class="stat bad">이상</span>
-    </div>
-    <div>
-      <span class="name">{{지표명}}</span>
-      <span class="val">000.0</span>
-      <span class="thresh">기준 {{임계값}}</span>
-      <span class="stat ok">정상</span>
-    </div>
+  <div class="pg" data-nav="전체 그림">
+    <!-- exhibit이 아니므로 .shead 를 쓰지 않는다 — 히어로 요약 목록에 들어가지 않는다 -->
+    <h2 class="ptitle">먼저 전체 그림</h2>
+    <section class="block">
+      <!-- 숲 → 나무 → 가지. 단계마다 전체 대비 위치(크기·비중)를 숫자로 적는다 -->
+      <div class="picture">
+        <div class="row"><span class="lv">숲</span><div>{{전체 규모 한 문장 — 원래 단위로}}</div></div>
+        <div class="row"><span class="lv">나무</span><div>{{그중 이 건이 속한 부분 · 전체의 00%}}</div></div>
+        <div class="row"><span class="lv">가지</span><div>{{그 안에서 지금 문제가 되는 칸 · 전체의 00%}}</div></div>
+      </div>
+      <p class="note">출처 … · 기간 … · 단위 … · 집계기준 …</p>
+    </section>
   </div>
-
-  <!-- 이탈 항목만 아래에 자동으로 펼쳐 상세를 보인다. 부품 A(exhibit)를 그대로 쓴다 -->
-  <div class="shead" id="wex1d"><span class="snum">2</span><h2>{{이탈 지표명}} — 무엇이 벗어났나</h2></div>
-  <section class="block">
-    <p class="sowhat">{{어느 임계값을, 언제부터, 얼마나 벗어났는지 한 줄}}</p>
-    <div class="chartwrap"><svg viewBox="0 0 720 300"><!-- 부품 A와 동일한 방식 --></svg></div>
-    <p class="note">출처 … · 기간 … · 단위 … · 집계기준 …</p>
-  </section>
-
-  <!-- 정상 항목은 접어둔다. "이상 없음"도 정상 출력이다 — 억지로 펼치지 않는다 -->
-  <details class="normalfold">
-    <summary>정상 {{N}}개 — 펼쳐서 확인</summary>
-    <div class="tw"><table>
-      <thead><tr><th>{{지표명}}</th><th class="r">값</th><th class="r">기준</th></tr></thead>
-      <tbody><tr><td>{{값}}</td><td class="r">000.0</td><td class="r">{{임계값}}</td></tr></tbody>
-    </table></div>
-  </details>
 
   <!-- ══════════════════════════════════════════════════
-       추적형(track) 전용 부품. report_type: track일 때만 쓴다.
-       뼈대: 데이터 시점 → 시간축+기준선+현재위치(primary) → 이벤트 마커 → 이 속도면 어떻게 되는가
+       결정형(decide) 전용 — 선택지 × 판단 기준, 택하지 않는 이유, 실행 일정
+       판단 기준은 선택지를 보기 전에 정한다. 탈락시킨 안을 지우지 않는다
        ══════════════════════════════════════════════════ -->
+  <div class="pg" data-nav="선택지">
+    <div class="shead" id="opt"><span class="snum">1</span><h2>{{권고안이 나머지보다 나은 이유 — 서술형}}</h2></div>
+    <section class="block">
+      <div class="tw"><table class="opttbl">
+        <thead><tr><th>안</th><th>내용</th><th class="r">{{판단 기준 1}}</th><th class="r">{{판단 기준 2}}</th><th>위험</th></tr></thead>
+        <tbody>
+          <tr class="pick"><td><span class="pickmark">권고</span>{{A안}}</td><td>{{내용}}</td><td class="r">00.0%</td><td class="r">0.0억</td><td>{{위험}}</td></tr>
+          <tr><td>{{B안}}</td><td>{{내용}}</td><td class="r">00.0%</td><td class="r">0.0억</td><td>{{위험}}</td></tr>
+        </tbody>
+      </table></div>
+      <p class="note">출처 … · 기간 … · 단위 … · 집계기준 …</p>
+    </section>
+  </div>
+  <div class="pg" data-nav="택하지 않는 이유">
+    <div class="shead" id="rej"><span class="snum">2</span><h2>{{나머지 안을 택하지 않는다 — 서술형}}</h2></div>
+    <section class="block">
+      <ul class="reject">
+        <li><b>{{B안}}:</b> {{이유 — 숫자로}}</li>
+      </ul>
+      <p class="note">출처 … · 기간 … · 단위 … · 집계기준 …</p>
+    </section>
+  </div>
 
-  <div class="shead" id="tex1"><span class="snum">1</span><h2>{{무엇을 추적하는가 — 명사구 가능}}</h2></div>
-  <section class="block">
-    <div class="chartwrap">
-      <svg viewBox="0 0 720 320" role="img" aria-label="{{추적 대상}}">
-        <!-- 기준선: .baseline. 현재 위치: .curpos. 이벤트: .eventmark -->
-        <line class="baseline" x1="56" y1="120" x2="700" y2="60"/>
-        <text class="baseline-label" x="700" y="54" text-anchor="end">목표 궤적</text>
-        <circle class="curpos" cx="420" cy="150" r="5"/>
-        <text x="420" y="140" text-anchor="middle" font-size="12" font-weight="700">현재</text>
-        <line class="eventmark" x1="300" y1="20" x2="300" y2="280"/>
-        <text class="eventmark" x="304" y="24">{{이벤트명}}</text>
-      </svg>
+  <!-- ══════════════════════════════════════════════════
+       점검형(check) 전용 — 정해둔 기준이 결론을 낸다.
+       기준이 임계값이면 지표 행, 계획선이면 시간축. 둘 다 쓸 수 있다.
+       히어로·KPI 카드는 쓰지 않는다. 이상 없음도 정상 출력이다. 구성은 매번 같아야 한다
+       ══════════════════════════════════════════════════ -->
+  <div class="pg" data-nav="요약">
+    <!-- 데이터 시점. 점검형은 항상 최상단. 값보다 신선도가 먼저다 -->
+    <div class="freshness">
+      데이터 시점 <b>{{TIMESTAMP}}</b>
+      <!-- 갱신 주기를 넘겼으면 stale 표시. 정상 주기 안이면 이 span을 지운다 -->
+      <span class="stale">· {{경과}} 지연 — 확인 필요</span>
     </div>
-    <!-- 이 속도면 어떻게 되는가. 기준선이 없으면 추적이 아니라 그냥 추이다 -->
-    <p class="projection">이 속도면 <b>{{목표 시점}}까지 {{도달/미달}}</b>할 전망입니다.
-      ({{남은 기간}} 동안 {{필요한 속도}} 필요)</p>
-    <p class="note">출처 … · 기간 … · 단위 … · 집계기준 …</p>
-  </section>
+  </div>
+  <div class="pg" data-nav="{{지표군 이름}}">
+    <!-- 지표 행. 제목은 명사구 허용 — 결론이 매번 바뀌므로 -->
+    <div class="shead" id="wex1"><span class="snum">1</span><h2>{{채널·부문 이름 — 명사구 가능}}</h2></div>
+    <div class="watchrow">
+      <div class="breach">
+        <!-- 독자 배경 모름이면 .mean 으로 지표 뜻을 한 줄 붙인다. 앎이면 .mean 을 지운다 -->
+        <span class="name">{{지표명}}<span class="mean">{{이 지표가 뜻하는 것 한 줄}}</span></span>
+        <span class="val">000.0<em style="font-weight:400;font-size:var(--t1)">{{단위}}</em></span>
+        <span class="thresh">기준 {{임계값}}</span>
+        <span class="stat bad">이상</span>
+      </div>
+      <div>
+        <span class="name">{{지표명}}</span>
+        <span class="val">000.0</span>
+        <span class="thresh">기준 {{임계값}}</span>
+        <span class="stat ok">정상</span>
+      </div>
+    </div>
+    <!-- 정상 항목은 접어둔다. "이상 없음"도 정상 출력이다 -->
+    <details class="normalfold">
+      <summary>정상 {{N}}개 — 펼쳐서 확인</summary>
+      <div class="tw"><table>
+        <thead><tr><th>{{지표명}}</th><th class="r">값</th><th class="r">기준</th></tr></thead>
+        <tbody><tr><td>{{값}}</td><td class="r">000.0</td><td class="r">{{임계값}}</td></tr></tbody>
+      </table></div>
+    </details>
+  </div>
+  <div class="pg" data-nav="계획 진척">
+    <!-- 기준이 계획선일 때. 기준선이 없으면 점검이 아니라 그냥 추이다 -->
+    <div class="shead" id="tex1"><span class="snum">2</span><h2>{{무엇을 계획선과 견주는가 — 명사구 가능}}</h2></div>
+    <section class="block">
+      <div class="chartwrap">
+        <svg viewBox="0 0 720 320" role="img" aria-label="{{대상}}">
+          <line class="baseline" x1="56" y1="120" x2="700" y2="60"/>
+          <text class="baseline-label" x="700" y="54" text-anchor="end">계획</text>
+          <circle class="curpos" cx="420" cy="150" r="5"/>
+          <text x="420" y="140" text-anchor="middle" font-size="12" font-weight="700">현재</text>
+        </svg>
+      </div>
+      <!-- 이 속도면 어떻게 되는가. 계산 방법(calc)에 실제 숫자로 쓴 계산을 넣는다 -->
+      <p class="projection">이 속도면 <b>{{목표 시점}}까지 {{도달/미달}}</b>할 전망입니다.
+        <button class="infoi" data-modal="calc-1" aria-label="계산 방법">i</button></p>
+      <p class="note">출처 … · 기간 … · 단위 … · 집계기준 …</p>
+    </section>
+  </div>
 
+  <!-- ══════════════════════════════════════════════════
+       조망형(survey) 전용 — 결론 없이 전체 구조를 보여준다. 기본 배치는 side.
+       맨 위 = 범위와 전체 규모. 그다음 숲 → 나무 → 가지로 좁혀 들어간다.
+       문장은 판단(~해야 한다)이 아니라 관찰(~가 보인다)로 쓴다
+       ══════════════════════════════════════════════════ -->
+  <div class="pg" data-nav="범위와 규모">
+    <section class="hero question">
+      <span class="takelbl">개요</span>
+      <p class="takeaway">{{무엇을 한눈에 보는가 — 명사구 가능}}</p>
+      <dl class="scope">
+        <div><dt>대상</dt><dd>{{무엇을 포함하나}}</dd></div>
+        <div><dt>기간</dt><dd>{{기간}}</dd></div>
+        <div><dt>단위</dt><dd>{{단위}}</dd></div>
+        <div><dt>제외</dt><dd>{{무엇을 빼나}}</dd></div>
+      </dl>
+    </section>
+  </div>
+  <div class="pg" data-nav="{{숲 · 전체}}">
+    <div class="shead" id="sv1"><span class="snum">1</span><h2>{{전체는 이렇게 나뉜다 — 관찰}}</h2></div>
+    <section class="block">
+      <!-- 경로 표시. 단계마다 전체 대비 위치를 적는다 -->
+      <div class="crumb"><span class="on">전체 {{규모}}</span></div>
+      <div class="chartwrap"><svg viewBox="0 0 720 120"><!-- 100% 누적 막대 등 --></svg></div>
+      <p class="obs">{{관찰 한두 문장 — 판단·권고를 쓰지 않는다}}</p>
+      <p class="note">출처 … · 기간 … · 단위 … · 집계기준 …</p>
+    </section>
+  </div>
+  <div class="pg" data-nav="{{나무 · 부분}}">
+    <div class="shead" id="sv2"><span class="snum">2</span><h2>{{그중 가장 큰 부분 — 관찰}}</h2></div>
+    <section class="block">
+      <div class="crumb"><span>전체 {{규모}}</span>›<span class="on">{{부분}} {{규모}} · 전체의 00%</span></div>
+      <div class="chartwrap"><svg viewBox="0 0 720 120"></svg></div>
+      <p class="obs">{{관찰}}</p>
+      <p class="note">출처 … · 기간 … · 단위 … · 집계기준 …</p>
+    </section>
+  </div>
+  <div class="pg" data-nav="눈여겨볼 곳">
+    <div class="advice">
+      <h2>눈여겨볼 곳</h2>
+      <p class="lead">판단이 아니라 다음에 볼 곳이다.</p>
+      <ul class="lookat"><li>{{어디가 어떤 점에서 눈에 띄는지 — 숫자로}}</li></ul>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════
+       공통 부품 — exhibit. 단락 하나에 exhibit 하나
+       ══════════════════════════════════════════════════ -->
   <!-- ── 부품 A. 기본 exhibit ─────────────────────────── -->
-  <div class="shead" id="ex1"><span class="snum">1</span><h2>{{ACTION_TITLE}}</h2></div>
-  <section class="block">
-    <p class="sowhat">{{SO_WHAT}}</p>
+  <div class="pg" data-nav="{{짧은 라벨}}">
+    <div class="shead" id="ex1"><span class="snum">1</span><h2>{{ACTION_TITLE}}</h2></div>
+    <section class="block">
+      <p class="sowhat">{{SO_WHAT}}</p>
 
-    <div class="legend">
-      <span><i class="sw" style="background:var(--blue)"></i>계열 A</span>
-      <span><i class="sw" style="background:var(--g3)"></i>계열 B</span>
-    </div>
+      <div class="legend">
+        <span><i class="sw" style="background:var(--blue)"></i>계열 A</span>
+        <span><i class="sw" style="background:var(--g3)"></i>계열 B</span>
+      </div>
 
-    <div class="chartwrap">
-      <!-- 인라인 SVG. 라이브러리를 불러오지 않는다.
-           막대는 y=0 시작. 강조 1색(--blue), 나머지는 --g1~--g5 계조.
-           data-tip 을 두면 아래 스크립트가 툴팁을 붙인다. -->
-      <svg viewBox="0 0 720 320" role="img" aria-label="{{ACTION_TITLE}}">
-        <line x1="56" y1="280" x2="700" y2="280" stroke="var(--line2)"/>
-        <rect class="cell" x="80" y="120" width="52" height="160" rx="3" fill="var(--blue)"
-              data-tip="{{범주}}|{{지표}} 0,000|비중 00.0%"/>
-        <text x="106" y="112" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--ink)">0,000</text>
-        <text x="106" y="298" text-anchor="middle" font-size="12" fill="var(--sub)">{{범주}}</text>
-      </svg>
-    </div>
+      <div class="chartwrap">
+        <!-- 인라인 SVG. 라이브러리를 불러오지 않는다.
+             막대는 y=0 시작. 강조 1색(--blue), 나머지는 --g1~--g5 계조.
+             data-tip 을 두면 아래 스크립트가 툴팁을 붙인다. -->
+        <svg viewBox="0 0 720 320" role="img" aria-label="{{ACTION_TITLE}}">
+          <line x1="56" y1="280" x2="700" y2="280" stroke="var(--line2)"/>
+          <rect class="cell" x="80" y="120" width="52" height="160" rx="3" fill="var(--blue)"
+                data-tip="{{범주}}|{{지표}} 0,000|비중 00.0%"/>
+          <text x="106" y="112" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--ink)">0,000</text>
+          <text x="106" y="298" text-anchor="middle" font-size="12" fill="var(--sub)">{{범주}}</text>
+        </svg>
+      </div>
 
-    <p class="note">출처 {{SOURCE}} · 기간 {{PERIOD}} · 단위 {{UNIT}} · 집계기준 {{BASIS}}</p>
-  </section>
+      <p class="note">출처 {{SOURCE}} · 기간 {{PERIOD}} · 단위 {{UNIT}} · 집계기준 {{BASIS}}</p>
+    </section>
+  </div>
 
   <!-- ── 부품 B. 축 전환 + 드릴다운 ───────────────────── -->
-  <!-- 축이 하나면 .seg 와 .view 를 지우고 부품 A 형태로 쓴다.
-       데이터에 없는 그룹으로 묶지 않았으면 .drillbtn / .drill 을 통째로 지운다 -->
-  <div class="shead" id="ex1b"><span class="snum">2</span><h2>{{ACTION_TITLE_2}}</h2></div>
-  <section class="block">
-    <p class="sowhat">{{SO_WHAT}}</p>
+  <div class="pg" data-nav="{{짧은 라벨}}">
+    <!-- 축이 하나면 .seg 와 .view 를 지우고 부품 A 형태로 쓴다.
+         데이터에 없는 그룹으로 묶지 않았으면 .drillbtn / .drill 을 통째로 지운다 -->
+    <div class="shead" id="ex1b"><span class="snum">2</span><h2>{{ACTION_TITLE_2}}</h2></div>
+    <section class="block">
+      <p class="sowhat">{{SO_WHAT}}</p>
 
-    <!-- views 가 2개 이상일 때만 토글을 만든다 -->
-    <div class="seg" role="group" aria-label="축 전환">
-      <button aria-pressed="true"  data-view="v1">{{축 A}}</button>
-      <button aria-pressed="false" data-view="v2">{{축 B}}</button>
-    </div>
+      <!-- views 가 2개 이상일 때만 토글을 만든다 -->
+      <div class="seg" role="group" aria-label="축 전환">
+        <button aria-pressed="true"  data-view="v1">{{축 A}}</button>
+        <button aria-pressed="false" data-view="v2">{{축 B}}</button>
+      </div>
 
-    <div class="view" data-view="v1">
-      <p class="vread">이 축에서 읽히는 것 한 줄. <b>결론이 되는 대목만 감싼다.</b></p>
-      <div class="chartwrap"><svg viewBox="0 0 720 300"><!-- … --></svg></div>
-    </div>
-    <div class="view" data-view="v2" hidden>
-      <p class="vread">축이 바뀌면 보이는 것도 바뀐다. <b>그래서 축마다 한 줄을 따로 쓴다.</b></p>
-      <div class="chartwrap"><svg viewBox="0 0 720 300"><!-- … --></svg></div>
-    </div>
+      <div class="view" data-view="v1">
+        <p class="vread">이 축에서 읽히는 것 한 줄. <b>결론이 되는 대목만 감싼다.</b></p>
+        <div class="chartwrap"><svg viewBox="0 0 720 300"><!-- … --></svg></div>
+      </div>
+      <div class="view" data-view="v2" hidden>
+        <p class="vread">축이 바뀌면 보이는 것도 바뀐다. <b>그래서 축마다 한 줄을 따로 쓴다.</b></p>
+        <div class="chartwrap"><svg viewBox="0 0 720 300"><!-- … --></svg></div>
+      </div>
 
-    <!-- 드릴다운: 묶은 그룹에서 개별 단위로.
-         분류 근거는 .cap 과 .note 에 **두 곳 다** 적는다 -->
-    <p style="margin:14px 0 0;font-size:12.5px;color:var(--sub)">
-      {{무엇으로 묶었는지 한 줄}}
-      <button class="drillbtn" data-drill="d-1" aria-expanded="false">{{그룹 1}} 상세</button>
-      <button class="drillbtn" data-drill="d-2" aria-expanded="false">{{그룹 2}} 상세</button>
-    </p>
-    <div class="drill" data-drill="d-1">
-      <h4>{{그룹 1}} — {{하위 단위}}</h4>
-      <p class="cap">{{분류 근거}}. 이번 분석에서 정의한 구분이다.</p>
-      <div class="tw"><table><thead><tr><th>{{하위 단위}}</th><th class="r">{{지표}}</th><th class="r">{{차이}}</th></tr></thead>
-      <tbody><tr><td>{{값}}</td><td class="r">0.0</td><td class="r">+0.0%p</td></tr></tbody></table></div>
-    </div>
-    <div class="drill" data-drill="d-2">
-      <h4>{{그룹 2}} — {{하위 단위}}</h4>
-      <p class="cap">{{분류 근거}}.</p>
-      <div class="tw"><table><tbody><tr><td>{{값}}</td><td class="r">0.0</td><td class="r">−0.0%p</td></tr></tbody></table></div>
-    </div>
+      <!-- 드릴다운: 묶은 그룹에서 개별 단위로.
+           분류 근거는 .cap 과 .note 에 **두 곳 다** 적는다 -->
+      <p style="margin:14px 0 0;font-size:12.5px;color:var(--sub)">
+        {{무엇으로 묶었는지 한 줄}}
+        <button class="drillbtn" data-drill="d-1" aria-expanded="false">{{그룹 1}} 상세</button>
+        <button class="drillbtn" data-drill="d-2" aria-expanded="false">{{그룹 2}} 상세</button>
+      </p>
+      <div class="drill" data-drill="d-1">
+        <h4>{{그룹 1}} — {{하위 단위}}</h4>
+        <p class="cap">{{분류 근거}}. 이번 분석에서 정의한 구분이다.</p>
+        <div class="tw"><table><thead><tr><th>{{하위 단위}}</th><th class="r">{{지표}}</th><th class="r">{{차이}}</th></tr></thead>
+        <tbody><tr><td>{{값}}</td><td class="r">0.0</td><td class="r">+0.0%p</td></tr></tbody></table></div>
+      </div>
+      <div class="drill" data-drill="d-2">
+        <h4>{{그룹 2}} — {{하위 단위}}</h4>
+        <p class="cap">{{분류 근거}}.</p>
+        <div class="tw"><table><tbody><tr><td>{{값}}</td><td class="r">0.0</td><td class="r">−0.0%p</td></tr></tbody></table></div>
+      </div>
 
-    <p class="note">출처 … · 기간 … · 단위 … · 집계기준 …<br>
-      {{그룹 구분}}은 이번 분석에서 정의한 구분이다 — {{분류 근거}}.</p>
-  </section>
+      <p class="note">출처 … · 기간 … · 단위 … · 집계기준 …<br>
+        {{그룹 구분}}은 이번 분석에서 정의한 구분이다 — {{분류 근거}}.</p>
+    </section>
+  </div>
 
   <!-- ── 부품 C. 묶은 행 + 전체 보기 모달 ─────────────── -->
-  <div class="shead" id="ex2"><span class="snum">3</span><h2>{{ACTION_TITLE_3}}</h2></div>
-  <section class="block">
-    <div class="tw"><table>
-      <thead><tr><th>{{항목}}</th><th class="r">{{지표}}</th><th class="r">비중</th></tr></thead>
-      <tbody>
-        <tr><td>{{값}}</td><td class="r">000.0</td><td class="r">00.0%</td></tr>
-        <!-- 묶은 행은 반드시 클릭해서 전체를 볼 수 있어야 한다 -->
-        <tr class="clickable" data-modal="m-etc">
-          <td>나머지 N개 {{항목}} <button class="infoi" aria-label="전체 보기">i</button></td>
-          <td class="r">00.0</td><td class="r">0.0%</td>
-        </tr>
-      </tbody>
-    </table></div>
-    <p class="note">출처 … · 기간 … · 단위 … · 집계기준 …</p>
-  </section>
-
-  <!-- ── 인사이트와 액션 ─────────────────────────────── -->
-  <div class="advice">
-    <h2>인사이트 → 액션</h2>
-    <p class="lead">근거는 데이터, 액션은 제안이다. 담당자는 적지 않는다 — 조직이 정한다.</p>
-    <div class="tw"><table class="acttbl">
-      <thead><tr><th>발견</th><th>근거</th><th>제안 액션</th><th style="width:88px">우선순위</th></tr></thead>
-      <tbody>
-        <tr>
-          <td class="find">{{발견 — 서술형 한 줄}}</td>
-          <td>{{수치 근거}} <span style="color:var(--dim)">(①)</span></td>
-          <td class="do">{{수신자 레벨에 맞는 행동}}</td>
-          <td><span class="tag hi">높음</span></td>
-        </tr>
-      </tbody>
-    </table></div>
-
-    <!-- 수신자보다 두 단계 아래 액션은 여기로 내린다. 지우지 않는다.
-         내릴 액션이 없으면 .subacts 를 통째로 지운다 -->
-    <div class="subacts">
-      <h3>실무 후속 과제</h3>
-      <p class="lead">이번 보고 범위 밖이지만 기록해 둔다.</p>
-      <div class="tw"><table class="acttbl">
-        <tbody><tr>
-          <td class="find">{{발견}}</td>
-          <td>{{수치 근거}} <span style="color:var(--dim)">(④)</span></td>
-          <td class="do">{{실무 단위 조치}}</td>
-          <td><span class="tag">실무</span></td>
-        </tr></tbody>
+  <div class="pg" data-nav="{{짧은 라벨}}">
+    <div class="shead" id="ex2"><span class="snum">3</span><h2>{{ACTION_TITLE_3}}</h2></div>
+    <section class="block">
+      <div class="tw"><table>
+        <thead><tr><th>{{항목}}</th><th class="r">{{지표}}</th><th class="r">비중</th></tr></thead>
+        <tbody>
+          <tr><td>{{값}}</td><td class="r">000.0</td><td class="r">00.0%</td></tr>
+          <!-- 묶은 행은 반드시 클릭해서 전체를 볼 수 있어야 한다 -->
+          <tr class="clickable" data-modal="m-etc">
+            <td>나머지 N개 {{항목}} <button class="infoi" aria-label="전체 보기">i</button></td>
+            <td class="r">00.0</td><td class="r">0.0%</td>
+          </tr>
+        </tbody>
       </table></div>
+      <p class="note">출처 … · 기간 … · 단위 … · 집계기준 …</p>
+    </section>
+  </div>
+
+  <!-- ── 인사이트와 액션 — 결정형은 실행 일정, 진단형은 그래서 달라지는 것 ─────────────────────────────── -->
+  <div class="pg" data-nav="액션">
+    <div class="advice">
+      <h2>인사이트 → 액션</h2>
+      <p class="lead">근거는 데이터, 액션은 제안이다. 담당자는 적지 않는다 — 조직이 정한다.</p>
+      <div class="tw"><table class="acttbl">
+        <thead><tr><th>발견</th><th>근거</th><th>제안 액션</th><th style="width:88px">우선순위</th></tr></thead>
+        <tbody>
+          <tr>
+            <td class="find">{{발견 — 서술형 한 줄}}</td>
+            <td>{{수치 근거}} <span style="color:var(--dim)">(①)</span></td>
+            <td class="do">{{수신자 레벨에 맞는 행동}}</td>
+            <td><span class="tag hi">높음</span></td>
+          </tr>
+        </tbody>
+      </table></div>
+
+      <!-- 수신자보다 두 단계 아래 액션은 여기로 내린다. 지우지 않는다.
+           내릴 액션이 없으면 .subacts 를 통째로 지운다 -->
+      <div class="subacts">
+        <h3>실무 후속 과제</h3>
+        <p class="lead">이번 보고 범위 밖이지만 기록해 둔다.</p>
+        <div class="tw"><table class="acttbl">
+          <tbody><tr>
+            <td class="find">{{발견}}</td>
+            <td>{{수치 근거}} <span style="color:var(--dim)">(④)</span></td>
+            <td class="do">{{실무 단위 조치}}</td>
+            <td><span class="tag">실무</span></td>
+          </tr></tbody>
+        </table></div>
+      </div>
     </div>
   </div>
 
   <!-- ── 가정과 한계 ─────────────────────────────────── -->
-  <!-- 줄마다 **기준과 그 기준에서 하면 안 되는 것**을 같이 적는다 -->
-  <div class="assume">
-    <h3>이 리포트의 가정</h3>
-    <ul>
-      <li>{{어느 기준으로 본다}}. {{그래서 무엇과 합산하지 않는다}}</li>
-      <li>{{확인되지 않은 가정}} <span class="q">확인 필요</span></li>
-    </ul>
-  </div>
+  <div class="pg" data-nav="가정·확인">
+    <!-- 줄마다 **기준과 그 기준에서 하면 안 되는 것**을 같이 적는다 -->
+    <div class="assume">
+      <h3>이 리포트의 가정</h3>
+      <ul>
+        <li>{{어느 기준으로 본다}}. {{그래서 무엇과 합산하지 않는다}}</li>
+        <li>{{확인되지 않은 가정}} <span class="q">확인 필요</span></li>
+      </ul>
+    </div>
 
-  <div class="open">
-    <h3>확인 필요</h3>
-    <ul><li>{{OPEN_QUESTION}}</li></ul>
+    <div class="open">
+      <h3>확인 필요</h3>
+      <ul><li>{{OPEN_QUESTION}}</li></ul>
+    </div>
   </div>
 
   <div class="foot">
     출처 {{SOURCE}} · 기간 {{PERIOD}} · 단위 {{UNIT}} · 집계기준 {{BASIS}} · 추출 {{EXTRACTED_AT}}
   </div>
 </main>
+
+<!-- 용어 사전. 스펙 glossary 를 {"id":{"t":"용어 (원어)","d":"쉬운 말 뜻. 오해받는 지점"}} 로 넣는다.
+     d 는 두 문장 이내. 더 길면 용어가 아니라 계산 방법(calcs) 창이다 -->
+<script type="application/json" id="rm-glossary">{"{{TERM_ID}}":{"t":"{{용어}} ({{원어}})","d":"{{쉬운 말 뜻}}. {{이 말이 오해받는 지점}}."}}</script>
 
 <!-- ── 모달 ───────────────────────────────────────────── -->
 <div class="mask" id="mask">
@@ -659,19 +849,36 @@ td .sw{display:inline-block;width:8px;height:8px;border-radius:var(--r3);margin-
       <p class="formula">{{지표}} = <b>{{구성 항목 A}}</b> − <b>{{구성 항목 B}}</b><br>
         · {{구성 항목 A}}: {{원본 어디의 무엇을 어떻게 집계했나}}<br>
         · {{구성 항목 B}}: {{같은 방식으로}}</p>
-      <p class="note">포함·제외 조건, 원본 위치, 확인되지 않은 부분을 함께 적는다.</p>
+      <!-- ★ 실제 숫자로 쓴 계산. 읽는 사람이 계산기로 그대로 따라 할 수 있어야 한다.
+           한두 줄로 안 써지면 계산이 너무 복잡한 것이다 — 설명을 늘리지 말고 계산을 줄인다 -->
+      <div class="worked">
+        <p>{{구성 항목 A}} 0,000 − {{구성 항목 B}} 000 = <b>0,000</b></p>
+      </div>
+      <p class="note">포함·제외 조건, 원본 위치, 확인되지 않은 부분을 함께 적는다.
+        예외는 최소로 — 예외가 필요해지면 먼저 기준을 단순하게 바꿀 수 있는지 본다.</p>
     </div>
   </div>
 </div>
+<script type="application/json" id="rm-edits">{}</script>
 <div id="tt"></div>
 <script>
 (function(){
-  /* ── 용어 사전. spec 의 glossary 를 그대로 넣는다 ── */
+  /* ── 저장용 원본. 다른 코드가 화면을 건드리기 전에 가장 먼저 잡아 둔다 ──
+     편집 내용을 저장할 때 이 원본에 편집 기록(rm-edits)만 바꿔 끼워 문서를 다시 만든다 */
+  var PRISTINE={
+    title:document.title,
+    styles:[].map.call(document.querySelectorAll('head style'),function(s){return s.textContent;}),
+    body:document.body.innerHTML
+  };
+
+  /* ── 용어 사전. spec 의 glossary 를 그대로 넣는다 ──
+     본문의 <script type="application/json" id="rm-glossary">에서 읽는다 */
   /* d 에는 뜻만 적지 않는다. 그 말이 오해받는 지점까지 적는다
      (예: 외부 기준 지표라면 "사내 기준과 합산하지 않는다"까지) */
-  var GLOSSARY = {
-    "{{TERM_ID}}": {t:"{{용어}} ({{원어}})", d:"{{뜻}}. {{이 말이 오해받는 지점}}."}
-  };
+  var GLOSSARY = {};   /* 비워 둔다. 용어는 본문의 rm-glossary(JSON)에 넣는다 */
+
+  try{ var gj=document.getElementById('rm-glossary');
+       if(gj){ var gd=JSON.parse(gj.textContent||'{}'); for(var gk in gd) GLOSSARY[gk]=gd[gk]; } }catch(_){}
 
   /* ── 툴팁: [data-tip] 과 [data-term] 공용 ── */
   var tt=document.getElementById('tt');
@@ -705,6 +912,15 @@ td .sw{display:inline-block;width:8px;height:8px;border-radius:var(--r3);margin-
   });
   document.addEventListener('mouseout',function(e){
     if(e.target.closest('[data-tip],[data-term]')) tt.classList.remove('on');
+  });
+  /* 키보드·터치에서도 용어 설명을 연다 — 마우스가 없는 사람도 읽을 수 있어야 한다 */
+  document.addEventListener('focusin',function(e){
+    var g=e.target.closest&&e.target.closest('[data-term]'); if(!g) return;
+    var k=GLOSSARY[g.getAttribute('data-term')], r=g.getBoundingClientRect();
+    if(k) show('<div class="tt">'+esc(k.t)+'</div>'+esc(k.d), r.left, r.bottom);
+  });
+  document.addEventListener('focusout',function(e){
+    if(e.target.closest&&e.target.closest('[data-term]')) tt.classList.remove('on');
   });
 
   /* ── 모달 ── */
@@ -814,6 +1030,260 @@ td .sw{display:inline-block;width:8px;height:8px;border-radius:var(--r3);margin-
                document.querySelectorAll('tr[data-key]').forEach(function(r){ r.classList.toggle('hl', r===row); }); }
     });
   });
+
+  /* ══════════════════════════════════════════════════════════════
+     단락 · 배치 · 편집
+     - 본문은 단락(.pg) 단위로 쓴다. 단락 하나 = 목차 한 줄 = 순서를 옮기는 단위
+     - 배치: main[data-layout] = one(한 페이지) | side(사이드바) | menu(메뉴)
+     - 편집: 작성자가 화면에서 글·순서·숨김·배치를 고치고 저장한다.
+       원본은 그대로 두고, 고친 것만 <script id="rm-edits">에 적는다
+     ══════════════════════════════════════════════════════════════ */
+  var main=document.querySelector('main.wrap');
+  var edNode=document.getElementById('rm-edits');
+  if(!main) return;
+  var pgs=[].slice.call(main.children).filter(function(n){return n.classList.contains('pg');});
+  if(!pgs.length) return;   /* 단락으로 나누지 않은 본문은 예전처럼 한 페이지로 둔다 */
+
+  var EDITS={};
+  try{ EDITS=JSON.parse((edNode&&edNode.textContent)||'{}')||{}; }catch(_){ EDITS={}; }
+  var LOCAL_KEY='rm-edits:'+location.pathname+'|'+document.title;
+  var isFile=location.protocol==='file:';
+  if(isFile){ try{ var ld=localStorage.getItem(LOCAL_KEY); if(ld){ EDITS=JSON.parse(ld); } }catch(_){} }
+  EDITS.text=EDITS.text||{}; EDITS.order=EDITS.order||null; EDITS.hidden=EDITS.hidden||[];
+
+  /* 단락 번호와 편집 대상 번호는 원본 순서로 매긴다 — 옮겨도 번호는 따라간다 */
+  var ED_SEL='h1,h2,h3,h4,p,li,td,th,dd,dt';
+  pgs.forEach(function(pg,i){
+    pg.dataset.pid=String(i);
+    var k=0;
+    [].forEach.call(pg.querySelectorAll(ED_SEL),function(el){
+      if(el.closest('svg,.chartwrap,.seg,.mask,[data-gen],.legend')) return;
+      if(el.querySelector(ED_SEL+',button,svg,select,input')) return;
+      var id='p'+i+'e'+(k++); el.dataset.eid=id;
+      if(EDITS.text[id]!=null) el.innerHTML=EDITS.text[id];
+    });
+  });
+  var ORIG={}; /* 원본 글 — 무엇을 고쳤는지 가리는 기준 */
+  (function(){
+    var box=document.createElement('div'); box.innerHTML=PRISTINE.body;
+    var m=box.querySelector('main.wrap'); if(!m) return;
+    [].filter.call(m.children,function(n){return n.classList.contains('pg');}).forEach(function(pg,i){
+      var k=0;
+      [].forEach.call(pg.querySelectorAll(ED_SEL),function(el){
+        if(el.closest('svg,.chartwrap,.seg,.mask,[data-gen],.legend')) return;
+        if(el.querySelector(ED_SEL+',button,svg,select,input')) return;
+        ORIG['p'+i+'e'+(k++)]=clean(el);
+      });
+    });
+  })();
+
+  /* 틀: 목차(.pnav) + 본문(.pbody) + 메뉴 배치의 이전/다음 */
+  var nav=document.createElement('nav'); nav.className='pnav'; nav.setAttribute('aria-label','목차');
+  var body=document.createElement('div'); body.className='pbody';
+  while(main.firstChild) body.appendChild(main.firstChild);
+  main.appendChild(nav); main.appendChild(body);
+  var pager=document.createElement('div'); pager.className='pager';
+  pager.innerHTML='<button type="button" class="pgbtn" data-pg="-1">← 이전</button><button type="button" class="pgbtn" data-pg="1">다음 →</button>';
+  body.insertBefore(pager, body.querySelector(':scope>.foot'));   /* 각주보다 위 */
+
+  /* 저장된 순서·숨김을 적용한다 */
+  if(EDITS.order&&EDITS.order.length){
+    var byId={}; pgs.forEach(function(p){byId[p.dataset.pid]=p;});
+    var seq=EDITS.order.map(function(id){return byId[id];}).filter(Boolean);
+    pgs.forEach(function(p){ if(seq.indexOf(p)<0) seq.push(p); });
+    var first=pgs[0], parent=first.parentNode, marker=document.createComment('pg');
+    parent.insertBefore(marker,first);
+    seq.forEach(function(p){ parent.insertBefore(p,marker); });
+    parent.removeChild(marker);
+  }
+  EDITS.hidden.forEach(function(id){ var p=body.querySelector('.pg[data-pid="'+id+'"]'); if(p) p.classList.add('pg-off'); });
+
+  function order(){ return [].slice.call(body.querySelectorAll(':scope>.pg')); }
+  function shown(){ return order().filter(function(p){ return !p.classList.contains('pg-off')||document.body.classList.contains('editing'); }); }
+  function label(p){
+    if(p.dataset.nav) return p.dataset.nav;
+    var h=p.querySelector('h2,h1,h3'); return h?h.textContent.trim():'단락';
+  }
+  var cur=null;
+  function layout(){ return main.dataset.layout||'one'; }
+  function setLayout(v){
+    main.dataset.layout=v; render();
+    var sw=document.querySelectorAll('.edbar [data-lay]');
+    [].forEach.call(sw,function(b){ b.setAttribute('aria-pressed', String(b.dataset.lay===v)); });
+  }
+  function render(){
+    var list=shown();
+    if(!cur||list.indexOf(cur)<0) cur=list[0];
+    nav.innerHTML='';
+    list.forEach(function(p){
+      var b=document.createElement('button'); b.type='button'; b.textContent=label(p);
+      b.setAttribute('aria-current', String(p===cur));
+      b.addEventListener('click',function(){
+        if(layout()==='menu'){ go(p); window.scrollTo(0,0); }
+        else { p.scrollIntoView({behavior:'smooth',block:'start'}); }
+      });
+      nav.appendChild(b);
+    });
+    order().forEach(function(p){ p.classList.toggle('cur', p===cur); });
+    var i=list.indexOf(cur);
+    pager.querySelector('[data-pg="-1"]').disabled=i<=0;
+    pager.querySelector('[data-pg="1"]').disabled=i>=list.length-1;
+    var mast=document.querySelector('.mast');
+    document.documentElement.style.setProperty('--mastH',(mast?mast.getBoundingClientRect().height:0)+'px');
+  }
+  function go(p){ cur=p; render(); }
+  pager.addEventListener('click',function(e){
+    var b=e.target.closest('[data-pg]'); if(!b) return;
+    var list=shown(), i=list.indexOf(cur)+(+b.dataset.pg);
+    if(list[i]){ go(list[i]); main.scrollIntoView({block:'start'}); }
+  });
+  /* 사이드바 배치: 지금 읽는 단락을 목차에 표시한다 */
+  window.addEventListener('scroll',function(){
+    if(layout()!=='side') return;
+    var top=(parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--mastH'))||0)+48;
+    var list=shown(), c=list[0];
+    list.forEach(function(p){ if(p.getBoundingClientRect().top<=top) c=p; });
+    if(c!==cur){ cur=c; [].forEach.call(nav.children,function(b,i){ b.setAttribute('aria-current', String(list[i]===cur)); }); }
+  },{passive:true});
+  if(EDITS.layout) main.dataset.layout=EDITS.layout;
+  render();
+
+  /* ── 편집 ── */
+  if(main.dataset.editable==='false') return;
+  var bar=document.createElement('div'); bar.className='edbar';
+  bar.innerHTML=
+    '<span class="edmsg" role="status"></span>'+
+    '<span class="edonly edlay" role="group" aria-label="배치">'+
+      '<button type="button" data-lay="one">한 페이지</button><button type="button" data-lay="side">사이드바</button><button type="button" data-lay="menu">메뉴</button></span>'+
+    '<button type="button" class="edonly" data-act="reset">원본으로</button>'+
+    '<button type="button" class="edonly pri" data-act="save" disabled>저장</button>'+
+    '<button type="button" data-act="toggle" aria-pressed="false">편집</button>';
+  document.body.appendChild(bar);
+  var msg=bar.querySelector('.edmsg'), saveBtn=bar.querySelector('[data-act="save"]');
+  var dirty=false, cap=null;
+  if(window.claude&&window.claude.use){ window.claude.use('artifact').then(function(a){cap=a;},function(){}); }
+  if(isFile&&localStorage&&(function(){try{return localStorage.getItem(LOCAL_KEY);}catch(_){return null;}})()){
+    msg.textContent='이 브라우저에 임시 저장된 수정이 적용돼 있습니다';
+  }
+  function mark(){ dirty=true; saveBtn.disabled=false; msg.textContent='저장하지 않은 수정이 있습니다'; }
+
+  /* 단락마다 위로·아래로·숨기기 */
+  order().forEach(function(p){
+    var c=document.createElement('div'); c.className='pgctl';
+    c.innerHTML='<button type="button" data-mv="-1">↑ 위로</button><button type="button" data-mv="1">↓ 아래로</button><button type="button" data-hide>숨기기</button>';
+    p.insertBefore(c,p.firstChild);
+    c.querySelector('[data-hide]').textContent=p.classList.contains('pg-off')?'보이기':'숨기기';
+  });
+  body.addEventListener('click',function(e){
+    var b=e.target.closest('.pgctl button'); if(!b) return;
+    var p=b.closest('.pg');
+    if(b.dataset.mv){
+      var all=order(), i=all.indexOf(p), to=all[i+(+b.dataset.mv)];
+      if(to){ if(+b.dataset.mv<0) to.parentNode.insertBefore(p,to); else to.parentNode.insertBefore(p,to.nextSibling); mark(); render(); }
+    } else if(b.hasAttribute('data-hide')){
+      p.classList.toggle('pg-off'); b.textContent=p.classList.contains('pg-off')?'보이기':'숨기기'; mark(); render();
+    }
+  });
+  function setEditing(on){
+    document.body.classList.toggle('editing',on);
+    var t=bar.querySelector('[data-act="toggle"]'); t.textContent=on?'편집 끝내기':'편집'; t.setAttribute('aria-pressed',String(on));
+    [].forEach.call(document.querySelectorAll('[data-eid]'),function(el){
+      if(on) el.setAttribute('contenteditable','true'); else el.removeAttribute('contenteditable');
+    });
+    setLayout(layout());
+    if(!on&&dirty) msg.textContent='저장하지 않은 수정이 있습니다 · 편집을 다시 켜서 저장하세요';
+  }
+  document.addEventListener('input',function(e){ if(e.target.closest&&e.target.closest('[data-eid]')) mark(); });
+  document.addEventListener('paste',function(e){
+    var t=e.target.closest&&e.target.closest('[contenteditable="true"]'); if(!t) return;
+    e.preventDefault(); var s=(e.clipboardData||window.clipboardData).getData('text/plain');
+    document.execCommand('insertText',false,s);
+  });
+  bar.addEventListener('click',function(e){
+    var b=e.target.closest('button'); if(!b) return;
+    if(b.dataset.lay){ setLayout(b.dataset.lay); mark(); return; }
+    var a=b.dataset.act;
+    if(a==='toggle') setEditing(!document.body.classList.contains('editing'));
+    if(a==='save') save(collect());
+    if(a==='reset'){
+      if(b.dataset.armed){ save({}, true); }
+      else { b.dataset.armed='1'; b.textContent='한 번 더 누르면 원본으로'; setTimeout(function(){ delete b.dataset.armed; b.textContent='원본으로'; },4000); }
+    }
+  });
+
+  /* 고친 글은 굵게·기울임·줄바꿈·용어 표시만 남기고 나머지 태그를 벗긴다 */
+  function clean(node){
+    var out=document.createElement('div');
+    (function walk(src,dst){
+      [].forEach.call(src.childNodes,function(n){
+        if(n.nodeType===3){ dst.appendChild(document.createTextNode(n.nodeValue)); return; }
+        if(n.nodeType!==1) return;
+        var tg=n.tagName;
+        if(tg==='BR'){ dst.appendChild(document.createElement('br')); return; }
+        if(tg==='B'||tg==='STRONG'||tg==='I'||tg==='EM'){
+          var e=document.createElement(tg==='STRONG'?'b':tg==='EM'?'i':tg.toLowerCase()); dst.appendChild(e); walk(n,e); return; }
+        if(tg==='ABBR'&&n.getAttribute('data-term')){
+          var a=document.createElement('abbr'); a.className='term'; a.setAttribute('data-term',n.getAttribute('data-term'));
+          a.tabIndex=0; dst.appendChild(a); walk(n,a); return; }
+        if(tg==='SPAN'&&/\b(tag|vd|stat)\b/.test(n.className)){
+          var s=document.createElement('span'); s.className=n.className.replace(/[^\w\s-]/g,''); dst.appendChild(s); walk(n,s); return; }
+        walk(n,dst);
+      });
+    })(node,out);
+    return out.innerHTML;
+  }
+  function collect(){
+    var st={text:{},hidden:[],layout:layout()};
+    [].forEach.call(document.querySelectorAll('[data-eid]'),function(el){
+      var h=clean(el); if(h!==ORIG[el.dataset.eid]) st.text[el.dataset.eid]=h;
+    });
+    var ids=order().map(function(p){return p.dataset.pid;});
+    if(ids.join()!==ids.slice().sort(function(a,b){return a-b;}).join()) st.order=ids;
+    order().forEach(function(p){ if(p.classList.contains('pg-off')) st.hidden.push(p.dataset.pid); });
+    if(st.layout===PRISTINE_LAYOUT) delete st.layout;   /* 원래 배치 그대로면 적지 않는다 */
+    return st;
+  }
+  var PRISTINE_LAYOUT=(function(){ var m=/<main[^>]*data-layout="(\w+)"/.exec(PRISTINE.body); return m?m[1]:'one'; })();
+  var RESET=':root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}';
+  function buildDoc(st){
+    var json=JSON.stringify(st).replace(/</g,'\\u003c');
+    var b=PRISTINE.body.replace(/(<script type="application\/json" id="rm-edits">)[\s\S]*?(<\/script>)/, function(_,a,z){ return a+json+z; });
+    return '<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>'+RESET+'</style></head><body>'+
+      '<title>'+PRISTINE.title.replace(/</g,'&lt;')+'</title>'+
+      PRISTINE.styles.map(function(s){return '<style>'+s+'</style>';}).join('')+b+'</body></html>';
+  }
+  /* 저장 순서 (AGENTS.md 2장 폴백):
+     ① claude.ai 게시본 — 페이지가 스스로 새 버전으로 저장
+     ② 그 기능이 없으면 — 이 브라우저에 임시 보관 + 고친 파일 내려받기
+     ③ 둘 다 안 되면 — 저장할 수 없다고 알린다 */
+  function save(st, reset){
+    saveBtn.disabled=true; msg.textContent='저장 중…';
+    if(cap){
+      cap.publish(buildDoc(st)).then(function(){ dirty=false; msg.textContent='저장했습니다'; },
+        function(err){
+          var c=err&&err.code;
+          msg.textContent = c==='conflict' ? '다른 곳에서 먼저 저장해 새 버전으로 바뀝니다'
+            : (c==='not_granted'||c==='not_writer') ? '이 화면에서는 저장 권한이 없습니다'
+            : '저장하지 못했습니다. 다시 눌러 주세요';
+          saveBtn.disabled=false;
+        });
+      return;
+    }
+    var kept=false;
+    try{ if(reset) localStorage.removeItem(LOCAL_KEY); else localStorage.setItem(LOCAL_KEY, JSON.stringify(st)); kept=true; }catch(_){}
+    var dl=false;
+    try{
+      var blob=new Blob([buildDoc(st)],{type:'text/html'}), a=document.createElement('a');
+      a.href=URL.createObjectURL(blob); a.download=(document.title||'report').replace(/[\\/:*?"<>|]/g,'_')+'.html';
+      document.body.appendChild(a); a.click(); a.remove(); dl=true;
+    }catch(_){}
+    dirty=false;
+    msg.textContent = kept&&dl ? '이 브라우저에 임시 보관하고, 고친 파일을 내려받았습니다'
+      : kept ? '이 브라우저에만 임시 보관했습니다'
+      : dl ? '고친 파일을 내려받았습니다'
+      : '이 환경에서는 저장할 수 없습니다';
+    if(reset&&kept) location.reload();
+  }
 })();
 </script>
 </body>

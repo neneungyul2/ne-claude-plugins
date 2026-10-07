@@ -23,5 +23,5 @@ argument-hint: [HTML 파일 경로. 스펙·브리프가 있으면 함께]
 **고칠 것을 심각도 순으로 낸다.** 좋은 점을 나열해 균형을 맞추지 않는다.
 사용자가 고쳐 달라고 하면 그때 고친다 — 검수와 수정은 분리한다.
 
-`brief.report_type`에 따라 필수가 다르다. 감시형에 액션이 없다고 지적하면 틀린 검수다
+`brief.report_type`에 따라 필수가 다르다. 점검형에 액션이 없다고, 조망형에 권고가 없다고 지적하면 틀린 검수다
 (`${CLAUDE_PLUGIN_ROOT}/references/report-types.md` §3).

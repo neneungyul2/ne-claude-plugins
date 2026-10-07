@@ -10,8 +10,8 @@ description: 데이터를 보여줘야 하는 모든 상황의 진입점. "차�
 
 ## 0. 먼저 읽을 것
 
-- `${CLAUDE_PLUGIN_ROOT}/references/product-lines.md` — **필수. 가장 먼저 읽는다.**
-  quick/report보다 앞선 갈림길이 여기서 갈린다 (아래 0-1장)
+- `${CLAUDE_PLUGIN_ROOT}/references/report-types.md` — **필수. 가장 먼저 읽는다.**
+  무엇을 만들지는 이 문서의 질문 하나("결론을 누가 내는가")와 조건 셋으로 정해진다
 
 quick·report 어느 쪽이든 동일하게 적용되는 두 문서:
 
@@ -20,27 +20,21 @@ quick·report 어느 쪽이든 동일하게 적용되는 두 문서:
 
 지표 이름이 등장하면 `${CLAUDE_PLUGIN_ROOT}/references/metrics.md`도 읽는다.
 
-## 0-1. 계열 판정 — quick/report보다 먼저 가른다
+## 0-1. 탐색형인지 먼저 가른다
 
-**quick이냐 report냐를 묻기 전에, 설명형이냐 탐색형이냐를 먼저 가른다.**
-`product-lines.md` §1의 질문을 그대로 쓴다.
+다섯 종류 중 **탐색형만 파이프라인이 다르다.** 그래서 이것부터 가른다.
+사용자 말에서 "필터로 볼 수 있게", "날짜·기간을 바꿔가며", "대시보드로 계속 쓸",
+"직접 파볼 수 있게" 같은 신호가 나오면 되묻지 않고 **탐색형**으로 보고
+`${CLAUDE_PLUGIN_ROOT}/skills/frame-explore/SKILL.md`로 바로 넘어간다.
+quick/report 구분도, frame-question도 거치지 않는다.
 
-> "이 화면을 다음에 열 때, 무엇을 볼지도 그때 정하나요, 아니면 지금 정한 게 계속
-> 유지되나요?"
-
-사용자의 말에서 신호를 먼저 찾는다 — "필터로 볼 수 있게", "날짜·기간을 바꿔가며",
-"대시보드로 계속 쓸", "직접 파볼 수 있게" 같은 말이 나오면 되묻지 않고 **탐색형**으로
-판정한다. "정리해줘", "일보 만들어줘", "이상 있으면 알아야" 같은 말은 **설명형**이다.
-
-**탐색형이면 여기서 갈라진다.** 아래 1~6장(quick/report 모드 판단, frame-question 등)은
-설명형의 것이다. 탐색형은 `${CLAUDE_PLUGIN_ROOT}/skills/frame-explore/SKILL.md`로
-바로 넘어간다 — quick/report 구분도, frame-question도 거치지 않는다.
+나머지 넷(결정·진단·점검·조망)은 아래 1장부터 이어서 간다. 종류는 frame-question이 정한다.
+**종류 이름을 사용자에게 묻지 않는다** — `report-types.md` §8.
 
 둘 다 필요하다는 요청("일보도 만들고, 필터로도 보게")이 오면 **산출물 두 개**라고
-알린다. `product-lines.md` §1의 감시형·탐색형 비교표를 보여주며 하나씩 순서대로
-진행한다고 안내한다.
+알린다. `report-types.md` §8의 점검형·탐색형 구분을 보여주며 하나씩 순서대로 진행한다.
 
-## 1. 모드 판단 — 설명형일 때만
+## 1. 모드 판단 — 탐색형이 아닐 때
 
 | | quick (빠른 시각화) | report (정식 보고) |
 |---|---|---|
@@ -80,7 +74,7 @@ quick 모드는 이 단계를 건너뛰고 `load-data`로 바로 간다.
 ```
 [이 스킬] 모드 판단
    ↓
-frame-question   유형 판정 → 질문·가정·수신자 레벨·분석 축 합의  ← report 필수
+frame-question   종류·조건 판정 → 질문·가정·수신자 레벨·분석 축 합의  ← report 필수
    ↓
 load-data        데이터 확보 + 정규화 + 데이터셋 카드
    ↓
@@ -102,7 +96,7 @@ HTML을 그려서 확인받지 않는다 — 화면을 만들면 사용자는 �
 
 다음 스킬로 넘어갈 때는 해당 SKILL.md를 Read 도구로 읽고 그 지침을 따른다.
 
-- `${CLAUDE_PLUGIN_ROOT}/references/report-types.md` — **유형이 형태를 정한다. 먼저 읽는다**
+- `${CLAUDE_PLUGIN_ROOT}/references/report-types.md` — **종류가 형태를 정한다. 먼저 읽는다**
 - `${CLAUDE_PLUGIN_ROOT}/skills/frame-question/SKILL.md`
 - `${CLAUDE_PLUGIN_ROOT}/skills/load-data/SKILL.md`
 - `${CLAUDE_PLUGIN_ROOT}/skills/plan-report/SKILL.md`
@@ -118,20 +112,23 @@ HTML을 그려서 확인받지 않는다 — 화면을 만들면 사용자는 �
 - `${CLAUDE_PLUGIN_ROOT}/skills/build-explore/SKILL.md`
 - `${CLAUDE_PLUGIN_ROOT}/skills/verify-report/SKILL.md` (탐색형 분기)
 
-report 모드에서는 **인사이트·액션(3~5개)이 필수**다. exhibit만 늘어놓고 끝내지 않는다.
-축약어·사내 용어가 나오면 용어 설명을 붙이고, 한 문장으로 안 되는 계산은 산식 모달로 뺀다.
+결정·진단형은 **요청과 액션이 필수**다. exhibit만 늘어놓고 끝내지 않는다.
+점검형은 정상이면 액션 0개가 정답이고, 조망형은 판단 대신 "눈여겨볼 곳"으로 끝난다.
+축약어·사내 용어가 나오면 용어 설명(툴팁)을 붙이고, 계산은 계산 방법 창으로 뺀다 —
+창에는 **실제 숫자로 쓴 계산**을 넣는다. 읽는 사람이 계산기로 따라 할 수 있어야 한다.
 
 **스펙 단계를 건너뛰지 않는다.** exhibit이 하나뿐이어도 "무엇을 어떤 차트로 어떤 메시지로"를
 먼저 적고 나서 그린다. 이 순서를 지키지 않으면 같은 데이터로 만든 두 산출물의 결론이 달라진다.
 
-## 5. 반복해서 여는 화면 — 감시형
+## 5. 반복해서 여는 화면 — 점검형
 
 "일보", "매주 확인", "이상 있으면 알아야" 같은 요청은 **질문이 고정되어 있다.**
 매번 브리프를 다시 돌리지 않는다.
 
 - 처음 만들 때는 `frame-question`을 돈다. **임계값을 정하는 것이 이 단계의 핵심**이고,
   `${CLAUDE_PLUGIN_ROOT}/references/watch-thresholds.md`를 읽는다
-- 두 번째부터는 `/refresh`다. 구성은 그대로 두고 데이터만 갈아끼운다
+- 두 번째부터는 `/refresh`다. 구성은 그대로 두고 데이터만 갈아끼운다.
+  작성자가 화면에서 고친 기록은 `scripts/carry_edits.py`로 옮긴다
 - **아무것도 안 걸리면 "특이사항 없음"이 정답이다.** 억지로 액션을 만들지 않는다
 
 기존 산출물을 갱신하는 것인지 새로 만드는 것인지 애매하면 **묻는다.**

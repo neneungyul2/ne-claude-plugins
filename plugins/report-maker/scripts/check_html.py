@@ -36,6 +36,10 @@ PLACEHOLDERS = [
 
 FOOTNOTE_PARTS = ["출처", "기간", "단위", "집계기준"]
 
+# 종류(report_type)와 배치(layout). 바꾸려면 references/report-types.md와 함께 바꾼다
+REPORT_TYPES = ("decide", "diagnose", "check", "survey")
+LAYOUTS = ("one", "side", "menu")
+
 
 class Report:
     def __init__(self):
@@ -253,7 +257,8 @@ def c_hero_list(html, r, tag=""):
         html, re.S)
     n_ex = len(re.findall(r"<div class=\"shead\"", html))
     if not hero:
-        if n_ex:
+        # 점검형·조망형은 판단 히어로가 없다 — 요약 목록도 없는 것이 정상이다
+        if n_ex and 'class="hero"' in html:
             r.warn(f"히어로 요약{tag}", "summary.steps가 없다 — action_title 목록을 넣는다")
         return
     n_li = len(re.findall(r"<li", hero.group(1)))
@@ -327,6 +332,12 @@ def c_glossary(html, r):
     used = set(re.findall(r"data-term\s*=\s*[\"']([^\"']+)", html))
     gl = re.search(r"var\s+GLOSSARY\s*=\s*\{(.*?)\n\s*\};", html, re.S)
     defined = set(re.findall(r"[\"']?([A-Za-z0-9_\-]+)[\"']?\s*:\s*\{", gl.group(1))) if gl else set()
+    gj = re.search(r'<script type="application/json" id="rm-glossary">(.*?)</script>', html, re.S)
+    if gj:
+        try:
+            defined |= set(json.loads(gj.group(1) or "{}").keys())
+        except json.JSONDecodeError:
+            r.fail("용어 등록", "rm-glossary가 JSON이 아니다")
     missing = used - defined
     if missing:
         r.fail("용어 등록", "툴팁은 있는데 GLOSSARY에 없다: " + ", ".join(sorted(missing)))
@@ -365,47 +376,135 @@ def c_spec_match(html, spec, r):
 
     n_primary = sum(1 for e in spec.get("exhibits", []) if e.get("weight") == "primary")
     rtype = spec.get("report_type")
+    b = spec.get("brief") or {}
     if n_primary > 1:
         r.fail("weight: primary 는 하나", f"{n_primary}개 — 결론이 둘이라는 뜻이다")
-    elif spec.get("exhibits") and n_primary == 0 and rtype not in ("watch", "choice"):
+    elif spec.get("exhibits") and n_primary == 0 and rtype in ("diagnose",):
         r.warn("weight: primary 는 하나", "primary가 없다 — 가장 큰 자리를 누가 갖는가")
 
-    # report_type이 바꾸는 필수 (references/report-types.md §3)
+    # 종류(report_type)가 바꾸는 필수 — references/report-types.md §3
     if spec.get("mode") == "report" and not rtype:
-        r.fail("report_type", "report 모드인데 유형이 없다 — frame-question에서 정한다")
-    if rtype and rtype not in ("diagnostic", "choice", "watch", "track"):
-        r.fail("report_type", f"알 수 없는 값: {rtype}")
-    if rtype == "watch":
-        if (spec.get("brief") or {}).get("tension"):
-            r.warn("유형별 해당 없음", "watch인데 tension이 있다 — 억지로 만든 긴장인지 본다")
-        if (spec.get("brief") or {}).get("three_minute_story"):
-            r.warn("유형별 해당 없음", "watch인데 three_minute_story가 있다")
-    elif rtype in ("diagnostic", "choice"):
-        b = spec.get("brief") or {}
+        r.fail("report_type", "report 모드인데 종류가 없다 — frame-question에서 정한다")
+    if rtype and rtype not in REPORT_TYPES:
+        old = {"diagnostic": "diagnose", "choice": "decide", "watch": "check", "track": "check"}
+        hint = f" — v0.12부터 '{old[rtype]}'다" if rtype in old else ""
+        r.fail("report_type", f"알 수 없는 값: {rtype}{hint}")
+    if spec.get("stance") or b.get("stance"):
+        r.warn("stance", "v0.12에서 없앴다 — 판단 없이 보여주려면 조망형(survey)을 고른다")
+
+    lay = spec.get("layout")
+    if lay and lay not in LAYOUTS:
+        r.fail("layout", f"알 수 없는 값: {lay} — one | side | menu")
+    m = re.search(r'<main\b[^>]*data-layout="(\w+)"', html)
+    if lay and m and m.group(1) != lay:
+        r.fail("layout 일치", f"스펙 {lay} vs 화면 {m.group(1)}")
+
+    ctx = spec.get("reader_context") or b.get("reader_context")
+    if ctx and ctx not in ("known", "new"):
+        r.fail("reader_context", f"알 수 없는 값: {ctx} — known | new")
+
+    if rtype in ("decide", "diagnose"):
         for k in ("tension", "three_minute_story"):
             if not b.get(k):
                 r.fail(f"{rtype} 필수", f"brief.{k}가 없다")
-        # stance: data_only — 수신자가 판단·제안을 빼라고 한 보고.
-        # 없는 것이 정답이므로 감점하지 않는다 (report-types.md §3).
-        if (spec.get("stance") or b.get("stance") or "judgment") == "data_only":
-            if kt.get("ask") or spec.get("actions"):
-                r.warn("stance: data_only",
-                       "판단·제안을 빼라고 한 보고인데 ask/actions가 남아 있다")
+        if not kt.get("ask"):
+            r.fail(f"{rtype} 필수", "key_takeaway.ask가 없다 — 발견에서 끝났다")
+        if not spec.get("actions"):
+            r.fail(f"{rtype} 필수", "actions가 비어 있다 — "
+                   + ("실행 일정" if rtype == "decide" else "그래서 달라지는 것"))
+        if ctx == "new":
+            cx = spec.get("context") or {}
+            if not cx.get("question") or not cx.get("picture"):
+                r.fail("배경 모름 — 질문·전체 그림", "context.question / context.picture가 없다")
+            q = html.find('class="hero question"')
+            a = html.find('class="hero"')
+            pic = html.find('class="picture"')
+            if q < 0 or pic < 0:
+                r.fail("배경 모름 — 질문·전체 그림", "화면에 질문(hero question)이나 전체 그림(.picture)이 없다")
+            elif a >= 0 and not (q < pic < a):
+                r.fail("배경 모름 — 순서", "질문 → 전체 그림 → 답 순서가 아니다")
             else:
-                r.ok("stance: data_only", "ask·actions 없음 — 요청대로다")
+                r.ok("배경 모름 — 질문·전체 그림", "질문 → 전체 그림 → 답")
+    if rtype == "decide":
+        opts = spec.get("options") or []
+        picks = [o for o in opts if o.get("pick")]
+        if len(opts) < 2:
+            r.fail("decide 필수", "options가 둘 미만이다 — 고를 것이 없으면 결정형이 아니다")
+        elif len(picks) != 1:
+            r.fail("decide 필수", f"권고(pick)가 {len(picks)}개다 — 정확히 하나")
         else:
-            if not kt.get("ask"):
-                r.fail(f"{rtype} 필수", "key_takeaway.ask가 없다 — 발견에서 끝났다")
-            if not spec.get("actions"):
-                r.fail(f"{rtype} 필수", "actions가 비어 있다")
+            nowhy = [o.get("name", "?") for o in opts if not o.get("pick") and not o.get("why_not")]
+            if nowhy:
+                r.fail("decide — 택하지 않는 이유", "why_not이 없다: " + ", ".join(nowhy))
+            else:
+                r.ok("decide — 선택지", f"{len(opts)}개, 권고 1, 탈락 이유 전부")
+    if rtype == "check":
+        for k in ("tension", "three_minute_story"):
+            if b.get(k):
+                r.warn("종류별 해당 없음", f"check인데 brief.{k}가 있다 — 억지로 만든 것인지 본다")
+        if 'class="freshness"' not in html:
+            r.fail("check 필수", "데이터 시점(.freshness)이 화면에 없다")
+    if rtype == "survey":
+        sc = spec.get("scope") or {}
+        miss = [k for k in ("target", "period", "unit", "excluded") if not sc.get(k)]
+        if miss:
+            r.fail("survey 필수", "scope에 없다: " + ", ".join(miss))
+        if 'class="scope"' not in html:
+            r.fail("survey 필수", "범위(.scope)가 화면에 없다")
+        if kt.get("ask") or spec.get("actions"):
+            r.warn("survey — 판단 없음", "조망형인데 ask/actions가 있다 — 판단은 독자가 한다")
+        if not miss:
+            r.ok("survey — 범위", "대상·기간·단위·제외")
+
+    for c in spec.get("calcs") or []:
+        if not c.get("worked"):
+            r.fail("계산 방법 — 실제 숫자", f"{c.get('id','?')}: worked가 없다 — 실제 숫자로 쓴 계산을 넣는다")
+
+
+def c_pages(html, r):
+    """단락(.pg)·배치·편집 기록 자리. 단락으로 나누지 않은 예전 본문은 건너뛴다."""
+    pgs = re.findall(r'<div class="pg[^"]*"([^>]*)>', html)
+    if not pgs:
+        r.warn("단락(.pg)", "본문이 단락으로 나뉘어 있지 않다 — 목차·배치·순서 편집이 안 된다")
+        return
+    m = re.search(r'<main\b[^>]*data-layout="(\w+)"', html)
+    if not m:
+        r.fail("배치(layout)", "main에 data-layout이 없다 — one | side | menu")
+    elif m.group(1) not in LAYOUTS:
+        r.fail("배치(layout)", f"알 수 없는 값: {m.group(1)}")
+    nonav = sum(1 for a in pgs if "data-nav=" not in a)
+    if nonav:
+        r.warn("단락 목차 라벨", f"{nonav}개 단락에 data-nav가 없다 — 제목이 길면 목차가 지저분해진다")
+    if 'id="rm-edits"' not in html:
+        r.fail("편집 기록 자리", "rm-edits가 없다 — assemble.py로 조립했는가")
+    else:
+        r.ok("단락·배치·편집", f"단락 {len(pgs)}개 · 배치 {m.group(1) if m else '?'}")
+
+
+def c_calc_worked(html, r):
+    """계산 방법 창에는 실제 숫자로 쓴 계산이 있어야 한다. 읽는 사람이 따라 할 수 있게."""
+    mods = re.findall(r'<div class="modal" data-id="([^"]+)"[^>]*>(.*?)(?=<div class="modal"|\Z)', html, re.S)
+    calc = [(i, b) for i, b in mods if 'class="formula"' in b]
+    if not calc:
+        return
+    bad = []
+    for i, b in calc:
+        w = re.search(r'<div class="worked">(.*?)</div>', b, re.S)
+        txt = re.sub(r"<[^>]+>", "", w.group(1)) if w else ""
+        if not (re.search(r"\d", txt) and re.search(r"[=＝]", txt)):
+            bad.append(i)
+    if bad:
+        r.fail("계산 방법 — 실제 숫자", f"{len(bad)}개 창에 숫자로 쓴 계산(.worked, '=' 포함)이 없다: " + ", ".join(bad[:4]))
+    else:
+        r.ok("계산 방법 — 실제 숫자", f"{len(calc)}개 창 전부")
 
 
 # 템플릿(부품 목록)에도 도는 검사 — CSS 스케일·구조
 STRUCTURAL = [c_external, c_korean_break, c_darkmode, c_token_inventory, c_grid,
               c_hardcoded_color, c_rotated_text, c_center_align, c_footnote,
-              c_body_table, c_legend_series]
+              c_body_table, c_legend_series, c_pages]
 # 실제 리포트에만 도는 검사 — 내용이 채워졌는지
-CONTENT = [c_placeholder, c_hero_list, c_action_title, c_number_repeat, c_glossary]
+CONTENT = [c_placeholder, c_hero_list, c_action_title, c_number_repeat, c_glossary, c_calc_worked]
 
 
 def main():

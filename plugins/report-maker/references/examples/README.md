@@ -9,7 +9,7 @@ exhibit 개수·순서·차트 종류·문구를 그대로 베끼는 습관이 �
 
 완결 예시가 아니라 **스키마 문서의 코드 조각**을 본다.
 
-- `skills/plan-report/references/spec-schema.md` — 설명형 스펙. §0이 코드 조각을 읽는 법을 설명한다
+- `skills/plan-report/references/spec-schema.md` — 결정·진단·점검·조망형 스펙. §0이 코드 조각을 읽는 법을 설명한다
 - `skills/plan-explore/references/explore-spec-schema.md` — 탐색형 스펙
 
 각 필드 옆 값·중첩 구조만 보고, 값 자체나 개수·순서는 가져오지 않는다.

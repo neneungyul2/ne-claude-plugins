@@ -12,7 +12,8 @@
     python3 assemble.py <본문.html> -o <산출물.html> [--title "제목"]
 
 본문 파일에 담는 것 — `<main class="wrap">` 안의 내용, 그리고 필요하면
-`<div class="mask">` 모달 블록. `<head>`·`<style>`·`<script>`는 쓰지 않는다.
+`<div class="mask">` 모달 블록과 용어 사전(`<script type="application/json" id="rm-glossary">`).
+편집 기록 자리(`rm-edits`)는 이 스크립트가 붙인다. `<head>`·`<style>`·`<script>`는 쓰지 않는다.
 차트별 추가 스타일이 꼭 필요하면 본문에 `<style data-extra>...</style>`을
 두면 그대로 따라 들어간다.
 
@@ -80,8 +81,8 @@ def main():
             print("본문에 문서 셸이 있어 <body> 안쪽만 썼다.", file=sys.stderr)
 
     # 본문 안의 <style data-extra>는 그대로 두되, 그 밖의 <style>·<script>는 경고
-    stray = [t for t in re.findall(r"<(style|script)\b[^>]*>", body, re.I)
-             if "data-extra" not in t]
+    stray = [t for t in re.findall(r"<(?:style|script)\b[^>]*>", body, re.I)
+             if "data-extra" not in t and "application/json" not in t]
     if stray:
         print(f"경고: 본문에 {len(stray)}개의 style/script가 있다. "
               "공통 CSS·JS는 base.css/base.js에 있다 — 중복인지 확인하라.",
@@ -91,6 +92,11 @@ def main():
     if not title:
         m = re.search(r"<h1[^>]*>(.*?)</h1>", body, re.S)
         title = re.sub(r"<[^>]+>", "", m.group(1)).strip() if m else "리포트"
+
+    # 편집 기록 자리. 작성자가 화면에서 고친 글·순서·숨김·배치가 여기에 저장된다.
+    # 본문이 이미 들고 있으면(refresh 때 carry_edits.py가 옮겨 둔 것) 그대로 둔다
+    if 'id="rm-edits"' not in body:
+        body += '\n<script type="application/json" id="rm-edits">{}</script>'
 
     out = SHELL.format(title=title, css=css, body=body, js=js)
     os.makedirs(os.path.dirname(os.path.abspath(a.out)) or ".", exist_ok=True)

@@ -27,7 +27,7 @@ Claude Code / Cowork에서 쓰는 사내 스킬 묶음을 한 곳에서 배포�
 | 플러그인 | 하는 일 | 상태 |
 |---|---|---|
 | [`work-toolkit`](plugins/work-toolkit) | 조사·기획·보고·카피·이미지·데이터·자동화 7개 영역 52개 실무 상황 대응 | v0.2.0 |
-| [`report-maker`](plugins/report-maker) | 컨설팅 펌 수준의 대시보드·보고서 제작 (질문 설계 → 데이터 → 스펙 → 스토리 검사 → HTML/문서) | v0.11.0 |
+| [`report-maker`](plugins/report-maker) | 컨설팅 펌 수준의 대시보드·보고서 제작 (결정·진단·점검·조망·탐색 다섯 종류, 질문 설계 → 데이터 → 스펙 → 스토리 검사 → HTML/문서, 화면 편집) | v0.12.0 |
 | [`knowledge-notes`](plugins/knowledge-notes) | 새 지식을 atomic 노트로 분해해 Obsidian vault에 축적 | v0.1.0 (파일럿) |
 | [`print-quantity`](plugins/print-quantity) | 도서 제작 수량 산출. 신간은 시장에서 역산, 기간본은 재고 소진 시점에서 역산 | v0.2.0 |
 

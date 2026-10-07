@@ -22,9 +22,11 @@ tools: Read, Bash, Glob, Grep
 | 필수 | `report-brief.json` — 무엇을 답하기로 했는가 |
 | 선택 | `report-spec.json` — 스펙 대조에 쓴다 |
 
-`brief.report_type`(`diagnostic`/`choice`/`watch`/`track`)에 따라 **무엇이 필수인지가 다르다.**
+`brief.report_type`(`decide`/`diagnose`/`check`/`survey`)에 따라 **무엇이 필수인지가 다르다.**
 `${CLAUDE_PLUGIN_ROOT}/references/report-types.md` §3을 먼저 읽는다 —
-감시형에 액션이 없다고 지적하면 틀린 검수다.
+점검형에 액션이 없다고, 조망형에 권고가 없다고 지적하면 틀린 검수다.
+`reader_context: new`면 맨 위가 답이 아니라 질문이고 전체 그림이 먼저 오는지 본다.
+계산 방법 창(ⓘ)은 열어서 **계산을 그대로 따라 할 수 있는지** 본다.
 
 **만드는 과정의 대화나 근거는 받지 않는다.** 받게 되더라도 읽지 마라.
 

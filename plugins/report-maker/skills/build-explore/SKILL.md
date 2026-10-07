@@ -12,7 +12,7 @@ description: 확정된 탐색 스펙을 HTML 대시보드 하나로 렌더링한
 ## 0. 먼저 읽을 것
 
 - `${CLAUDE_PLUGIN_ROOT}/references/explore-model.md` — **필수.** 그레인·축·패널·엔진 원칙
-- `${CLAUDE_PLUGIN_ROOT}/references/design-rules.md` — 배치·타이포·색은 설명형과 동일
+- `${CLAUDE_PLUGIN_ROOT}/references/design-rules.md` — 배치·타이포·색은 보고형과 동일
 - `${CLAUDE_PLUGIN_ROOT}/references/template/explore-parts.html` — **패널 부품 목록. 이것만 읽는다**
 - 지역 패널이 있으면 `${CLAUDE_PLUGIN_ROOT}/references/korea-map.md`
 

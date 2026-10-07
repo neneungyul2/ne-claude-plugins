@@ -46,7 +46,7 @@ description: 탐색형(대시보드) 산출물의 구성을 포맷과 무관하�
 `plan-report` 2-1장과 같은 이유로 필요하다 — 설계하지 않으면 렌더러가 패널을
 전부 같은 크기로 깐다. 다만 판정 기준이 다르다.
 
-| | plan-report (설명형) | plan-explore (탐색형) |
+| | plan-report (보고형) | plan-explore (탐색형) |
 |---|---|---|
 | 가장 큰 자리 | `weight: primary` 결론 exhibit | KPI 카드 행. 항상 최상단 |
 | 서열의 근거 | 어느 것이 결론을 만드는가 | 어느 것을 가장 먼저 확인해야 하는가 |

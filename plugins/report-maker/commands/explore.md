@@ -19,8 +19,8 @@ argument-hint: [무엇을 탐색할 대시보드인지]
 `${CLAUDE_PLUGIN_ROOT}/skills/<이름>/SKILL.md`
 
 **`action_title`·`key_takeaway`·`weight: primary`는 이 파이프라인에 없다.**
-`/report`의 대응 필드를 억지로 채우려 하지 않는다 — `references/product-lines.md`가
-왜 나뉘는지 설명한다.
+`/report`의 대응 필드를 억지로 채우려 하지 않는다 — `references/report-types.md` §1이
+왜 탐색형만 파이프라인이 따로인지 설명한다.
 
 **사용자 확인은 두 곳이다. 둘 다 글자로 한다.**
 
@@ -36,4 +36,4 @@ argument-hint: [무엇을 탐색할 대시보드인지]
 | **표현** | 라벨 위치, 색, 마진 | 본문만 `Edit` |
 
 이 화면이 실은 매번 같은 자리에 데이터만 갈아끼우는 것이라는 게 드러나면
-탐색형이 아니라 감시형이다 — `/report`로 다시 시작한다.
+탐색형이 아니라 점검형이다 — `/report`로 다시 시작한다.

@@ -2,7 +2,7 @@
 
 포맷 중립 스펙. HTML 렌더러와 문서 렌더러가 동일하게 이 구조를 입력으로 받는다.
 
-**현재 버전: 2.5**
+**현재 버전: 2.6**
 
 - 2.0 — `key_takeaway` · `kpis` · `actions` · `glossary` · `calcs` · `group_detail` 추가
 - 2.1 — `brief` · `segments` 추가. exhibit에 `views`(축 전환) · `drilldown`(계층) 추가.
@@ -15,6 +15,10 @@
 - 2.5 — `groups` 추가 (exhibit을 묶는 단위, §5-1). 결론이 두 갈래 이상이면 exhibit을
   세우기 전에 그룹으로 나눈다. `references/examples/`를 비웠다 — 완결 예시는
   스키마 확인 용도로도 결국 형태를 고정시켰다
+- 2.6 — **종류를 "결론을 누가 내는가"로 다시 나눴다** (`references/report-types.md`).
+  `report_type` 값이 `decide` | `diagnose` | `check` | `survey`로 바뀌었다 (옛 값은 §1 표).
+  `stance` 삭제. `reader_context` · `repeat` · `layout` · `context` · `options` · `scope` · `look_at` 추가.
+  `calcs`에 `worked`(실제 숫자로 쓴 계산) 필수
 
 ---
 
@@ -40,8 +44,11 @@
 키 목록이다. 값이 아니라 **어떤 키가 어느 층에 있는지**만 본다.
 
 ```
-spec_version  mode  report_type  title  period_badge
+spec_version  mode  report_type  reader_context  repeat  layout  title  period_badge
 key_takeaway { text  emphasis  ask }
+context { question  deadline  picture[] }          ← reader_context: new 일 때
+options [ ]                                         ← decide
+scope { target  period  unit  excluded }  look_at [ ]   ← survey
 audience  decision  period  basis  unit
 brief { }  segments [ ]  dataset_card { }
 kpis [ ]  groups [ ]  exhibits [ ]  actions [ ]
@@ -50,9 +57,15 @@ glossary [ ]  calcs [ ]  footnote { }  open_questions [ ]
 
 | 필드 | 필수 | 설명 |
 |---|---|---|
-| `spec_version` | O | 현재 `"2.5"` |
+| `spec_version` | O | 현재 `"2.6"` |
 | `mode` | O | `quick` \| `report` |
-| `report_type` | **report 필수** | `diagnostic` \| `choice` \| `watch` \| `track`. **아래 표의 필수 여부를 바꾼다** |
+| `report_type` | **report 필수** | `decide` \| `diagnose` \| `check` \| `survey`. **아래 표의 필수 여부를 바꾼다.** 탐색형은 별도 스펙(`explore-spec-schema.md`) |
+| `reader_context` | report 필수 | `known` \| `new`. 독자가 이 건의 배경을 아는가. **애매하면 `new`** |
+| `repeat` | report 필수 | `once` \| `recurring`. `recurring`이면 구성을 고정하고 데이터 시점을 맨 위에 |
+| `layout` | 선택 | `one` \| `side` \| `menu`. 없으면 종류의 기본값 (결정·진단·점검 `one`, 조망 `side`) |
+| `context` | 조건부 | `reader_context: new`이고 결정·진단이면 필수. 아래 2-1장 |
+| `options` | 조건부 | `decide` 필수. 아래 5-2장 |
+| `scope` · `look_at` | 조건부 | `survey` 필수 (`look_at`은 선택). 아래 5-3장 |
 | `title` | O | 문서 제목. 명사구 허용 (문서 이름이지 결론이 아님) |
 | `period_badge` | 선택 | 제목 옆 배지. 예: `"2026년 8월"` |
 | `key_takeaway` | O | **화면 최상단 강조 블록.** 아래 4장 |
@@ -74,22 +87,25 @@ glossary [ ]  calcs [ ]  footnote { }  open_questions [ ]
 
 ### report_type이 "필수"를 바꾼다
 
-아래 표의 `필수` 표기는 **진단형 기준**이다. 유형에 따라 달라진다.
+아래 표의 `필수` 표기는 **결정·진단형 기준**이다. 종류에 따라 달라진다.
 원본은 `${CLAUDE_PLUGIN_ROOT}/references/report-types.md` §3.
 
-| 요소 | `diagnostic` | `choice` | `watch` | `track` |
+| 요소 | `decide` | `diagnose` | `check` | `survey` |
 |---|---|---|---|---|
-| `key_takeaway.text` | 판단 문장 | 추천안 | 현재 상태 판정 | 도달 전망 |
-| `key_takeaway.ask` | 필수 | 필수 | **이상일 때만** | 이탈 시 필수 |
-| `brief.tension` | 필수 | 필수 | **—** | 필수 |
-| `brief.three_minute_story` | 필수 | 필수 | **—** | **—** |
-| `actions` | 3~5개 | 추천 1 + 대안 | **정상이면 0개** | 이탈 항목만 |
-| `weight: primary` | exhibit 하나 | 옵션 표 | **KPI 행** | 시간축 차트 |
-| exhibit 수 | 3~7 | 옵션 수 | **고정 슬롯** | 1~3 |
-| `narrative_order` 기본 | `lead_with_ending` | `lead_with_ending` | `lead_with_ending` | **`chronological`** |
+| `key_takeaway.text` | 권고안 | 핵심 사실 | 현재 상태 판정 | 무엇을 보는가 (명사구 가능) |
+| `key_takeaway.ask` | 필수 | 필수 | **이탈일 때만** | **—** |
+| `brief.tension` · `three_minute_story` | 필수 | 필수 | **—** | **—** |
+| `options` | **필수** | — | — | — |
+| `actions` | 실행 일정 | 그래서 달라지는 것 | **정상이면 0개** | **—** (`look_at`) |
+| `scope` | — | — | — | **필수** |
+| `weight: primary` | 선택지 표 | exhibit 하나 | 지표 행 | — |
+| exhibit 수 | 선택지 수 | 3~7 | **고정 슬롯** | 단계 수 |
 
-**`—`인 것을 억지로 채우지 않는다.** 감시형에 만들어 낸 긴장, 정상인데 지어낸 액션은
-다음부터 그 칸을 아무도 안 읽게 만든다.
+**`—`인 것을 억지로 채우지 않는다.** 점검형에 만들어 낸 긴장, 정상인데 지어낸 액션,
+조망형에 끼워 넣은 권고는 다음부터 그 칸을 아무도 안 읽게 만든다.
+
+옛 값은 이렇게 옮긴다 — `diagnostic`→`diagnose`, `choice`→`decide`, `watch`·`track`→`check`.
+`stance: data_only`는 없앴다. 판단 없이 보여주는 보고는 `survey`다.
 
 ---
 
@@ -139,6 +155,30 @@ brief {
 
 ---
 
+## 2-1. context — 배경을 모르는 독자에게 먼저 주는 것
+
+`reader_context: new`이고 결정·진단형이면 필수다. 맨 위에 **답 대신 질문**을 두고,
+**전체 그림**을 보인 다음, 답(`key_takeaway`)으로 간다.
+
+```
+context {
+  question   "수능 기본 어휘서의 개정 시점을 정해야 합니다"   ← 결정할 것 / 풀 질문. 한 문장
+  deadline   "10월 20일 편집 회의 전"                        ← 결정형만. 없으면 키째 뺀다
+  picture [ { level  text  share } ]                          ← 숲 → 나무 → 가지
+}
+```
+
+| 필드 | 설명 |
+|---|---|
+| `picture[].level` | `forest` \| `tree` \| `branch` — 숲(전체) · 나무(부분) · 가지(지금 문제가 되는 칸) |
+| `picture[].text` | 한 문장. **원래 단위**로 크기를 적는다 |
+| `picture[].share` | 전체 대비 비중. 숲은 비운다. **위치가 없으면 나무를 볼 때 숲이 사라진다** |
+
+점검형은 `context` 대신 지표마다 뜻을 한 줄(`glossary`의 쉬운 말 첫 문장)로 붙인다.
+조망형은 그 자체가 전체 그림이라 `context`가 없다.
+
+---
+
 ## 3. key_takeaway
 
 화면에서 **가장 큰 글자**이고 가장 먼저 읽힌다.
@@ -152,7 +192,7 @@ key_takeaway { text  emphasis[]  ask  ask_level }
 |---|---|---|
 | `text` | O | **판단.** 명사구 금지. 읽고 "그래서 뭐?"가 남으면 반려 |
 | `emphasis` | O | `text` 안에서 형광펜으로 칠할 **부분 문자열** 2~4개 |
-| `ask` | **report 필수** | **요청.** 독자가 무엇을 알거나 하기를 원하는가. `watch`는 이상일 때만 |
+| `ask` | **report 필수** | **요청.** 독자가 무엇을 알거나 하기를 원하는가. `check`는 이탈일 때만, `survey`는 없다 |
 | `ask_level` | 선택 | 요청의 결정 레벨. `brief.audience_level`과 맞아야 한다 |
 
 **Big Idea 3요소** — `text`+`ask`가 아래를 만족해야 한다.
@@ -160,7 +200,7 @@ key_takeaway { text  emphasis[]  ask  ask_level }
 2. 무엇이 걸려 있는지 전달할 것
 3. 완전한 문장일 것
 
-> **발견에서 멈추면 반려다** (`watch`·정상 상태는 예외 — "이상 없음"이 결론이다). "가격이 하락했다"는 관찰이고,
+> **발견에서 멈추면 반려다** (`check`의 정상 상태는 예외 — "이상 없음"이 결론이다. `survey`는 판단하지 않는다). "가격이 하락했다"는 관찰이고,
 > "그러므로 이 범위로 출시하자"까지가 결론이다.
 > 액션 표는 문서 맨 아래에 있다. 위에서 아래로 읽는 독자는 요청을 마지막에 만난다.
 > `ask`는 그래서 히어로 안에 있어야 한다.
@@ -217,7 +257,7 @@ exhibit {
 | 필드 | 필수 | 설명 |
 |---|---|---|
 | `id` | O | `ex1`, `ex2` … 목차·앵커에 쓰인다 |
-| `nav_label` | report만 | 목차에 쓸 짧은 라벨. 6자 내외 |
+| `nav_label` | report만 | 목차에 쓸 짧은 라벨. 6자 내외. 렌더러가 단락의 `data-nav`로 쓴다 |
 | `answers` | report 필수 | **이 exhibit이 답하는 `brief.questions`의 id 배열.** 비어 있으면 왜 있는 exhibit인지 되묻는다 |
 | `action_title` | O | **서술형 결론. 주장 하나.** 아래 참조 |
 | `so_what` | O | 한 줄. 제목의 반복 금지 |
@@ -395,12 +435,38 @@ groups [
 - 히어로 요약(`build-html/SKILL.md` §2)은 그룹이 있으면 **각 exhibit의 `action_title`이
   아니라 각 그룹의 `summary`**를 순서대로 나열한다 — 그룹이 없을 때만 exhibit 단위로 나열한다
 
-### 감시형(watch)의 고정 슬롯과는 다르다
+### 점검형(check)의 고정 슬롯과는 다르다
 
-감시형의 온라인/오프라인 채널 같은 **고정 섹션**은 `groups`가 아니다. `groups`는
-**이번 리포트의 결론이 갈리는 지점**을 표시하는 것이고, 감시형 고정 슬롯은
+점검형의 온라인/오프라인 채널 같은 **고정 섹션**은 `groups`가 아니다. `groups`는
+**이번 리포트의 결론이 갈리는 지점**을 표시하는 것이고, 점검형 고정 슬롯은
 결론과 무관하게 매번 같은 구조로 열리는 것이다 (`report-types.md` §4).
-감시형에서 섹션을 그룹으로 묶으려 하지 않는다 — 이미 고정 슬롯 자체가 구조다.
+점검형에서 섹션을 그룹으로 묶으려 하지 않는다 — 이미 고정 슬롯 자체가 구조다.
+
+---
+
+## 5-2. options — 결정형의 선택지
+
+```
+options [ { id  name  summary  values{기준:값}  risk  pick  why_not } ]
+criteria [ "27년 1~2월 점유율 예상", "비용" ]          ← 판단 기준. 선택지보다 먼저 정한다
+```
+
+- 둘 이상. `pick: true`는 **정확히 하나**
+- 권고가 아닌 안은 `why_not`이 **필수**다 — 숫자로 쓴다. 지우지 않는다
+- `values`의 키는 `criteria`와 같아야 한다. 기준마다 같은 단위로 적는다
+- 예상치가 들어가면 그 예상을 어떻게 잡았는지를 `calcs`에 둔다 (실제 숫자로 쓴 계산)
+
+## 5-3. scope · look_at — 조망형
+
+```
+scope   { target  period  unit  excluded }
+look_at [ "수능 기본 × 온라인은 시장의 18%이고 올해 순위가 바뀐 유일한 칸이다" ]
+```
+
+- `scope`는 네 칸 모두 필수다. 무엇을 **빼는지**가 없으면 독자가 범위를 넓게 읽는다
+- exhibit은 숲 → 나무 → 가지 순서다. 각 exhibit에 `path`(예: `["전체 209.9만", "수능 기본 87.9만 · 42%"]`)를 둔다
+- 조망형의 `action_title`은 **관찰**이다 — "~가 보인다", "~가 가장 크다". "~해야 한다"는 쓰지 않는다
+- `look_at`은 권고가 아니라 **다음에 볼 곳**이다. 숫자로 쓴다
 
 ---
 
@@ -469,6 +535,7 @@ groups [
 glossary [ { id term full desc } ]
 ```
 
+`desc`는 **두 문장 이내**다. 더 길면 용어가 아니라 계산 방법(`calcs`)이다.
 `desc`는 뜻만 적고 끝내지 않는다. **그 말이 오해받는 지점이 있으면 그것까지 적는다.**
 예: 외부 플랫폼 기준 금액 지표라면 "사내 출고 기준과 다르므로 합산하지 않는다"를 `desc`에 넣는다.
 
@@ -485,7 +552,7 @@ glossary [ { id term full desc } ]
 정의는 `references/metrics.md`에서 가져온다. **여기서 새로 만들지 않는다.**
 metrics.md에 없고 확인도 안 됐으면 `desc`에 `확인 필요`를 적고 `open_questions`에도 올린다.
 
-렌더러는 본문 첫 등장 지점에 점선 밑줄 + 호버 툴팁을 붙인다.
+렌더러는 본문 첫 등장 지점에 점선 밑줄 + 툴팁을 붙인다 (마우스·키보드·터치 모두). 사전은 본문의 `rm-glossary`에 넣는다.
 
 ### calcs — 산식 모달
 
@@ -502,10 +569,18 @@ metrics.md에 없고 확인도 안 됐으면 `desc`에 `확인 필요`를 적고
       "판매금액: 판매분석 리포트의 일자×SKU 합계",
       "반품금액: 같은 리포트의 음수 행 합계 (−3,950,060원)"
     ],
+    "worked": ["판매금액 1억 2,350만 − 반품금액 395만 = 1억 1,955만 원"],
     "caveats": ["세트 상품은 구성품이 아니라 세트 단위로 집계된다"]
   }
 ]
 ```
+
+**`worked`는 필수다.** 실제 숫자로 쓴 계산 한두 줄. 읽는 사람이 계산기로 그대로 따라 할 수 있어야 한다.
+한두 줄로 안 써지면 계산이 너무 복잡한 것이다 — **설명을 늘리지 말고 계산을 줄인다.**
+
+- `formula`는 쉬운 말로 쓴다. 계수·지수가 꼭 들어가면 이름이 아니라 뜻으로 부른다
+  ("계절지수 1.3" → "1~2월은 평소 달보다 1.3배 팔린다")
+- `caveats`(예외·제외 조건)는 최소로. 예외가 필요해지면 먼저 기준을 단순하게 바꿀 수 있는지 본다
 
 판정 기준
 
