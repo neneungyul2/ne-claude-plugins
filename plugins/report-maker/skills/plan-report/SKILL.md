@@ -17,6 +17,7 @@ description: 대시보드·보고서의 구성을 포맷과 무관하게 확정�
 - `${CLAUDE_PLUGIN_ROOT}/skills/plan-report/references/spec-schema.md` — 스펙 규격
 - `${CLAUDE_PLUGIN_ROOT}/references/chart-rules.md` — 질문 유형 → 차트 매핑, 금칙
 - `${CLAUDE_PLUGIN_ROOT}/references/design-rules.md` — 배치 원칙
+- `${CLAUDE_PLUGIN_ROOT}/references/writing-rules.md` — **필수.** 제목·결론 문장·질문 사슬·문장 규칙
 - `${CLAUDE_PLUGIN_ROOT}/references/metrics.md` — 지표·기준 정의 (glossary의 원본)
 - `${CLAUDE_PLUGIN_ROOT}/references/korea-map.md` — 지역 데이터가 있을 때
 
@@ -89,9 +90,13 @@ description: 대시보드·보고서의 구성을 포맷과 무관하게 확정�
 
 ### ④ 흐름 — 위에서부터 좁혀 들어가는가
 
-exhibit 순서대로 `action_title`만 읽어 내려간다.
+exhibit 순서대로 `reader_question`과 `action_title`만 읽어 내려간다.
 앞 항목이 틀을 세우지 않은 채 뒤 항목의 세부가 먼저 나오면 순서를 바꾼다.
-규모 → 대상 → 전체 그림 → 차이 → 한계.
+대상 → 범위·현황(원래 값) → 전체 판단 → 부분 비교 → 원인 → 다른 설명 → 한계 (`report-types.md` §4).
+
+- 질문이 앞 결론에서 나오지 않으면 순서가 틀렸거나 단락이 빠졌다
+- 본문 첫 exhibit이 `value_kind: derived`(나눈 값)면 앞에 원래 값 exhibit을 세운다
+- 부분을 쪼갠 exhibit이 전체 평균보다 앞에 있으면 뒤로 보낸다
 
 ### ⑤ 사용자에게 보여주고 동의를 받는다
 
@@ -104,10 +109,10 @@ exhibit 순서대로 `action_title`만 읽어 내려간다.
 ```
 "데이터를 보고 이렇게 잡았습니다.
 
- ① <action_title>              ← 가장 큰 자리
- ② <action_title>
- ③ <action_title>
- ④ <action_title>              ← 접어둠 (참고)
+ ① <title> — <action_title>              ← 가장 큰 자리
+ ② <title> — <action_title>
+ ③ <title> — <action_title>
+ ④ <title> — <action_title>              ← 접어둠 (참고)
 
  강조는 ①에만 씁니다. 나머지는 회색입니다.
  <수치>는 KPI 카드에만 두고 본문에서는 반복하지 않습니다.
@@ -125,12 +130,16 @@ exhibit 순서대로 `action_title`만 읽어 내려간다.
 | | primary가 되는 것 | 특히 다른 것 |
 |---|---|---|
 | 결정 | 선택지 × 판단 기준 표 (`options`) | 탈락시킨 안을 지우지 않는다. 안마다 `why_not` |
-| 진단 | 근거 exhibit 하나 | "다른 설명은 맞지 않는다"를 둔다 |
+| 진단 | 결론을 만드는 exhibit 하나 (맨 앞이 아니어도 된다) | "다른 설명은 맞지 않는다"를 둔다 |
 | 점검 | 지표 행 (임계값) 또는 시간축 (계획선) | **exhibit 구성이 매번 같아야 한다.** 이번에 흥미로운 게 생겼다고 섹션을 추가하지 않는다 |
-| 조망 | 없음 — 숲 → 나무 → 가지 단계가 곧 구조 | `scope` 필수. `action_title`은 관찰. exhibit마다 `path`(경로·비중) |
+| 조망 | 없음 — 전체 → 부분 → 칸 단계가 곧 구조 | `scope` 필수. `action_title`은 관찰. exhibit마다 `path`(경로·비중) |
 
-**배경 모름(`reader_context: new`)이면** 결정·진단형 맨 앞에 `context`(질문 → 전체 그림)를 둔다.
-전체 그림은 단계마다 크기와 전체 대비 비중을 숫자로 적는다. 스펙 §2-1.
+**배경 모름(`reader_context: new`)이면** 결정·진단형에 `context`(질문 · 범위)와 `subject`(대상 설명)를 둔다.
+화면 순서는 질문 → 답 → 대상 설명 → 범위 → 본문이다. 범위는 단계마다 크기와 첫 단계 대비 비중을 숫자로 적고,
+단계 이름은 데이터의 말로 쓴다 — 숲·나무·가지를 쓰지 않는다. 스펙 §2-1, §2-2.
+
+**문장은 `references/writing-rules.md`를 따른다.** exhibit 제목(`title`)은 짧은 명사구,
+결론(`action_title`)은 첫 문장이다. 스펙을 넘기기 전에 "쓰지 않는 말" 표로 모든 문장을 한 번 훑는다.
 
 **계산이 들어간 숫자는 `calcs`로 뺀다.** `worked`에 실제 숫자로 쓴 계산을 한두 줄 넣는다.
 한두 줄로 안 써지면 계산을 줄인다 — 계수·지수를 늘리지 않는다 (`report-types.md` §5).
@@ -346,7 +355,10 @@ metrics.md에 없고 확인도 안 됐으면 `desc`에 `확인 필요`를 적고
 - [ ] `report_type`이 스펙에 있고, 그 종류의 필수 요소가 전부 채워졌는가 (report-types.md §3)
 - [ ] 그 종류에서 "해당 없음"인 것을 억지로 채우지 않았는가
 - [ ] `calcs`마다 `worked`(실제 숫자로 쓴 계산)가 있는가
-- [ ] `reader_context: new`인 결정·진단형에 `context.question`과 `context.picture`가 있는가
+- [ ] `reader_context: new`인 결정·진단형에 `context.question`·`context.picture`·`subject`가 있는가
+- [ ] exhibit마다 `title`(20자 이내 명사구)·`reader_question`·`value_kind`가 있고, `action_title`이 60자 이내인가
+- [ ] 본문 첫 exhibit이 `value_kind: raw`인가 (나눈 값이 하나라도 있을 때)
+- [ ] 화면에 쓸 이름표에 숲·나무·가지, "전체 그림" 같은 안내 문구가 없는가
 - [ ] `emphasis`의 각 문자열이 `text` 안에 실제로 있는가 (2~4개)
 - [ ] 본문 표가 12행을 넘지 않는가
 - [ ] 같은 숫자를 두 곳 이상에서 크게 말하고 있지 않은가

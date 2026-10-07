@@ -371,10 +371,33 @@ body.editing .edbar .edonly{display:inline-flex}
 .hero.question .takelbl{color:var(--sub);border-color:var(--line2)}
 .hero.question .ask::before{content:"기한"}
 .ptitle{font-size:var(--t3);font-weight:700;margin:32px 0 8px}
-.picture{display:grid;gap:8px;margin:0 0 16px}
-.picture .row{display:grid;grid-template-columns:48px minmax(0,1fr);gap:12px;align-items:baseline;
-              border-bottom:1px solid var(--line2);padding-bottom:8px}
-.picture .lv{font-size:var(--t1);font-weight:700;color:var(--dim)}
+/* 범위 — 넓은 것에서 이번에 보는 것까지 좁혀 가는 막대. 단계 이름은 데이터의 말 */
+.picture{display:grid;gap:12px;margin:0 0 12px}
+.picture .step{display:grid;grid-template-columns:minmax(120px,200px) minmax(0,1fr) minmax(96px,auto);
+               gap:16px;align-items:center}
+.picture .lb{font-size:var(--t2);font-weight:600;color:var(--sub)}
+.picture .bar{display:block;height:24px;background:var(--line);border-radius:var(--r3);overflow:hidden}
+.picture .bar i{display:block;height:100%;background:var(--g4);border-radius:var(--r3)}
+.picture .step:nth-child(2) .bar i{background:var(--g2)}
+.picture .step.on .bar i{background:var(--accent)}
+.picture .step.on .lb{color:var(--ink);font-weight:700}
+.picture .v{font-size:var(--t2);font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums;white-space:nowrap}
+.picture .v em{font-style:normal;font-weight:500;color:var(--dim);margin-left:4px}
+.picnote{margin:0;font-size:var(--t2);color:var(--sub)}
+@media (max-width:640px){ .picture .step{grid-template-columns:1fr auto} .picture .bar{grid-column:1 / -1;order:3} }
+/* 대상 설명 */
+.subject .subj{margin:0 0 12px;color:var(--sub);max-width:52em}
+.subject .subj:last-child{margin-bottom:0}
+.parts{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin:0 0 12px}
+.parts>div{border:1px solid var(--line2);border-radius:var(--r2);padding:12px 16px;background:var(--surface)}
+.parts dt{font-size:var(--t2);font-weight:700;color:var(--ink);margin-bottom:4px}
+.parts dd{margin:0;font-size:var(--t2);color:var(--sub)}
+.subjfig{margin:0 0 12px}
+.subjfig img{display:block;max-width:100%;border:1px solid var(--line2);border-radius:var(--r2)}
+.subjfig figcaption{margin-top:8px;font-size:var(--t1);color:var(--dim)}
+/* 단락 머리 — 제목(h2) 아래 결론 문장 */
+.claim{margin:0 0 12px;font-size:var(--t3);font-weight:500;line-height:1.55;color:var(--ink);max-width:44em}
+.claim .bridge{font-weight:400;color:var(--sub)}
 .crumb{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:var(--t1);margin:0 0 12px;color:var(--dim)}
 .crumb span{padding:2px 8px;border-radius:var(--r3);background:var(--line);color:var(--sub)}
 .crumb span.on{background:var(--ink);color:var(--on-dark);font-weight:700}

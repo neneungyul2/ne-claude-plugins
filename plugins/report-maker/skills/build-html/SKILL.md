@@ -12,6 +12,7 @@ description: 확정된 리포트 스펙을 HTML 단일 파일로 렌더링한다
 - `${CLAUDE_PLUGIN_ROOT}/references/report-types.md` — **필수.** `report_type`이 뼈대와 필수 요소를, `reader_context`·`layout`이 앞부분과 배치를 바꾼다
 - `${CLAUDE_PLUGIN_ROOT}/references/design-rules.md`
 - `${CLAUDE_PLUGIN_ROOT}/references/storytelling.md` — 히어로 구성과 수평 논리
+- `${CLAUDE_PLUGIN_ROOT}/references/writing-rules.md` — **필수.** 단락 머리(제목 + 결론 문장), 문장 규칙, 쓰지 않는 말
 - `${CLAUDE_PLUGIN_ROOT}/references/template/parts.html` — **부품 목록. 이것만 읽는다**
 - 지역 데이터가 있으면 `${CLAUDE_PLUGIN_ROOT}/references/korea-map.md`
 
@@ -78,12 +79,13 @@ python3 ${CLAUDE_PLUGIN_ROOT}/scripts/assemble.py <이름>.content.html -o <이�
 `report-types.md` §4의 뼈대를 따른다. 부품은 `parts.html`에서 그 종류 칸에 있는 것만 쓴다.
 
 ```
-결정형  [배경 모름: 질문 → 전체 그림] → 히어로(권고 + 요청) → 선택지 표 → 택하지 않는 이유
-        → 근거 exhibit … → 액션(= 실행 일정) → 가정·확인
-진단형  [배경 모름: 질문 → 전체 그림] → 히어로(핵심 사실 + 요청) + KPI → ① 근거(primary)
-        → ② 다른 설명은 맞지 않는다 → ③ 한계 → 액션(= 그래서 달라지는 것) → 가정·확인
+결정형  [배경 모름: 질문] → 히어로(권고 + 요청) → [배경 모름: 대상 설명 → 범위] → 선택지 표
+        → 택하지 않는 이유 → 근거 exhibit … → 액션(= 실행 일정) → 가정·확인
+진단형  [배경 모름: 질문] → 히어로(핵심 사실 + 요청) + KPI → [배경 모름: 대상 설명 → 범위]
+        → 현황(원래 값) → 전체 판단 → 부분 비교 → 원인 → 다른 설명 → 한계
+        → 액션(= 그래서 달라지는 것) → 가정·확인
 점검형  데이터 시점 → 지표 행(임계값) 또는 시간축(계획선) → 이탈만 펼침 · 정상 접기 → 담당·다음 점검일
-조망형  범위와 규모(.scope) → 숲 → 나무 → 가지 (단계마다 .crumb 경로 + .obs 관찰) → 눈여겨볼 곳
+조망형  범위와 규모(.scope) → 전체 → 부분 → 칸 (단계마다 .crumb 경로 + .obs 관찰) → 눈여겨볼 곳
 ```
 
 - exhibit은 스펙 배열 순서 그대로. 재배치하지 않는다
@@ -91,15 +93,29 @@ python3 ${CLAUDE_PLUGIN_ROOT}/scripts/assemble.py <이름>.content.html -o <이�
 
 ### 배경 모름 (`reader_context: new`) — 결정·진단형
 
-맨 앞에 두 단락을 더한다. **답(히어로)은 그 다음이다.**
+세 단락을 더한다. 질문은 히어로 앞, 대상 설명과 범위는 히어로 뒤 본문 앞이다.
 
 ```
 .hero.question   context.question + context.deadline(결정형). 라벨은 "정할 것" / "풀 질문"
-.picture         context.picture 를 숲 · 나무 · 가지 세 줄로. 줄마다 크기와 전체 대비 비중
-                 (그림을 차트로 보여주면 더 좋다 — 100% 누적 막대 하나면 충분하다)
+.subject         subject — 무엇인가(.subj) · 구성 요소(dl.parts) · 돌아가는 방식 · 그림(선택)
+.picture         context.picture — 좁혀 가는 막대. .step 하나에 이름(.lb) · 막대(.bar i 폭 = 첫 단계 대비 %) · 값(.v)
+                 마지막 단계에 .on. 빠진 것은 .picnote 한 줄
 ```
 
-`.picture` 단락의 제목은 `.shead`가 아니라 `h2.ptitle`이다 — exhibit이 아니므로 히어로 요약에 넣지 않는다.
+- 두 단락의 제목은 `.shead`가 아니라 `h2.ptitle`이다 — exhibit이 아니므로 히어로 요약에 넣지 않는다
+- 제목은 `subject.name`, `context.picture_title` 그대로. **"먼저 전체 그림" 같은 안내 문구, 숲·나무·가지 이름표를 쓰지 않는다**
+- 범위 숫자를 문장 줄로 또 쓰지 않는다. 막대 하나와 `.picnote` 한 줄이면 된다
+
+### 단락 머리 — 제목 + 결론 문장
+
+```
+<div class="shead"><span class="snum">n</span><h2>{title}</h2></div>
+<p class="claim"><span class="bridge">{bridge}</span> {action_title}</p>
+```
+
+- `h2`에는 `title`(짧은 명사구)만. `action_title`은 바로 아래 `p.claim`에 글자 그대로
+- `bridge`가 없으면 `span.bridge`째 지운다. 점검형은 `p.claim`을 생략할 수 있다
+- 본문 문장은 `references/writing-rules.md` §3을 따른다. 스펙 문장에 "쓰지 않는 말"이 있으면 그리지 말고 스펙을 고친다
 
 점검형은 `.watchrow .name` 안에 `<span class="mean">`으로 지표 뜻을 한 줄 붙인다
 (`glossary`의 쉬운 말 첫 문장). 배경 앎이면 `.mean`을 지운다.
@@ -363,7 +379,7 @@ exhibit 헤더보다 한 단계 위 헤더로 얹는다. 그 아래 `exhibit_ids
 - [ ] 본문이 단락(`.pg`)으로 나뉘고 단락마다 짧은 `data-nav`가 있는가. 배치가 스펙 `layout`과 같은가
 - [ ] 편집을 켜서 글 하나 고치고 단락 하나 옮긴 뒤 저장 → 다시 열었을 때 그대로인가
 - [ ] 계산 방법 창마다 실제 숫자로 쓴 계산(`.worked`)이 있고, 그대로 따라 하면 화면 숫자가 나오는가
-- [ ] 배경 모름이면 맨 위가 질문이고 전체 그림이 답보다 먼저인가
+- [ ] 배경 모름이면 질문 → 답 → 대상 설명 → 범위 순서인가. 숲·나무·가지 이름표가 없는가
 - [ ] `word-break:keep-all`이 살아 있는가 — **한국어가 단어 중간에서 잘리지 않는가**
 - [ ] 모든 막대 차트가 0에서 시작하는가
 - [ ] 모든 exhibit에 각주 4요소가 있는가
@@ -379,7 +395,7 @@ exhibit 헤더보다 한 단계 위 헤더로 얹는다. 그 아래 `exhibit_ids
 - [ ] 묶은 항목이 모두 클릭해서 열리는가
 - [ ] 400px 폭에서 가로 스크롤이 없는가
 - [ ] `open_questions`가 화면에 표시되는가
-- [ ] 스펙의 `action_title`과 화면 제목이 글자 그대로 일치하는가
+- [ ] 스펙의 `title`이 화면 제목(h2)과, `action_title`이 결론 문장(p.claim)과 글자 그대로 일치하는가
 - [ ] **히어로 요약이 각 exhibit의 `action_title`을 순서대로 나열하는가**
 - [ ] **`key_takeaway.ask`가 히어로 안에 보이는가** (액션 표에만 있으면 안 된다)
       — 조망형·정상인 점검형은 `ask` 자리를 통째로 지운다. 빈 줄로 남기지 않는다

@@ -8,6 +8,8 @@
 
      ★ 본문은 단락(.pg) 단위로 쓴다. 단락 하나 = 목차 한 줄 = 작성자가 순서를 옮기는 단위.
        data-nav 에 목차에 보일 짧은 라벨을 적는다. 목차는 스크립트가 만든다 — 손으로 쓰지 않는다
+     ★ 단락 머리 = 제목(짧은 명사구, h2) + 결론 문장(p.claim = action_title). references/writing-rules.md
+     ★ 순서는 넓은 데서 좁은 데로 — 대상 → 범위·현황(원래 값) → 전체 판단 → 부분 비교 → 원인 → 다른 설명 → 한계
      ══════════════════════════════════════════════════════════════ -->
 
 <header class="mast">
@@ -25,7 +27,7 @@
   <!-- ══════════════════════════════════════════════════
        맨 위 — 결정형·진단형 (독자 배경 앎)
        히어로 = 판단(text) + 섹션 헤더 목록 + 요청(ask). 세 부분이다.
-       요약을 새로 쓰지 않는다. 각 exhibit의 action_title을 순서대로 그대로 넣는다.
+       요약을 새로 쓰지 않는다. 각 exhibit의 결론 문장(action_title)을 순서대로 그대로 넣는다. 제목이 아니다.
        ══════════════════════════════════════════════════ -->
   <div class="pg" data-nav="요약">
     <section class="hero">
@@ -57,26 +59,44 @@
 
   <!-- ══════════════════════════════════════════════════
        독자 배경 모름 — 결정형·진단형 전용 (reader_context: new)
-       맨 위에 답 대신 질문 → 전체 그림(숲→나무→가지) → 답(위의 히어로) 순서.
-       그림 없이 답부터 보면 독자는 그 답이 전체의 어느 부분인지 모른다
+       질문 → 답(위의 히어로) → 대상 설명 → 범위 → 본문 순서.
+       대상과 범위 없이 숫자부터 보면 독자는 무엇의 숫자인지, 전체의 어느 부분인지 모른다
        ══════════════════════════════════════════════════ -->
   <div class="pg" data-nav="질문">
     <section class="hero question">
       <span class="takelbl">{{정할 것 / 풀 질문}}</span>
       <p class="takeaway">{{결정해야 할 것 또는 풀어야 할 질문 — 한 문장}}</p>
-      <p class="ask">{{결정 기한 · 답은 전체 그림 다음에 있다}}</p>
+      <p class="ask">{{결정 기한}}</p>
     </section>
   </div>
-  <div class="pg" data-nav="전체 그림">
-    <!-- exhibit이 아니므로 .shead 를 쓰지 않는다 — 히어로 요약 목록에 들어가지 않는다 -->
-    <h2 class="ptitle">먼저 전체 그림</h2>
+  <!-- 대상 설명 (spec.subject). 무엇이고 어떻게 돌아가는지. 정의 나열이 아니라 뒤 숫자를 읽는 데 필요한 것만.
+       exhibit이 아니므로 .shead 를 쓰지 않는다 — 히어로 요약 목록에 들어가지 않는다 -->
+  <div class="pg" data-nav="{{대상 이름}}">
+    <h2 class="ptitle">{{대상 이름 — 짧은 명사구}}</h2>
+    <section class="block subject">
+      <p class="subj">{{무엇인가 — 쉬운 말 한두 문장}}</p>
+      <!-- 구성 요소. 이름은 뒤 단락에서 비교하는 단위와 같게 쓴다 -->
+      <dl class="parts">
+        <div><dt>{{구성 요소}}</dt><dd>{{어디에 보이나 · 돈이 어떻게 나가나}}</dd></div>
+        <div><dt>{{구성 요소}}</dt><dd>{{어디에 보이나 · 돈이 어떻게 나가나}}</dd></div>
+      </dl>
+      <p class="subj">{{돌아가는 방식 한 줄}}</p>
+      <!-- 화면 캡처나 도식이 있으면 넣는다. 없으면 figure째 지운다 -->
+      <figure class="subjfig"><img src="data:," alt="{{무엇의 그림인지}}"><figcaption>{{캡션}}</figcaption></figure>
+    </section>
+  </div>
+
+  <!-- 범위 (spec.context.picture). 넓은 것에서 이번에 보는 것까지 좁혀 가는 막대 하나.
+       단계 이름은 데이터의 말로 쓴다. 숲·나무·가지 같은 이름표를 쓰지 않는다. 숫자를 문장으로 또 쓰지 않는다 -->
+  <div class="pg" data-nav="{{범위}}">
+    <h2 class="ptitle">{{범위를 말하는 제목 — 예: 예산과 분석 범위}}</h2>
     <section class="block">
-      <!-- 숲 → 나무 → 가지. 단계마다 전체 대비 위치(크기·비중)를 숫자로 적는다 -->
       <div class="picture">
-        <div class="row"><span class="lv">숲</span><div>{{전체 규모 한 문장 — 원래 단위로}}</div></div>
-        <div class="row"><span class="lv">나무</span><div>{{그중 이 건이 속한 부분 · 전체의 00%}}</div></div>
-        <div class="row"><span class="lv">가지</span><div>{{그 안에서 지금 문제가 되는 칸 · 전체의 00%}}</div></div>
+        <div class="step"><span class="lb">{{가장 넓은 것}}</span><span class="bar"><i style="width:100%"></i></span><span class="v">0,000<em>{{단위}}</em></span></div>
+        <div class="step"><span class="lb">{{그중 부분}}</span><span class="bar"><i style="width:75%"></i></span><span class="v">0,000<em>{{단위}} · 00%</em></span></div>
+        <div class="step on"><span class="lb">{{이번에 보는 것}}</span><span class="bar"><i style="width:44%"></i></span><span class="v">0,000<em>{{단위}} · 00%</em></span></div>
       </div>
+      <p class="picnote">{{단계 사이에서 빠진 것과 이유 한 줄}}</p>
       <p class="note">출처 … · 기간 … · 단위 … · 집계기준 …</p>
     </section>
   </div>
@@ -86,7 +106,9 @@
        판단 기준은 선택지를 보기 전에 정한다. 탈락시킨 안을 지우지 않는다
        ══════════════════════════════════════════════════ -->
   <div class="pg" data-nav="선택지">
-    <div class="shead" id="opt"><span class="snum">1</span><h2>{{권고안이 나머지보다 나은 이유 — 서술형}}</h2></div>
+    <div class="shead" id="opt"><span class="snum">1</span><h2>{{선택지 비교 — 짧은 명사구}}</h2></div>
+    <!-- 결론 문장 = action_title. 제목 바로 아래 첫 문장. bridge(앞 결과를 받는 구)가 없으면 span째 지운다 -->
+    <p class="claim"><span class="bridge">{{앞 단락 결과를 받는 구}}</span> {{권고안이 나머지보다 나은 이유 — 결론 문장}}</p>
     <section class="block">
       <div class="tw"><table class="opttbl">
         <thead><tr><th>안</th><th>내용</th><th class="r">{{판단 기준 1}}</th><th class="r">{{판단 기준 2}}</th><th>위험</th></tr></thead>
@@ -99,7 +121,9 @@
     </section>
   </div>
   <div class="pg" data-nav="택하지 않는 이유">
-    <div class="shead" id="rej"><span class="snum">2</span><h2>{{나머지 안을 택하지 않는다 — 서술형}}</h2></div>
+    <div class="shead" id="rej"><span class="snum">2</span><h2>{{택하지 않는 안 — 짧은 명사구}}</h2></div>
+    <!-- 결론 문장 = action_title. 제목 바로 아래 첫 문장. bridge(앞 결과를 받는 구)가 없으면 span째 지운다 -->
+    <p class="claim"><span class="bridge">{{앞 단락 결과를 받는 구}}</span> {{나머지 안을 택하지 않는 이유 — 결론 문장}}</p>
     <section class="block">
       <ul class="reject">
         <li><b>{{B안}}:</b> {{이유 — 숫자로}}</li>
@@ -122,8 +146,8 @@
     </div>
   </div>
   <div class="pg" data-nav="{{지표군 이름}}">
-    <!-- 지표 행. 제목은 명사구 허용 — 결론이 매번 바뀌므로 -->
-    <div class="shead" id="wex1"><span class="snum">1</span><h2>{{채널·부문 이름 — 명사구 가능}}</h2></div>
+    <!-- 지표 행. 제목은 명사구. 결론 문장(p.claim)은 생략할 수 있다 — 결론이 매번 바뀌므로 -->
+    <div class="shead" id="wex1"><span class="snum">1</span><h2>{{채널·부문 이름}}</h2></div>
     <div class="watchrow">
       <div class="breach">
         <!-- 독자 배경 모름이면 .mean 으로 지표 뜻을 한 줄 붙인다. 앎이면 .mean 을 지운다 -->
@@ -150,7 +174,7 @@
   </div>
   <div class="pg" data-nav="계획 진척">
     <!-- 기준이 계획선일 때. 기준선이 없으면 점검이 아니라 그냥 추이다 -->
-    <div class="shead" id="tex1"><span class="snum">2</span><h2>{{무엇을 계획선과 견주는가 — 명사구 가능}}</h2></div>
+    <div class="shead" id="tex1"><span class="snum">2</span><h2>{{무엇을 계획선과 견주는가 — 명사구}}</h2></div>
     <section class="block">
       <div class="chartwrap">
         <svg viewBox="0 0 720 320" role="img" aria-label="{{대상}}">
@@ -169,7 +193,7 @@
 
   <!-- ══════════════════════════════════════════════════
        조망형(survey) 전용 — 결론 없이 전체 구조를 보여준다. 기본 배치는 side.
-       맨 위 = 범위와 전체 규모. 그다음 숲 → 나무 → 가지로 좁혀 들어간다.
+       맨 위 = 범위와 전체 규모. 그다음 전체 → 부분 → 칸으로 좁혀 들어간다. 단계 이름은 데이터의 말로.
        문장은 판단(~해야 한다)이 아니라 관찰(~가 보인다)로 쓴다
        ══════════════════════════════════════════════════ -->
   <div class="pg" data-nav="범위와 규모">
@@ -184,8 +208,10 @@
       </dl>
     </section>
   </div>
-  <div class="pg" data-nav="{{숲 · 전체}}">
-    <div class="shead" id="sv1"><span class="snum">1</span><h2>{{전체는 이렇게 나뉜다 — 관찰}}</h2></div>
+  <div class="pg" data-nav="{{전체 이름}}">
+    <div class="shead" id="sv1"><span class="snum">1</span><h2>{{전체 이름 — 짧은 명사구}}</h2></div>
+    <!-- 결론 문장 = action_title. 제목 바로 아래 첫 문장. bridge(앞 결과를 받는 구)가 없으면 span째 지운다 -->
+    <p class="claim"><span class="bridge">{{앞 단락 결과를 받는 구}}</span> {{전체는 이렇게 나뉜다 — 관찰 문장}}</p>
     <section class="block">
       <!-- 경로 표시. 단계마다 전체 대비 위치를 적는다 -->
       <div class="crumb"><span class="on">전체 {{규모}}</span></div>
@@ -194,8 +220,10 @@
       <p class="note">출처 … · 기간 … · 단위 … · 집계기준 …</p>
     </section>
   </div>
-  <div class="pg" data-nav="{{나무 · 부분}}">
-    <div class="shead" id="sv2"><span class="snum">2</span><h2>{{그중 가장 큰 부분 — 관찰}}</h2></div>
+  <div class="pg" data-nav="{{부분 이름}}">
+    <div class="shead" id="sv2"><span class="snum">2</span><h2>{{부분 이름 — 짧은 명사구}}</h2></div>
+    <!-- 결론 문장 = action_title. 제목 바로 아래 첫 문장. bridge(앞 결과를 받는 구)가 없으면 span째 지운다 -->
+    <p class="claim"><span class="bridge">{{앞 단락 결과를 받는 구}}</span> {{그중 가장 큰 부분 — 관찰 문장}}</p>
     <section class="block">
       <div class="crumb"><span>전체 {{규모}}</span>›<span class="on">{{부분}} {{규모}} · 전체의 00%</span></div>
       <div class="chartwrap"><svg viewBox="0 0 720 120"></svg></div>
@@ -216,7 +244,9 @@
        ══════════════════════════════════════════════════ -->
   <!-- ── 부품 A. 기본 exhibit ─────────────────────────── -->
   <div class="pg" data-nav="{{짧은 라벨}}">
-    <div class="shead" id="ex1"><span class="snum">1</span><h2>{{ACTION_TITLE}}</h2></div>
+    <div class="shead" id="ex1"><span class="snum">1</span><h2>{{TITLE — 짧은 명사구}}</h2></div>
+    <!-- 결론 문장 = action_title. 제목 바로 아래 첫 문장. bridge(앞 결과를 받는 구)가 없으면 span째 지운다 -->
+    <p class="claim"><span class="bridge">{{앞 단락 결과를 받는 구}}</span> {{ACTION_TITLE}}</p>
     <section class="block">
       <p class="sowhat">{{SO_WHAT}}</p>
 
@@ -246,7 +276,9 @@
   <div class="pg" data-nav="{{짧은 라벨}}">
     <!-- 축이 하나면 .seg 와 .view 를 지우고 부품 A 형태로 쓴다.
          데이터에 없는 그룹으로 묶지 않았으면 .drillbtn / .drill 을 통째로 지운다 -->
-    <div class="shead" id="ex1b"><span class="snum">2</span><h2>{{ACTION_TITLE_2}}</h2></div>
+    <div class="shead" id="ex1b"><span class="snum">2</span><h2>{{TITLE_2}}</h2></div>
+    <!-- 결론 문장 = action_title. 제목 바로 아래 첫 문장. bridge(앞 결과를 받는 구)가 없으면 span째 지운다 -->
+    <p class="claim"><span class="bridge">{{앞 단락 결과를 받는 구}}</span> {{ACTION_TITLE_2}}</p>
     <section class="block">
       <p class="sowhat">{{SO_WHAT}}</p>
 
@@ -291,7 +323,9 @@
 
   <!-- ── 부품 C. 묶은 행 + 전체 보기 모달 ─────────────── -->
   <div class="pg" data-nav="{{짧은 라벨}}">
-    <div class="shead" id="ex2"><span class="snum">3</span><h2>{{ACTION_TITLE_3}}</h2></div>
+    <div class="shead" id="ex2"><span class="snum">3</span><h2>{{TITLE_3}}</h2></div>
+    <!-- 결론 문장 = action_title. 제목 바로 아래 첫 문장. bridge(앞 결과를 받는 구)가 없으면 span째 지운다 -->
+    <p class="claim"><span class="bridge">{{앞 단락 결과를 받는 구}}</span> {{ACTION_TITLE_3}}</p>
     <section class="block">
       <div class="tw"><table>
         <thead><tr><th>{{항목}}</th><th class="r">{{지표}}</th><th class="r">비중</th></tr></thead>

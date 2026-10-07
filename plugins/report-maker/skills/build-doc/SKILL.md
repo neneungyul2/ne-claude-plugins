@@ -27,7 +27,7 @@ description: 확정된 리포트 스펙을 문서(Word/Markdown) 또는 슬라�
 
 - 종류(`report_type`)의 뼈대 순서를 그대로 쓴다 (`references/report-types.md` §4).
   조망형은 판단 문장·액션 슬라이드를 만들지 않고 "눈여겨볼 곳"으로 끝낸다
-- `reader_context: new`인 결정·진단형은 **질문 → 전체 그림 → 답** 순서로 앞 두 장(또는 두 절)을 둔다
+- `reader_context: new`인 결정·진단형은 **질문 → 답 → 대상 설명 → 범위** 순서로 앞부분을 둔다. 범위는 좁혀 가는 막대 하나, 단계 이름은 데이터의 말
 - `layout`과 편집 막대는 HTML 전용이다. 문서·슬라이드는 스펙의 단락 순서를 그대로 쓴다
 - 계산 방법(`calcs`)은 부록 장·각주로 옮기되 **`worked`(실제 숫자로 쓴 계산)를 그대로 넣는다**
 
@@ -48,8 +48,9 @@ description: 확정된 리포트 스펙을 문서(Word/Markdown) 또는 슬라�
 ## 2. 슬라이드 규칙
 
 - **슬라이드 1장 = exhibit 1개.** 두 개를 한 장에 넣지 않는다.
-- **`action_title`이 슬라이드 제목이다.** 글자 그대로 쓴다. 줄여서 명사구로 만들지 않는다.
-- 구성: 제목(action_title) → 차트 → so_what 한 줄 → 각주 4요소
+- **`action_title`이 슬라이드 제목이다.** 글자 그대로 쓴다. 슬라이드는 제목 한 줄이 곧 메시지라 결론 문장을 제목에 둔다.
+  `title`(짧은 명사구)은 제목 위 작은 머리말로 둔다
+- 구성: 머리말(title) → 제목(action_title) → 차트 → so_what 한 줄 → 각주 4요소
 - 표지 다음 장은 **헤드라인 한 문장 + 요약 3줄**. 목차는 exhibit이 5개를 넘을 때만.
 - 마지막 장에 공통 각주와 `open_questions`.
 
@@ -58,7 +59,7 @@ description: 확정된 리포트 스펙을 문서(Word/Markdown) 또는 슬라�
 ## 3. 문서 규칙
 
 - 맨 앞에 헤드라인 한 문장. 그 아래 요약 3줄.
-- exhibit마다 `## action_title` → 차트 이미지 → so_what → 각주.
+- exhibit마다 `## title` → 첫 문단에 `action_title`(bridge가 있으면 앞에 붙여 한 문장) → 차트 이미지 → so_what → 각주.
 - 표 exhibit은 이미지가 아니라 실제 표로 넣는다. 복사해서 쓸 수 있어야 한다.
 - 각주는 각 exhibit 바로 아래. 문서 끝에 몰아두지 않는다.
 

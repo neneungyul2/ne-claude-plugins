@@ -2,7 +2,7 @@
 
 포맷 중립 스펙. HTML 렌더러와 문서 렌더러가 동일하게 이 구조를 입력으로 받는다.
 
-**현재 버전: 2.6**
+**현재 버전: 2.7**
 
 - 2.0 — `key_takeaway` · `kpis` · `actions` · `glossary` · `calcs` · `group_detail` 추가
 - 2.1 — `brief` · `segments` 추가. exhibit에 `views`(축 전환) · `drilldown`(계층) 추가.
@@ -19,6 +19,10 @@
   `report_type` 값이 `decide` | `diagnose` | `check` | `survey`로 바뀌었다 (옛 값은 §1 표).
   `stance` 삭제. `reader_context` · `repeat` · `layout` · `context` · `options` · `scope` · `look_at` 추가.
   `calcs`에 `worked`(실제 숫자로 쓴 계산) 필수
+- 2.7 — **단락 머리를 제목과 결론 문장으로 나눴다** (`references/writing-rules.md`). exhibit에 `title`(짧은 명사구) ·
+  `reader_question`(앞 단락을 읽은 독자의 질문) · `bridge`(앞 결과를 받는 구) · `value_kind`(`raw`|`derived`) 추가.
+  `action_title`은 이제 제목이 아니라 **단락 첫 문장**으로 그려진다. 최상위에 `subject`(대상 설명) 추가.
+  `context.picture`는 `level`(숲·나무·가지) 대신 `label`·`value`로 쓰고 `picture_title`을 둔다 — 단계 이름표를 화면에 쓰지 않는다
 
 ---
 
@@ -46,7 +50,8 @@
 ```
 spec_version  mode  report_type  reader_context  repeat  layout  title  period_badge
 key_takeaway { text  emphasis  ask }
-context { question  deadline  picture[] }          ← reader_context: new 일 때
+context { question  deadline  picture_title  picture[]  picture_note }   ← reader_context: new 일 때
+subject { name  what  parts[]  how  in_scope }      ← 대상 설명. reader_context: new 이고 결정·진단이면 필수
 options [ ]                                         ← decide
 scope { target  period  unit  excluded }  look_at [ ]   ← survey
 audience  decision  period  basis  unit
@@ -57,13 +62,14 @@ glossary [ ]  calcs [ ]  footnote { }  open_questions [ ]
 
 | 필드 | 필수 | 설명 |
 |---|---|---|
-| `spec_version` | O | 현재 `"2.6"` |
+| `spec_version` | O | 현재 `"2.7"` |
 | `mode` | O | `quick` \| `report` |
 | `report_type` | **report 필수** | `decide` \| `diagnose` \| `check` \| `survey`. **아래 표의 필수 여부를 바꾼다.** 탐색형은 별도 스펙(`explore-spec-schema.md`) |
 | `reader_context` | report 필수 | `known` \| `new`. 독자가 이 건의 배경을 아는가. **애매하면 `new`** |
 | `repeat` | report 필수 | `once` \| `recurring`. `recurring`이면 구성을 고정하고 데이터 시점을 맨 위에 |
 | `layout` | 선택 | `one` \| `side` \| `menu`. 없으면 종류의 기본값 (결정·진단·점검 `one`, 조망 `side`) |
 | `context` | 조건부 | `reader_context: new`이고 결정·진단이면 필수. 아래 2-1장 |
+| `subject` | 조건부 | `reader_context: new`이고 결정·진단이면 필수. 아래 2-2장 |
 | `options` | 조건부 | `decide` 필수. 아래 5-2장 |
 | `scope` · `look_at` | 조건부 | `survey` 필수 (`look_at`은 선택). 아래 5-3장 |
 | `title` | O | 문서 제목. 명사구 허용 (문서 이름이지 결론이 아님) |
@@ -157,25 +163,51 @@ brief {
 
 ## 2-1. context — 배경을 모르는 독자에게 먼저 주는 것
 
-`reader_context: new`이고 결정·진단형이면 필수다. 맨 위에 **답 대신 질문**을 두고,
-**전체 그림**을 보인 다음, 답(`key_takeaway`)으로 간다.
+`reader_context: new`이고 결정·진단형이면 필수다. 맨 위에 **질문**을 두고, 답(`key_takeaway`) 다음에
+**대상 설명**(`subject`, 2-2장)과 **범위**(`picture`)를 보인 뒤 본문으로 간다.
 
 ```
 context {
-  question   "수능 기본 어휘서의 개정 시점을 정해야 합니다"   ← 결정할 것 / 풀 질문. 한 문장
-  deadline   "10월 20일 편집 회의 전"                        ← 결정형만. 없으면 키째 뺀다
-  picture [ { level  text  share } ]                          ← 숲 → 나무 → 가지
+  question       "수능 기본 어휘서의 개정 시점을 정해야 합니다"   ← 결정할 것 / 풀 질문. 한 문장
+  deadline       "10월 20일 편집 회의 전"                        ← 결정형만. 없으면 키째 뺀다
+  picture_title  "어휘서 시장과 이번에 본 범위"                  ← 내용으로 쓴 제목. "전체 그림" 금지
+  picture [ { label  value  unit  share } ]                       ← 넓은 것 → 이번에 보는 것
+  picture_note   "빠진 것과 이유 한 줄"                           ← 선택
 }
 ```
 
 | 필드 | 설명 |
 |---|---|
-| `picture[].level` | `forest` \| `tree` \| `branch` — 숲(전체) · 나무(부분) · 가지(지금 문제가 되는 칸) |
-| `picture[].text` | 한 문장. **원래 단위**로 크기를 적는다 |
-| `picture[].share` | 전체 대비 비중. 숲은 비운다. **위치가 없으면 나무를 볼 때 숲이 사라진다** |
+| `picture_title` | 단락 제목. **데이터의 말**로 쓴다. 안내 문구("먼저 전체 그림")는 쓰지 않는다 |
+| `picture[].label` | 단계 이름. 데이터의 말("연 광고 예산", "진행 광고비"). **숲·나무·가지를 쓰지 않는다** |
+| `picture[].value` · `unit` | **원래 단위**의 크기. 화면에서 좁혀 가는 막대가 된다 |
+| `picture[].share` | 첫 단계 대비 비중. 첫 단계는 비운다. **위치가 없으면 부분을 볼 때 전체가 사라진다** |
+| `picture_note` | 단계 사이에서 빠진 금액·항목과 그 이유. 한 줄 |
+
+숫자를 문장 줄과 막대로 두 번 쓰지 않는다. 막대 하나와 빠진 것 한 줄이면 된다.
+(v2.6의 `level`·`text`는 읽되 화면에 이름표로 쓰지 않는다.)
 
 점검형은 `context` 대신 지표마다 뜻을 한 줄(`glossary`의 쉬운 말 첫 문장)로 붙인다.
 조망형은 그 자체가 전체 그림이라 `context`가 없다.
+
+## 2-2. subject — 대상 설명
+
+다루는 것이 **무엇이고 어떻게 돌아가는지**를 숫자보다 먼저 보인다. 독자가 대상을 모르면
+뒤의 숫자는 무엇의 숫자인지 모른 채 읽힌다. `reader_context: new`이고 결정·진단형이면 필수다.
+
+```
+subject {
+  name      "쿠팡 배너 광고"                       ← 단락 제목이 된다. 짧은 명사구
+  what      "쿠팡 화면의 정해진 자리에 배너를 거는 광고다"    ← 쉬운 말 한두 문장
+  parts [ { name  where  how } ]                   ← 구성 요소. 어디에 보이고 돈이 어떻게 나가나
+  how       "자리는 하루 단위로 사고, 노출·클릭과 상관없이 값이 정해져 있다"
+  in_scope  "이번에 산 자리: …"                    ← 이번 분석에 들어간 것
+  figure    "data:image/png;base64,…"              ← 선택. 화면 캡처나 도식
+}
+```
+
+- 정의를 나열하지 않는다. 뒤 단락의 숫자를 읽는 데 필요한 것만 쓴다
+- `parts`는 뒤 단락에서 비교할 단위와 이름이 같아야 한다
 
 ---
 
@@ -239,7 +271,7 @@ kpis [{ label  value  unit  delta { dir  text  note }  calc_ref  term_ref }]
 
 ```
 exhibit {
-  id  nav_label  answers[]  action_title  so_what  weight
+  id  nav_label  answers[]  title  reader_question  bridge  action_title  so_what  weight  value_kind
   views [{ id  label  read  question_type  chart  data{columns,rows}
            encoding{ x  y  series  claim  sort  y_zero } }]
   emphasis_steps [{ id  label  read  highlight[] }]
@@ -259,7 +291,11 @@ exhibit {
 | `id` | O | `ex1`, `ex2` … 목차·앵커에 쓰인다 |
 | `nav_label` | report만 | 목차에 쓸 짧은 라벨. 6자 내외. 렌더러가 단락의 `data-nav`로 쓴다 |
 | `answers` | report 필수 | **이 exhibit이 답하는 `brief.questions`의 id 배열.** 비어 있으면 왜 있는 exhibit인지 되묻는다 |
-| `action_title` | O | **서술형 결론. 주장 하나.** 아래 참조 |
+| `title` | O | **단락 제목. 짧은 명사구, 20자 이내.** 무엇을 보는 단락인지. `references/writing-rules.md` §1 |
+| `reader_question` | report 필수 | 앞 단락을 읽은 독자가 품는 질문. 이 단락이 그 질문에 답한다. 첫 단락은 결론에서 나오는 질문 |
+| `bridge` | 선택 | 결론 문장 앞에 붙는 짧은 구. 앞 단락의 결과를 가리킨다("앞에서 본 4,390만원 가운데"). 새 주장 금지 |
+| `action_title` | O | **이 단락의 결론. 제목 바로 아래 첫 문장으로 그려진다.** 서술형, 주장 하나, 60자 이내. 아래 참조 |
+| `value_kind` | report 필수 | `raw`(금액·수량 등 원래 값) \| `derived`(비율·건당 값 등 나눈 값). **본문 첫 exhibit은 `raw`** |
 | `so_what` | O | 한 줄. 제목의 반복 금지 |
 | `weight` | O | `primary` \| `supporting` \| `appendix`. **화면에서 차지할 비중.** 아래 참조 |
 | `views` | O | **1개 이상.** 하나뿐이면 토글 없이 그냥 그린다. 2개 이상이면 축 전환 버튼이 생긴다 |
@@ -304,9 +340,15 @@ exhibit {
 `scripts/check_html.py --spec` 이 이 항목을 기계적으로 본다.
 서열의 근거는 `references/chart-rules.md` §1-1.
 
+### title과 action_title — 제목은 짧게, 결론은 첫 문장에
+
+제목(`title`)은 찾기 위한 것이다. 짧은 명사구로 쓴다("영역별 광고비와 클릭").
+결론(`action_title`)은 제목 아래 첫 문장이 말한다. 제목에 결론 문장을 넣으면
+단락마다 긴 단정문이 붙어 화면이 빽빽해진다. 문장 규칙은 `references/writing-rules.md` §3.
+
 ### action_title — 주장 하나
 
-한 exhibit은 **한 가지만 말한다.** 서술형이기만 하면 통과가 아니다.
+한 exhibit은 **한 가지만 말한다.** 서술형이기만 하면 통과가 아니다. **60자를 넘기지 않는다.**
 
 | 반려 | 왜 | 고친 것 |
 |---|---|---|
@@ -464,7 +506,7 @@ look_at [ "수능 기본 × 온라인은 시장의 18%이고 올해 순위가 �
 ```
 
 - `scope`는 네 칸 모두 필수다. 무엇을 **빼는지**가 없으면 독자가 범위를 넓게 읽는다
-- exhibit은 숲 → 나무 → 가지 순서다. 각 exhibit에 `path`(예: `["전체 209.9만", "수능 기본 87.9만 · 42%"]`)를 둔다
+- exhibit은 넓은 데서 좁은 데로(전체 → 부분 → 칸) 간다. 단계 이름은 데이터의 말로 쓴다. 각 exhibit에 `path`(예: `["전체 209.9만", "수능 기본 87.9만 · 42%"]`)를 둔다
 - 조망형의 `action_title`은 **관찰**이다 — "~가 보인다", "~가 가장 크다". "~해야 한다"는 쓰지 않는다
 - `look_at`은 권고가 아니라 **다음에 볼 곳**이다. 숫자로 쓴다
 
@@ -757,6 +799,10 @@ segments [{ name  groups{ 그룹명: [소속 값들] }  basis  confirmed  drill_
 ## 12-1. 스토리 자체검사 — 스펙을 넘기기 전에 돈다
 
 렌더링 전에 반드시 통과시킨다. 자세한 것은 `references/storytelling.md` 8장.
+
+**⓪ 질문 사슬** — 각 exhibit의 `reader_question`만 순서대로 읽는다. 각 질문이 바로 앞 exhibit의
+`action_title`(첫 exhibit은 `key_takeaway.text`)에서 나오는가? 아니면 순서를 고치거나 빠진 단락을 넣는다.
+본문 첫 exhibit이 `value_kind: derived`면 앞에 원래 값 단락을 둔다.
 
 **① 수평 논리** — `key_takeaway.text` → 각 exhibit의 `action_title`을 **순서대로만 읽는다.**
 그것이 하나의 이야기가 되는가?

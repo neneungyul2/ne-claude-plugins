@@ -145,7 +145,8 @@ def c_external(html, r):
 def c_placeholder(html, r):
     # 숫자 모양 자리표시자(000.0, 0,000)는 스크립트 안 원자료(예: 상품명의 "20,000")와 겹친다 — 스크립트 밖에서만 찾는다
     nos = strip_scripts(html)
-    found = [p for p in PLACEHOLDERS if (p in nos if p[:1].isdigit() else p in html)]
+    found = [p for p in PLACEHOLDERS
+             if (re.search(r"(?<![\d,.])" + re.escape(p) + r"(?![\d])", nos) if p[:1].isdigit() else p in html)]
     if found:
         r.fail("템플릿 자리표시자 잔존", ", ".join(found[:6]))
     else:
@@ -268,20 +269,69 @@ def c_hero_list(html, r, tag=""):
         r.ok(f"히어로 요약 = exhibit 수{tag}", f"{n_li}개")
 
 
-def c_action_title(html, r):
-    """주장 하나. em dash로 두 주장 잇기 / 마침표 2개."""
+def _heads(html):
+    """exhibit 제목(h2)과 결론 문장(p.claim, bridge 제외)."""
     titles = [re.sub(r"<[^>]+>", "", t).strip()
               for t in re.findall(r"<div class=\"shead\".*?<h2[^>]*>(.*?)</h2>", html, re.S)]
+    claims = []
+    for c in re.findall(r'<p class="claim">(.*?)</p>', html, re.S):
+        c = re.sub(r'<span class="bridge">.*?</span>', "", c, flags=re.S)
+        claims.append(re.sub(r"\s+", " ", re.sub(r"<[^>]+>", "", c)).strip())
+    return titles, claims
+
+
+def c_action_title(html, r):
+    """단락 머리 — 제목은 짧은 명사구, 결론 문장은 주장 하나. references/writing-rules.md §1."""
+    titles, claims = _heads(html)
+    long_t = [t[:30] for t in titles if len(t) > 20 or re.search(r"[다요][.!?]?$", t)]
+    if long_t:
+        r.warn("제목은 짧은 명사구", f"{len(long_t)}건 — 결론은 제목 아래 첫 문장(p.claim)으로: " + " / ".join(long_t[:3]))
+    elif titles:
+        r.ok("제목은 짧은 명사구", f"{len(titles)}건")
+    if titles and not claims:
+        r.warn("결론 문장", "p.claim이 없다 — 제목 아래 첫 문장에 action_title을 둔다 (점검형은 생략 가능)")
+        return
     bad = []
-    for t in titles:
+    for t in claims:
         if "—" in t or t.count(".") >= 2 or re.search(r"[이가]고,", t):
             bad.append(t[:40])
+        elif len(t) > 60:
+            bad.append(t[:40] + f" ({len(t)}자)")
         elif t and not re.search(r"[다요]$|[다요][.!?]$", t):
             bad.append(t[:40] + " (서술형 아님?)")
     if bad:
-        r.warn("action_title 주장 하나", f"{len(bad)}건: " + " / ".join(bad[:3]))
-    elif titles:
-        r.ok("action_title 주장 하나", f"{len(titles)}건 통과")
+        r.warn("결론 문장 주장 하나", f"{len(bad)}건: " + " / ".join(bad[:3]))
+    elif claims:
+        r.ok("결론 문장 주장 하나", f"{len(claims)}건 통과")
+
+
+# references/writing-rules.md §3 "쓰지 않는 말" — 표를 고치면 여기도 고친다
+SLOP = re.compile(r"구조(?:다|이다|입니다)|핵심은|주목할 (?:점|만한)|시사(?:한다|합니다)|할 필요가 있|"
+                  r"유의미한|의미 있는|다양한|효과적으로|적극적으로|전략적으로|측면에서|관점에서|"
+                  r"명확히|분명히|확실히|결론적으로|요컨대|인 셈이다|매우 ")
+LABELS = re.compile(r">\s*(?:숲|나무|가지)\s*<|먼저 전체 그림")
+
+
+def c_writing(html, r):
+    """문장 규칙. 판단이 필요 없는 것만 — 긴 문장, 쓰지 않는 말, 줄표 잇기, 이름표."""
+    body = strip_svg(strip_scripts(html))
+    body = re.sub(r"<style[^>]*>.*?</style>", "", body, flags=re.S)
+    if LABELS.search(body):
+        r.fail("이름표", "숲·나무·가지 또는 '먼저 전체 그림'이 화면에 있다 — 데이터의 말로 쓴다 (writing-rules §4)")
+    paras = re.findall(r'<(p|li|dd)(?![^>]*class="(?:note|foot|formula)")[^>]*>(.*?)</\1>', body, re.S)
+    texts = [re.sub(r"\s+", " ", re.sub(r"<[^>]+>", "", t)).strip() for _, t in paras]
+    sents = [x.strip() for t in texts for x in re.split(r"(?<=[다요])\.\s+|(?<=[.!?])\s+", t) if x.strip()]
+    long_s = [x for x in sents if len(x) > 80]
+    slop = sorted({m.group(0).strip() for x in sents for m in SLOP.finditer(x)})
+    dash = [x for x in sents if re.search(r"\S\s?—\s?\S", x)]
+    if long_s:
+        r.warn("문장 길이 ≤80자", f"{len(long_s)}건: " + " / ".join(x[:30] + "…" for x in long_s[:2]))
+    if slop:
+        r.warn("쓰지 않는 말", ", ".join(slop[:8]) + " — writing-rules §3")
+    if dash:
+        r.warn("줄표로 두 말 잇기", f"{len(dash)}건: " + dash[0][:40])
+    if sents and not (long_s or slop or dash):
+        r.ok("문장 규칙", f"문장 {len(sents)}개")
 
 
 def c_body_table(html, r):
@@ -349,14 +399,32 @@ def c_glossary(html, r):
 
 def c_spec_match(html, spec, r):
     """스펙과 화면 대조. --spec 을 준 경우만."""
-    titles = [re.sub(r"<[^>]+>", "", t).strip()
-              for t in re.findall(r"<div class=\"shead\".*?<h2[^>]*>(.*?)</h2>", html, re.S)]
-    want = [e.get("action_title", "").strip() for e in spec.get("exhibits", [])]
-    miss = [w for w in want if w and w not in " ".join(titles)]
+    titles, claims = _heads(html)
+    exs = spec.get("exhibits", [])
+    want = [e.get("action_title", "").strip() for e in exs]
+    miss = [w for w in want if w and w not in " ".join(claims + titles)]
     if miss:
         r.fail("스펙 action_title 일치", f"{len(miss)}건이 화면에 없거나 바뀌었다: {miss[0][:40]}")
     elif want:
         r.ok("스펙 action_title 일치", f"{len(want)}건")
+    want_t = [e.get("title", "").strip() for e in exs if e.get("title")]
+    miss_t = [w for w in want_t if w not in titles]
+    if miss_t:
+        r.fail("스펙 title 일치", f"{len(miss_t)}건이 화면 제목(h2)에 없다: {miss_t[0][:30]}")
+    if spec.get("mode") == "report" and exs:
+        if any(not e.get("title") for e in exs):
+            r.warn("exhibit title", "title(짧은 명사구)이 없는 exhibit이 있다 — 스펙 2.7")
+        kinds = [e.get("value_kind") for e in exs]
+        if any(k is None for k in kinds):
+            r.warn("value_kind", "raw | derived가 없는 exhibit이 있다")
+        elif "derived" in kinds and kinds[0] != "raw":
+            r.fail("원래 값이 먼저", "본문 첫 exhibit이 나눈 값(derived)이다 — 금액·수량 단락을 앞에 둔다")
+        else:
+            r.ok("원래 값이 먼저", "첫 exhibit raw" if "derived" in kinds else "나눈 값 없음")
+        if spec.get("report_type") in ("decide", "diagnose", "survey"):
+            noq = [e.get("id", "?") for e in exs if not e.get("reader_question")]
+            if noq:
+                r.warn("질문 사슬", "reader_question이 없다: " + ", ".join(noq[:5]))
 
     kt = spec.get("key_takeaway", {}) or {}
     for e in spec.get("exhibits", []):
@@ -415,16 +483,20 @@ def c_spec_match(html, spec, r):
         if ctx == "new":
             cx = spec.get("context") or {}
             if not cx.get("question") or not cx.get("picture"):
-                r.fail("배경 모름 — 질문·전체 그림", "context.question / context.picture가 없다")
+                r.fail("배경 모름 — 질문·범위", "context.question / context.picture가 없다")
+            if not spec.get("subject"):
+                r.fail("배경 모름 — 대상 설명", "subject가 없다 — 무엇이고 어떻게 돌아가는지 숫자보다 먼저")
             q = html.find('class="hero question"')
             a = html.find('class="hero"')
+            sub = html.find('class="block subject"')
             pic = html.find('class="picture"')
-            if q < 0 or pic < 0:
-                r.fail("배경 모름 — 질문·전체 그림", "화면에 질문(hero question)이나 전체 그림(.picture)이 없다")
-            elif a >= 0 and not (q < pic < a):
-                r.fail("배경 모름 — 순서", "질문 → 전체 그림 → 답 순서가 아니다")
+            ex = html.find('<div class="shead"')
+            if q < 0 or pic < 0 or sub < 0:
+                r.fail("배경 모름 — 질문·대상·범위", "화면에 질문(hero question)·대상 설명(.subject)·범위(.picture) 중 없는 것이 있다")
+            elif not (q < a < sub < pic and (ex < 0 or pic < ex)):
+                r.fail("배경 모름 — 순서", "질문 → 답 → 대상 설명 → 범위 → 본문 순서가 아니다")
             else:
-                r.ok("배경 모름 — 질문·전체 그림", "질문 → 전체 그림 → 답")
+                r.ok("배경 모름 — 순서", "질문 → 답 → 대상 설명 → 범위 → 본문")
     if rtype == "decide":
         opts = spec.get("options") or []
         picks = [o for o in opts if o.get("pick")]
@@ -504,7 +576,7 @@ STRUCTURAL = [c_external, c_korean_break, c_darkmode, c_token_inventory, c_grid,
               c_hardcoded_color, c_rotated_text, c_center_align, c_footnote,
               c_body_table, c_legend_series, c_pages]
 # 실제 리포트에만 도는 검사 — 내용이 채워졌는지
-CONTENT = [c_placeholder, c_hero_list, c_action_title, c_number_repeat, c_glossary, c_calc_worked]
+CONTENT = [c_placeholder, c_hero_list, c_action_title, c_writing, c_number_repeat, c_glossary, c_calc_worked]
 
 
 def main():
