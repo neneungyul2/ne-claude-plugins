@@ -183,7 +183,8 @@
 | `references/watch-thresholds.md` | 점검형 임계값 설정·결론문 |
 | `references/sources/` | 엑셀·Metabase·붙여넣기 어댑터별 주의사항 |
 | `references/template/parts.html` | **부품 목록(결정·진단·점검·조망). 리포트 만들 때 읽는 것은 이것뿐** |
-| `references/template/base.css` `base.js` | 읽지 않는다. `assemble.py`가 붙인다 |
+| `references/template/tokens.css` | **디자인 토큰**(NE Design System 기준). 보고서 인상을 바꿀 때 이것만 고친다 |
+| `references/template/base.css` `base.js` | 읽지 않는다. `assemble.py`가 붙인다. base.css는 토큰 이름만 쓴다 |
 | `references/html-template.html` | 위 셋의 **조립 결과.** 검사용. 직접 고치지 않는다 |
 | `assets/korea_paths.json` | 시도 17개 + 시군구 전체 SVG 경로 (441KB) |
 | `references/report-types.md` | **가장 먼저 읽는 문서.** 다섯 종류, 조건 셋, 종류별 필수·해당없음, 로직 설명 원칙 |
@@ -223,6 +224,11 @@
 설계 근거는 [`docs/design-decisions.md`](../../docs/design-decisions.md) 참조.
 
 ## 변경 이력
+
+- **v0.13.0** — **디자인을 토큰 파일 하나로 정한다.** 색·글자·간격·라운드·그림자를 `template/tokens.css`로
+  떼어 NE Design System 값으로 바꿨다. 부품(base.css·explore.css)은 역할 이름만 쓰고 hex가 없다.
+  파란 그라데이션·형광펜 밑줄·검은 번호 상자를 걷어 내고, 따뜻한 회색 바탕 + 짙은 잉크 강조 +
+  브랜드 빨강 표식(결론·섹션 번호·권고)으로 바꿨다. 예전 토큰 이름(`--blue` 등)은 호환용으로 남겼다.
 
 - **v0.12.1** — **첫 대화에서 용도를 묻는다.** 요청을 맥락으로 넓혀 원인 분석까지 정해 버리던 문제를 고쳤다.
   첫 질문 "이 자료는 어떤 용도로 쓰실 건가요?"(보기는 요청의 말로)로 종류를 정하고, 사용자가 한 말을

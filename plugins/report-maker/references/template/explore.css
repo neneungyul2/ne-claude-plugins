@@ -5,20 +5,20 @@
    ══════════════════════════════════════════════════════════════ */
 
 /* ── 축 컨트롤 바 — 항상 최상단, 스크롤해도 고정 ── */
-.axisbar{position:sticky;top:0;z-index:41;background:rgba(255,255,255,.96);
+.axisbar{position:sticky;top:0;z-index:41;background:var(--surface-glass);
          backdrop-filter:saturate(180%) blur(12px);border-bottom:1px solid var(--line2);
          display:flex;flex-wrap:wrap;gap:12px 20px;align-items:center;
          padding:12px 20px;max-width:1120px;margin:0 auto}
 .axisitem{display:flex;align-items:center;gap:8px}
 .axisitem .lbl{font-size:var(--t1);font-weight:700;color:var(--dim);white-space:nowrap}
 .axisitem select{font-size:var(--t2);color:var(--ink);border:1px solid var(--line2);
-                  border-radius:var(--r3);padding:8px 12px;background:#fff;cursor:pointer}
-.axisitem select:focus{outline:2px solid var(--blueSoft)}
+                  border-radius:var(--r3);padding:8px 12px;background:var(--surface);cursor:pointer}
+.axisitem select:focus{outline:2px solid var(--line2)}
 .chipgroup{display:flex;gap:8px;flex-wrap:wrap}
-.chip{border:1px solid var(--line2);background:#fff;border-radius:var(--rp);
+.chip{border:1px solid var(--line2);background:var(--surface);border-radius:var(--rp);
       padding:4px 12px;font-size:var(--t1);font-weight:600;color:var(--sub);cursor:pointer}
-.chip:hover{border-color:var(--blue)}
-.chip.sel{background:var(--blueDk);border-color:var(--blueDk);color:#fff}
+.chip:hover{border-color:var(--accent)}
+.chip.sel{background:var(--ink);border-color:var(--ink);color:var(--on-dark)}
 
 /* 현재 선택된 축 조합 — 늘 화면에 보인다 (스크린샷 공유 시 무슨 조합인지 알 수 있게) */
 [data-state-badge]{font-size:var(--t1);color:var(--dim);white-space:nowrap;
@@ -26,7 +26,7 @@
 
 /* ── 패널 서열 — plan-explore의 weight: primary_view만 강조. kpi_row는 .kpi 그대로,
    detail은 .block 기본값 그대로 쓴다 ── */
-.block.panel-primary{background:var(--panel);border-color:var(--blueSoft)}
+.block.panel-primary{background:var(--panel);border-color:var(--line2)}
 
 /* ── 비교 토글(전기·전년)은 .seg를 그대로 쓴다. 별도 클래스가 필요 없다 ── */
 
@@ -47,10 +47,10 @@
 .xapp.collapsed{grid-template-columns:56px minmax(0,1fr)}
 .xapp>.xmain{min-width:0}
 .gnb{position:sticky;top:0;height:100vh;overflow-y:auto;border-right:1px solid var(--line2);
-     background:#fff;padding:20px 12px 32px}
+     background:var(--surface);padding:20px 12px 32px}
 .gnb .gtop{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:16px}
 .gnb .gtop b{font-size:var(--t2);color:var(--ink)}
-.gnb .fold{flex:none;width:28px;height:28px;border:1px solid var(--line2);background:#fff;
+.gnb .fold{flex:none;width:28px;height:28px;border:1px solid var(--line2);background:var(--surface);
            border-radius:var(--r3);color:var(--sub);cursor:pointer;font-size:var(--t2);line-height:1;padding:0}
 .gnb nav{display:flex;flex-direction:column;gap:2px}
 .gnb a{display:flex;gap:8px;align-items:baseline;padding:4px 8px;border-radius:var(--r3);
@@ -59,14 +59,14 @@
 .gnb a.l1 i{font-style:normal;color:var(--dim);width:16px}
 .gnb a.l2{padding-left:32px}
 .gnb a:hover{background:var(--line)}
-.gnb a.on{color:var(--blueDk);background:var(--blueBg);box-shadow:inset 2px 0 0 var(--blueDk)}
-.gnb a.pa,.gnb a.pa i,.gnb a.on i{color:var(--blueDk)}
+.gnb a.on{color:var(--ink);background:var(--line);box-shadow:inset 2px 0 0 var(--brand)}
+.gnb a.pa,.gnb a.pa i,.gnb a.on i{color:var(--ink)}
 .xapp.collapsed .gnb{padding:16px 8px;overflow-x:hidden}
 .xapp.collapsed .gnb .gtop{justify-content:center}
 .xapp.collapsed .gnb .gtop b,.xapp.collapsed .gnb a.l2,.xapp.collapsed .gnb a .tx{display:none}
 .xapp.collapsed .gnb a.l1{justify-content:center;padding:8px 0}
 .xapp.collapsed .gnb a.l1 i{width:auto;font-weight:800}
-.xapp.collapsed .gnb a.pa{background:var(--blueBg);box-shadow:inset 2px 0 0 var(--blueDk)}
+.xapp.collapsed .gnb a.pa{background:var(--line);box-shadow:inset 2px 0 0 var(--brand)}
 [data-loc]{flex-basis:100%;font-size:var(--t1);color:var(--sub)}
 .axisbar{max-width:none}
 
@@ -74,7 +74,7 @@
 .xsec{display:flex;gap:8px;align-items:baseline;padding-bottom:8px;border-bottom:2px solid var(--ink);
       margin:40px 0 16px;scroll-margin-top:120px}
 .xsec h2{margin:0;font-size:var(--t4);display:flex;align-items:center;gap:8px}
-.xsec .snum{color:var(--blueDk)}
+.xsec .snum{color:var(--brand)}
 
 /* ── 숫자 칩 — 패널 위 설명 문장 대신 ── */
 .pills{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 12px}
@@ -86,11 +86,11 @@
 
 /* ── ⓘ 버튼 — 사용법·기준·비고를 숨겨 두는 자리 (EXPLORE.bindInfo) ── */
 .xinfo{display:inline-flex;align-items:center;gap:4px;height:20px;margin-left:8px;padding:0 8px 0 0;border:1px solid var(--line2);
-       border-radius:var(--rp);background:#fff;color:var(--sub);font-size:var(--t1);font-weight:600;cursor:pointer;vertical-align:middle}
+       border-radius:var(--rp);background:var(--surface);color:var(--sub);font-size:var(--t1);font-weight:600;cursor:pointer;vertical-align:middle}
 .xinfo span{display:inline-grid;place-items:center;width:20px;height:20px;font-style:italic;font-weight:800}
 .xinfo.bare{padding:0}
-.xinfo:hover{border-color:var(--blue);color:var(--blueDk)}
-.modal .body h4{margin:12px 0 4px;font-size:var(--t1);color:var(--blueDk)}
+.xinfo:hover{border-color:var(--accent);color:var(--ink)}
+.modal .body h4{margin:12px 0 4px;font-size:var(--t1);color:var(--ink)}
 .modal .body p{margin:0 0 8px}
 
 /* ── KPI 아래 비교 표 (비교군·전국 값과 차이·배수) ── */
@@ -104,7 +104,7 @@
 
 /* ── 계층 드릴다운 (mix + hierarchy) ── */
 .crumb{display:flex;flex-wrap:wrap;gap:4px;align-items:center;font-size:var(--t2);margin-bottom:8px}
-.crumb button{border:0;background:none;padding:2px 4px;color:var(--blueDk);font-weight:600;cursor:pointer}
+.crumb button{border:0;background:none;padding:2px 4px;color:var(--ink);font-weight:600;cursor:pointer}
 .crumb button[disabled]{color:var(--ink);cursor:default}
 .crumb span{color:var(--dim)}
 .mixrow{display:grid;grid-template-columns:minmax(120px,220px) minmax(0,1fr) 88px;gap:4px 12px;
@@ -114,7 +114,7 @@
 .mixrow .nm small{display:block;font-weight:400;color:var(--dim);font-size:var(--t1)}
 .mixrow .bars{display:grid;gap:2px}
 .mixrow .bar{height:8px;border-radius:var(--r3);min-width:1px;background:var(--g4)}
-.mixrow .bar.t{background:var(--blue);height:12px}
+.mixrow .bar.t{background:var(--accent);height:12px}
 .mixrow .bar.s{background:var(--g1)}
 .mixrow .diff{font-size:var(--t2);font-weight:700;text-align:right;font-variant-numeric:tabular-nums}
 

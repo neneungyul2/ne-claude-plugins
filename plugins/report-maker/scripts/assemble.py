@@ -53,7 +53,7 @@ def main():
     ap.add_argument("content", help="본문 HTML (<main> 안쪽 + 선택적 모달)")
     ap.add_argument("-o", "--out", required=True)
     ap.add_argument("--title", help="생략하면 본문의 <h1>에서 가져온다")
-    ap.add_argument("--css", help="base.css 대신 쓸 파일. 쉼표로 여러 개 이으면 순서대로 붙인다"
+    ap.add_argument("--css", help="base.css 대신 쓸 파일. 쉼표로 여러 개 이으면 순서대로 붙인다. tokens.css는 늘 맨 앞에 붙는다"
                                   " (예: --css base.css,explore.css)")
     ap.add_argument("--js", help="base.js 대신 쓸 파일. 쉼표로 여러 개 이으면 순서대로 붙인다"
                                  " (예: --js base.js,explore-engine.js)")
@@ -62,6 +62,9 @@ def main():
     css_paths = (a.css or os.path.join(TPL, "base.css")).split(",")
     js_paths = (a.js or os.path.join(TPL, "base.js")).split(",")
     css_paths = [p if os.path.isabs(p) or os.path.dirname(p) else os.path.join(TPL, p) for p in css_paths]
+    # 디자인 토큰은 언제나 맨 앞. 색·글자·간격은 tokens.css만 정한다
+    if not any(os.path.basename(p) == "tokens.css" for p in css_paths):
+        css_paths.insert(0, os.path.join(TPL, "tokens.css"))
     js_paths = [p if os.path.isabs(p) or os.path.dirname(p) else os.path.join(TPL, p) for p in js_paths]
 
     for p in [a.content] + css_paths + js_paths:

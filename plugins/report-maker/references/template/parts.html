@@ -221,17 +221,17 @@
       <p class="sowhat">{{SO_WHAT}}</p>
 
       <div class="legend">
-        <span><i class="sw" style="background:var(--blue)"></i>계열 A</span>
+        <span><i class="sw" style="background:var(--accent)"></i>계열 A</span>
         <span><i class="sw" style="background:var(--g3)"></i>계열 B</span>
       </div>
 
       <div class="chartwrap">
         <!-- 인라인 SVG. 라이브러리를 불러오지 않는다.
-             막대는 y=0 시작. 강조 1색(--blue), 나머지는 --g1~--g5 계조.
+             막대는 y=0 시작. 강조 1색(--accent), 나머지는 --g1~--g5 계조.
              data-tip 을 두면 아래 스크립트가 툴팁을 붙인다. -->
         <svg viewBox="0 0 720 320" role="img" aria-label="{{ACTION_TITLE}}">
           <line x1="56" y1="280" x2="700" y2="280" stroke="var(--line2)"/>
-          <rect class="cell" x="80" y="120" width="52" height="160" rx="3" fill="var(--blue)"
+          <rect class="cell" x="80" y="120" width="52" height="160" rx="3" fill="var(--accent)"
                 data-tip="{{범주}}|{{지표}} 0,000|비중 00.0%"/>
           <text x="106" y="112" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--ink)">0,000</text>
           <text x="106" y="298" text-anchor="middle" font-size="12" fill="var(--sub)">{{범주}}</text>
