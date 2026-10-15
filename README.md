@@ -7,7 +7,7 @@ Claude Code / Cowork에서 쓰는 사내 스킬 묶음을 한 곳에서 배포�
 ## 설치
 
 ```
-/plugin marketplace add choiyh919/sales-strategy
+/plugin marketplace add neneungyul2/ne-claude-plugins
 /plugin install work-toolkit@ne-claude-plugins
 /plugin install report-maker@ne-claude-plugins
 /plugin install knowledge-notes@ne-claude-plugins
