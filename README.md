@@ -30,6 +30,7 @@ Claude Code / Cowork에서 쓰는 사내 스킬 묶음을 한 곳에서 배포�
 | [`report-maker`](plugins/report-maker) | 컨설팅 펌 수준의 대시보드·보고서 제작 (결정·진단·점검·조망·탐색 다섯 종류, 질문 설계 → 데이터 → 스펙 → 스토리 검사 → HTML/문서, 화면 편집, NE 디자인 토큰) | v0.14.0 |
 | [`knowledge-notes`](plugins/knowledge-notes) | 새 지식을 atomic 노트로 분해해 Obsidian vault에 축적 | v0.1.0 (파일럿) |
 | [`print-quantity`](plugins/print-quantity) | 도서 제작 수량 산출. 신간은 시장에서 역산, 기간본은 재고 소진 시점에서 역산 | v0.2.0 |
+| [`license-desk`](plugins/license-desk) | 외부 업체의 저작물 이용 건(신규·갱신·침해·후속)을 기존 계약과 표준 저작권료로 검증한 회신·계약 문서 초안과 진행 장부로 정리. 발송·날인은 사람이 한다 | v0.2.0 |
 
 ### report-maker 한눈에
 

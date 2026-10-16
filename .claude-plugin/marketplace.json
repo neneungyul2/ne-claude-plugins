@@ -6,7 +6,7 @@
   },
   "metadata": {
     "description": "NE능률 사내 Claude 플러그인 마켓플레이스",
-    "version": "0.9.0"
+    "version": "0.10.0"
   },
   "plugins": [
     {
@@ -107,7 +107,7 @@
       "name": "license-desk",
       "source": "./plugins/license-desk",
       "description": "외부 업체의 교재 저작물 이용 건(신규 문의·갱신·침해·계약 후속)을 기존 계약과 표준 저작권료로 검증한 회신·계약 문서 초안과 진행 장부로 바꾼다. 갱신은 표준가 대비 변동 여부로 자동 분기하고, 숫자는 스크립트로 계산·재검산한다. 발송·날인은 사람이 한다.",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "author": {
         "name": "choiyh",
         "email": "choiyh@neungyule.com"
